@@ -6,8 +6,9 @@ import { Inter } from "next/font/google"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Stock Market Predictor",
-  description: "Real-time stock market predictions powered by AI",
+  title: "Indian Stock Market Predictor",
+  description:
+    "NSE Nifty 50 stock predictions and historical closes powered by AI (INR)",
 }
 
 export default function RootLayout({
