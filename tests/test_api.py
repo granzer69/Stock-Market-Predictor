@@ -52,6 +52,7 @@ def test_predict_legacy_lstm(client):
     assert body["currency"] == "INR"
     assert body["symbol"] == "RELIANCE"
     assert isinstance(body["predicted_price"], float)
+    assert body.get("confidence") == RELIANCE_CONFIDENCE or "confidence" in body
 
 
 def test_symbols_list_length(client):

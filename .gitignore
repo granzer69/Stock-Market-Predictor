@@ -10,3 +10,5 @@ venv/
 frontend/node_modules/
 frontend/.next/
 frontend/.env.local
+backend/cache/
+backend/paper_trading.db
