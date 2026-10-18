@@ -1,79 +1,45 @@
-# Stock Market Predictor
+# Bharat Desk
 
-LSTM-style Keras model for **next-day close** forecasting from historical OHLCV windows, exposed via **FastAPI** and a **Next.js** UI (plus a Streamlit prototype).
+Next-day Nifty 50 forecasts from a log-return LSTM, with a paper trading book in INR. Built for research and practice. It is not investment advice, not a SEBI-registered product, and it does not send orders to a broker.
 
-## Overview
+## What it does
 
-Given recent close prices (60-day window), the model predicts the next close. The FastAPI service serves `/predict`, `/chart`, and a demo `/realtime` endpoint over a bundled top-50 stocks CSV. A Next.js frontend consumes the API; `main.py` is an alternate Streamlit upload flow.
+- Daily NSE closes for the Nifty 50, plus Nifty, Sensex, Bank Nifty, India VIX, USD/INR, Brent, gold, the S&P 500, and Nasdaq
+- A single LSTM that predicts the next session's log return, then converts that to a close
+- Holdout directional accuracy and error versus a flat forecast, shown in the UI
+- Candlesticks, volume, SMA 20/50, and a dashed next-close line
+- Paper buys and sells of whole shares at the latest close, starting from ₹10,00,000
 
-## Architecture
+Quotes refresh about every 15 minutes. History is cached for about 12 hours. `yfinance` is an unofficial source and can fail or lag the exchange.
 
-```text
-CSV / upload  →  MinMaxScaler + Keras model (.h5)
-                      │
-         ┌────────────┴────────────┐
-    FastAPI (backend/)        Streamlit (main.py)
-         │
-    Next.js frontend
-```
-
-## Tech stack
-
-- **ML**: TensorFlow / Keras, scikit-learn (`MinMaxScaler`), joblib
-- **API**: FastAPI, CORS for `localhost:3000`
-- **UI**: Next.js (TypeScript, Tailwind), Streamlit prototype
-- **Data**: `top50_stocks_data.csv`, sample CSV for demos
-
-## Features
-
-- Next-day close prediction from last 60 closes
-- Chart series endpoint for the UI
-- Symbol-based lookup against bundled historical CSV
-- Streamlit path for ad-hoc CSV upload (requires `Close` column)
-
-## Honest limitations
-
-- Trained / served on **historical CSV**, not live market feeds
-- `/realtime` **simulates** small price jitter for demo UX — not a live exchange quote
-- `confidence` returned by the API is a **placeholder random value** for UI wiring — do not treat as model calibration
-- Educational / portfolio project, not trading advice
-
-## Getting started
-
-### API
+## Run
 
 ```bash
-cd backend
-# ensure stock_predictor_model.h5 + scaler.save + top50_stocks_data.csv are present
-uvicorn main:app --reload --port 8000
+pip install -r backend/requirements.txt
+python backend/train_lstm.py
+python -m uvicorn main:app --app-dir backend --port 8000
 ```
-
-### Frontend
 
 ```bash
 cd frontend
-pnpm install   # or npm install
+pnpm install
 pnpm dev
 ```
 
-### Streamlit prototype
+Open `http://localhost:3000`.
 
-```bash
-# from repo root; place model + scaler beside main.py or adjust paths
-streamlit run main.py
-```
-
-## Project structure
+## Layout
 
 ```text
-backend/     FastAPI + model artifacts + CSV
-frontend/    Next.js app
-main.py      Streamlit upload demo
-Stock_Market_Predictor.ipynb   training / exploration notebook
+backend/universe.py       Nifty 50 and macro symbols
+backend/market_data.py    download + disk cache
+backend/features.py       return windows shared by train and inference
+backend/train_lstm.py     writes artifacts/model.keras, scaler, metrics
+backend/predictor.py      next close, signal, recent actual-vs-predicted
+backend/portfolio.py      SQLite paper book
+backend/main.py           FastAPI
+frontend/                 Next.js desk
+main.py                   older Streamlit CSV upload demo
 ```
 
-## Future improvements
-
-- Replace dummy confidence with real validation metrics
-- Wire live market data (with clear caching / rate limits)
-- Document training recipe and eval metrics in-repo
+Signals are `BUY` or `SELL` only when the predicted move is beyond 0.3%. Otherwise the hint is `HOLD`. Confidence on a name is that name's holdout directional hit rate.
