@@ -244,8 +244,20 @@ def evaluate_symbol(symbol: str, ohlcv: pd.DataFrame, macro: pd.DataFrame) -> di
 
 
 def pick_champion(pooled: dict[str, dict]) -> str:
-    skip = {"legacy_lstm_trained", "gru_reliance_sample"}
-    candidates = [k for k in pooled if k not in skip and "directional_accuracy" in pooled.get(k, {})]
+    skip = {
+        "legacy_lstm_trained",
+        "gru_reliance_sample",
+        "momentum",
+        "persistence",
+        "legacy_lstm_close",
+    }
+    candidates = [
+        k
+        for k in pooled
+        if k not in skip
+        and isinstance(pooled[k].get("directional_accuracy"), (int, float))
+        and pooled[k]["directional_accuracy"] < 0.99
+    ]
     best = None
     best_score = (-1.0, float("inf"))
     for name in candidates:

@@ -6,8 +6,8 @@ Research-grade **paper-trading** stack for Nifty 50 names: honest walk-forward e
 
 | Model | Directional accuracy | MAPE % | RMSE (₹, avg) |
 |-------|---------------------|--------|---------------|
-| MA(20) (best direction on holdout) | **~0.506** | ~3.55 | ~115 |
-| ARIMA(1,1,1) | ~0.507 | ~11.8 | ~332 |
+| ARIMA(1,1,1) (best direction on holdout) | **~0.507** | ~11.8 | ~332 |
+| MA(20) | **~0.506** | ~3.55 | ~115 |
 | **LightGBM (deployed for quantiles)** | ~0.471 | **~1.42** | **~47.5** |
 | Persistence (close, MAPE) | ~0.50 (zero-return dir.) | **~1.23** | **~42.6** |
 | Legacy 60d LSTM (trained) | — | **1.39** pooled MAPE | — |

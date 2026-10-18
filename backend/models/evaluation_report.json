@@ -72,8 +72,8 @@
       "n_samples": 221
     }
   },
-  "champion_model": "momentum",
-  "champion_directional_accuracy": 1.0,
+  "champion_model": "arima_111",
+  "champion_directional_accuracy": 0.5066,
   "production_model": "lightgbm",
   "production_note": "LightGBM deployed for quantile bands and feature-rich API; see champion_model for best holdout direction.",
   "nifty_buy_hold_benchmark": {
