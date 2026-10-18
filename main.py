@@ -42,7 +42,7 @@ if uploaded_file is not None:
         ax.plot(df['Close'], color='skyblue', linewidth=2)
         ax.set_title("Close Price Over Time", fontsize=14)
         ax.set_xlabel("Days")
-        ax.set_ylabel("Close Price (USD)")
+        ax.set_ylabel("Close Price (₹)")
         ax.grid(True)
         st.pyplot(fig)
 
@@ -58,7 +58,11 @@ if uploaded_file is not None:
         pred_price = model.predict(X_test)
         pred_price = scaler.inverse_transform(pred_price)
 
-        st.markdown(f"<h2 style='color:#FF4B4B;text-align:center;'>🚀 Predicted Next Day Price: <span style='color:#4CAF50;'>${pred_price[0][0]:.2f}</span></h2>", unsafe_allow_html=True)
+        st.markdown(
+            f"<h2 style='color:#FF4B4B;text-align:center;'>🚀 Predicted Next Day Price: "
+            f"<span style='color:#4CAF50;'>₹{pred_price[0][0]:,.2f}</span></h2>",
+            unsafe_allow_html=True,
+        )
 
 else:
     st.info("👈 Upload a CSV file to get started!")

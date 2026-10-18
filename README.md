@@ -61,6 +61,14 @@ pnpm dev
 ```bash
 # from repo root; place model + scaler beside main.py or adjust paths
 streamlit run main.py
+streamlit run main2.py   # live Yahoo .NS quotes in INR (no secrets)
+```
+
+### Tests
+
+```bash
+pip install -r requirements.txt
+pytest tests/ -q
 ```
 
 ## Project structure
@@ -68,7 +76,8 @@ streamlit run main.py
 ```text
 backend/     FastAPI + model artifacts + CSV
 frontend/    Next.js app
-main.py      Streamlit upload demo
+main.py      Streamlit upload demo (INR labels)
+main2.py     Streamlit NSE demo via yfinance (.NS, no API keys)
 Stock_Market_Predictor.ipynb   training / exploration notebook
 ```
 

@@ -1,86 +1,73 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
+"""
+Streamlit demo: NSE quotes via Yahoo Finance (.NS tickers), prices in INR.
+
+No API keys required. Optional local Keras model prediction if
+stock_predictor_model.h5 and scaler.save exist beside this file.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
 import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-import joblib
-import finnhub
-from tensorflow.keras.models import load_model
-from sklearn.preprocessing import MinMaxScaler
-import os
-import time
+import numpy as np
+import pandas as pd
+import streamlit as st
+import yfinance as yf
 
-# Set page config
-st.set_page_config(page_title="FinTech Stock Predictor", layout="wide")
+st.set_page_config(page_title="NSE Yahoo Finance Demo", layout="wide")
 
-# Load Model & Scaler
-model = load_model("stock_predictor_model.h5")
-scaler = joblib.load('scaler.save')
+st.markdown(
+    "<h1 style='text-align:center;'>🇮🇳 NSE stock snapshot (Yahoo Finance)</h1>",
+    unsafe_allow_html=True,
+)
+st.caption("Uses public Yahoo Finance data for `.NS` tickers. Not investment advice.")
 
-# Finnhub API
-api_key = 'd15h9k1r01qhqto5r8r0d15h9k1r01qhqto5r8rg'  # Replace with your actual Finnhub API key
-finnhub_client = finnhub.Client(api_key=api_key)
+symbol = st.text_input("NSE symbol", value="RELIANCE").strip().upper().replace(".NS", "")
+yahoo = f"{symbol}.NS"
 
-st.markdown("<h1 style='color:#FF4B4B;text-align:center;'>🔥 FinTech Grade Real-Time Stock Predictor 🔥</h1>", unsafe_allow_html=True)
+if st.button("Fetch & chart"):
+    hist = yf.Ticker(yahoo).history(period="3mo", auto_adjust=True)
+    if hist.empty or len(hist) < 2:
+        st.error(f"No data for {yahoo}. Check the symbol.")
+        st.stop()
 
-# User input
-ticker = st.text_input("Enter Stock Symbol (e.g., AAPL, MSFT, TSLA):", value="AAPL")
+    hist = hist.tail(60)
+    latest = float(hist["Close"].iloc[-1])
+    prev = float(hist["Close"].iloc[-2])
+    change = latest - prev
+    pct = (change / prev) * 100 if prev else 0.0
 
-if st.button("Predict Now"):
-    try:
-        end_time = int(time.time())
-        start_time = end_time - (60 * 86400)  # last 60 days in seconds
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Latest close", f"₹{latest:,.2f}", f"{change:+.2f}")
+    c2.metric("% change", f"{pct:+.2f}%")
+    c3.metric("Bars shown", str(len(hist)))
 
-        res = finnhub_client.stock_candles(ticker, 'D', start_time, end_time)
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(hist.index, hist["Close"], color="#2563eb", linewidth=2)
+    ax.set_title(f"{symbol} — last {len(hist)} closes (INR)")
+    ax.set_ylabel("Price (₹)")
+    ax.grid(True, alpha=0.3)
+    st.pyplot(fig)
 
-        if res and 'c' in res and len(res['c']) >= 60:
-            closes = res['c'][-60:]
-            highs = res['h'][-60:]
-            lows = res['l'][-60:]
-            opens = res['o'][-60:]
-            volumes = res['v'][-60:]
+    model_path = Path("stock_predictor_model.h5")
+    scaler_path = Path("scaler.save")
+    if model_path.exists() and scaler_path.exists():
+        import joblib
+        from tensorflow.keras.models import load_model
 
-            # Display real-time summary stats
-            latest_close = closes[-1]
-            prev_close = closes[-2]
-            change = latest_close - prev_close
-            pct_change = (change / prev_close) * 100
-
-            col1, col2, col3 = st.columns(3)
-            col1.metric("📈 Latest Close", f"${latest_close:.2f}", f"{change:.2f} USD")
-            col2.metric("📊 % Change", f"{pct_change:.2f}%", delta_color="normal" if pct_change >=0 else "inverse")
-            col3.metric("🕒 Volume", f"{volumes[-1]:,.0f}")
-
-            # Plot Candlestick Chart using Plotly
-            fig = go.Figure(data=[go.Candlestick(
-                x=pd.to_datetime(res['t'], unit='s'),
-                open=opens,
-                high=highs,
-                low=lows,
-                close=closes
-            )])
-            fig.update_layout(title=f"{ticker} - Last 60 Days Candlestick Chart",
-                              xaxis_title='Date', yaxis_title='Price (USD)',
-                              template='plotly_dark', width=1000, height=500)
-            st.plotly_chart(fig)
-
-            # Predict Next Day Price
-            last_60_days = np.array(closes).reshape(-1, 1)
-            last_60_days_scaled = scaler.transform(last_60_days)
-
-            X_test = np.array([last_60_days_scaled])
-            X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-
-            pred_price = model.predict(X_test)
-            pred_price = scaler.inverse_transform(pred_price)
-
-            st.markdown(f"<h2 style='color:#4CAF50;text-align:center;'>🚀 Predicted Next Close Price for {ticker}: <span style='color:#FF4B4B;'>${pred_price[0][0]:.2f}</span></h2>", unsafe_allow_html=True)
-
+        if len(hist) >= 60:
+            model = load_model(model_path)
+            scaler = joblib.load(scaler_path)
+            window = hist["Close"].values[-60:].reshape(-1, 1)
+            scaled = scaler.transform(window)
+            x = np.reshape(scaled, (1, 60, 1))
+            pred = scaler.inverse_transform(model.predict(x, verbose=0))[0][0]
+            st.success(f"Model next-close hint: ₹{float(pred):,.2f}")
         else:
-            st.error("❌ Not enough data fetched from Finnhub!")
-
-    except Exception as e:
-        st.error(f"Error: {e}")
+            st.info("Need at least 60 closes for optional model prediction.")
+    else:
+        st.info("Add stock_predictor_model.h5 and scaler.save for an optional LSTM hint.")
 
 else:
-    st.info("👈 Enter a ticker symbol & hit Predict Now!")
+    st.info("Enter an NSE symbol (e.g. RELIANCE, TCS) and click **Fetch & chart**.")
