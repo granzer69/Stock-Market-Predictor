@@ -1,88 +1,116 @@
-# Stock Market Predictor
+# Indian Stock Market Predictor
 
-LSTM-style Keras model for **next-day close** forecasting from historical OHLCV windows, exposed via **FastAPI** and a **Next.js** UI (plus a Streamlit prototype).
+LSTM Keras model for **next-session NSE close** forecasting from a 60-day adjusted-close window, exposed via **FastAPI** and a **Next.js** UI (plus Streamlit demos).
 
 ## Overview
 
-Given recent close prices (60-day window), the model predicts the next close. The FastAPI service serves `/predict`, `/chart`, and a demo `/realtime` endpoint over a bundled top-50 stocks CSV. A Next.js frontend consumes the API; `main.py` is an alternate Streamlit upload flow.
+The app targets **Nifty 50** names on NSE (Yahoo tickers `*.NS`). Historical daily data is fetched with **yfinance**, trained with **per-symbol MinMaxScalers** and a shared LSTM, then served from bundled CSV + model artifacts. The UI lists symbols from `GET /symbols`, shows prices in **INR**, and labels the quote card as **latest close** (end-of-day CSV), not a live exchange tape.
 
 ## Architecture
 
 ```text
-CSV / upload  →  MinMaxScaler + Keras model (.h5)
-                      │
-         ┌────────────┴────────────┐
-    FastAPI (backend/)        Streamlit (main.py)
-         │
-    Next.js frontend
+data/nifty50_symbols.csv  →  scripts/fetch_nifty.py  →  backend/data/nifty50_closes.csv
+                                      │
+                              scripts/train.py
+                                      │
+                    backend/models/nifty_lstm.keras + scalers.joblib + metrics.json
+                                      │
+                         FastAPI (backend/main.py)
+                                      │
+                              Next.js frontend
 ```
+
+Legacy US artifacts (`stock_predictor_model.h5`, `top50_stocks_data.csv`) remain in `backend/` for history but are **not** used by the API.
 
 ## Tech stack
 
-- **ML**: TensorFlow / Keras, scikit-learn (`MinMaxScaler`), joblib
-- **API**: FastAPI, CORS for `localhost:3000`
-- **UI**: Next.js (TypeScript, Tailwind), Streamlit prototype
-- **Data**: `top50_stocks_data.csv`, sample CSV for demos
+- **ML**: TensorFlow / Keras, scikit-learn, joblib
+- **Data**: yfinance (NSE `.NS`, `auto_adjust=True`)
+- **API**: FastAPI, CORS via `ALLOWED_ORIGINS` (default `http://localhost:3000`)
+- **UI**: Next.js (TypeScript, Tailwind, Recharts)
+- **Demos**: Streamlit upload (`main.py`), yfinance NSE ticker demo (`main2.py`, no API keys)
 
 ## Features
 
-- Next-day close prediction from last 60 closes
-- Chart series endpoint for the UI
-- Symbol-based lookup against bundled historical CSV
-- Streamlit path for ad-hoc CSV upload (requires `Close` column)
+- Nifty 50 symbol list with names and sectors
+- `GET /predict`, `/chart`, `/realtime`, `/symbols`
+- Symbol aliases: `RELIANCE`, `reliance.ns`, `RELIANCE.NS`
+- **Confidence** = `clip(1 − symbol_test_MAPE, 0, 0.99)` from `metrics.json` (error proxy, not a probability)
+- Deterministic `/realtime` from last two CSV closes
 
 ## Honest limitations
 
-- Trained / served on **historical CSV**, not live market feeds
-- `/realtime` **simulates** small price jitter for demo UX — not a live exchange quote
-- `confidence` returned by the API is a **placeholder random value** for UI wiring — do not treat as model calibration
-- Educational / portfolio project, not trading advice
+- **Not trading advice.** Educational / portfolio use only.
+- Quotes and charts are **EOD historical** data baked into `nifty50_closes.csv`, not live NSE feeds.
+- Nifty membership is **pinned** in `data/nifty50_symbols.csv`; refresh data manually when the index changes.
+- Yahoo Finance can rate-limit or return gaps; see `backend/data/fetch_report.json` after fetch.
+- CI runs **pytest without TensorFlow** (mocked model/scalers). Training and smoke tests need TensorFlow locally.
 
 ## Getting started
 
-### API
-
-```bash
-cd backend
-# ensure stock_predictor_model.h5 + scaler.save + top50_stocks_data.csv are present
-uvicorn main:app --reload --port 8000
-```
-
-### Frontend
-
-```bash
-cd frontend
-pnpm install   # or npm install
-pnpm dev
-```
-
-### Streamlit prototype
-
-```bash
-# from repo root; place model + scaler beside main.py or adjust paths
-streamlit run main.py
-streamlit run main2.py   # live Yahoo .NS quotes in INR (no secrets)
-```
-
-### Tests
+### 1. Install dependencies
 
 ```bash
 pip install -r requirements.txt
+```
+
+### 2. Data and training (first time or refresh)
+
+```bash
+python3 scripts/fetch_nifty.py
+python3 scripts/train.py
+```
+
+### 3. API
+
+```bash
+cd backend
+uvicorn main:app --reload --port 8000
+```
+
+### 4. Frontend
+
+```bash
+cd frontend
+pnpm install
+cp .env.example .env.local   # optional: NEXT_PUBLIC_API_URL
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### Streamlit
+
+```bash
+streamlit run main.py          # CSV upload (₹ labels; needs model beside app or adjust paths)
+streamlit run main2.py         # yfinance .NS demo in INR
+```
+
+### Tests and smoke
+
+```bash
 pytest tests/ -q
+python3 scripts/smoke_predict.py   # requires trained artifacts + TensorFlow
 ```
 
 ## Project structure
 
 ```text
-backend/     FastAPI + model artifacts + CSV
-frontend/    Next.js app
-main.py      Streamlit upload demo (INR labels)
-main2.py     Streamlit NSE demo via yfinance (.NS, no API keys)
-Stock_Market_Predictor.ipynb   training / exploration notebook
+data/                    Pinned Nifty 50 list
+scripts/                 fetch_nifty.py, train.py, smoke_predict.py
+backend/
+  main.py                FastAPI app
+  data/                  nifty50_closes.csv, fetch_report.json
+  models/                nifty_lstm.keras, scalers.joblib, metrics.json
+frontend/                Next.js dashboard
+tests/                   Mocked API tests (no TF in CI)
+main.py, main2.py        Streamlit demos
+Stock_Market_Predictor.ipynb   Original US notebook (reference)
 ```
 
 ## Future improvements
 
-- Replace dummy confidence with real validation metrics
-- Wire live market data (with clear caching / rate limits)
-- Document training recipe and eval metrics in-repo
+- Scheduled data refresh and GitHub Actions (pytest-only CI)
+- Docker Compose for API + frontend
+- Optional delayed live quote endpoint with caching
+- BSE `.BO` or Nifty Next 50 expansion

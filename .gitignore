@@ -7,3 +7,6 @@ venv/
 .env
 *.egg-info/
 .ipynb_checkpoints/
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
