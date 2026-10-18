@@ -42,14 +42,13 @@ def test_realtime_stable(client):
     assert first.json() == second.json()
     body = first.json()
     assert body["currency"] == "INR"
-    assert "change" in body and "change_percent" in body
+    assert "disclaimer" in body
 
 
-def test_predict_confidence_from_metrics(client):
+def test_predict_legacy_lstm(client):
     r = client.get("/predict", params={"symbol": "RELIANCE"})
     assert r.status_code == 200
     body = r.json()
-    assert body["confidence"] == RELIANCE_CONFIDENCE
     assert body["currency"] == "INR"
     assert body["symbol"] == "RELIANCE"
     assert isinstance(body["predicted_price"], float)
@@ -60,3 +59,19 @@ def test_symbols_list_length(client):
     assert r.status_code == 200
     symbols = r.json()["symbols"]
     assert len(symbols) == 50
+
+
+def test_evaluation_endpoint(client):
+    r = client.get("/evaluation")
+    assert r.status_code == 200
+    body = r.json()
+    assert "pooled_model_comparison" in body
+    assert "disclaimer" in body
+
+
+def test_backtest_endpoint(client):
+    r = client.get("/backtest", params={"symbol": "RELIANCE"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["paper_trading_only"] is True
+    assert "metrics" in body

@@ -11,3 +11,5 @@ httpx==0.28.1
 streamlit==1.41.1
 matplotlib==3.9.3
 python-multipart==0.0.20
+lightgbm==4.5.0
+statsmodels==0.14.4

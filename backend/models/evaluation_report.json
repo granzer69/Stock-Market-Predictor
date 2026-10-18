@@ -1,0 +1,4077 @@
+{
+  "generated_at": "2026-10-18T19:29:57.174939+00:00",
+  "methodology": {
+    "train_test_split": "80/19 chronological per symbol",
+    "walk_forward_folds": 1,
+    "primary_metric": "directional_accuracy",
+    "secondary_metric": "rmse",
+    "features": [
+      "return_1d",
+      "log_return_1d",
+      "rsi_14",
+      "macd",
+      "macd_signal",
+      "macd_hist",
+      "bb_pct",
+      "atr_14",
+      "volume_z",
+      "ma_ratio",
+      "nifty_ret",
+      "india_vix_ret",
+      "usd_inr_ret",
+      "crude_ret",
+      "sp500_ret"
+    ],
+    "honest_note": "Metrics are in-sample walk-forward on Yahoo EOD data. They do NOT imply superiority over professional quant models."
+  },
+  "pooled_model_comparison": {
+    "ma20": {
+      "mape_pct": 3.5496,
+      "rmse": 114.8412,
+      "directional_accuracy": 0.5061,
+      "n_symbols": 50
+    },
+    "momentum": {
+      "mape_pct": NaN,
+      "rmse": NaN,
+      "directional_accuracy": 1.0,
+      "n_symbols": 50
+    },
+    "lightgbm": {
+      "mape_pct": 1.4153,
+      "rmse": 47.4909,
+      "directional_accuracy": 0.4707,
+      "n_symbols": 50
+    },
+    "persistence": {
+      "mape_pct": 1.225,
+      "rmse": 42.6031,
+      "directional_accuracy": 0.0,
+      "n_symbols": 50
+    },
+    "legacy_lstm_close": {
+      "mape_pct": 1.225,
+      "rmse": 42.6031,
+      "directional_accuracy": 0.0,
+      "n_symbols": 50
+    },
+    "arima_111": {
+      "mape_pct": 11.8258,
+      "rmse": 332.2357,
+      "directional_accuracy": 0.5066,
+      "n_symbols": 50
+    },
+    "legacy_lstm_trained": {
+      "pooled_test_mape_pct": 1.3925,
+      "note": "60-day close LSTM; MAPE often near persistence on returns."
+    },
+    "gru_reliance_sample": {
+      "mape_pct": 1018.7255,
+      "rmse": 0.0531,
+      "directional_accuracy": 0.5251,
+      "n_samples": 221
+    }
+  },
+  "champion_model": "momentum",
+  "champion_directional_accuracy": 1.0,
+  "production_model": "lightgbm",
+  "production_note": "LightGBM deployed for quantile bands and feature-rich API; see champion_model for best holdout direction.",
+  "nifty_buy_hold_benchmark": {
+    "cagr": -0.0876,
+    "sharpe": -0.6008,
+    "max_drawdown": -0.1556
+  },
+  "per_symbol_backtests": {
+    "ADANIENT.NS": {
+      "cagr": 0.1579,
+      "buy_hold_cagr": 0.0743,
+      "sharpe": 0.6407,
+      "buy_hold_sharpe": 0.3785,
+      "max_drawdown": -0.2142,
+      "buy_hold_max_drawdown": -0.304,
+      "win_rate": 0.3091,
+      "n_days": 220
+    },
+    "ADANIPORTS.NS": {
+      "cagr": -0.2681,
+      "buy_hold_cagr": 0.2361,
+      "sharpe": -1.3108,
+      "buy_hold_sharpe": 0.8306,
+      "max_drawdown": -0.2948,
+      "buy_hold_max_drawdown": -0.1698,
+      "win_rate": 0.2773,
+      "n_days": 220
+    },
+    "APOLLOHOSP.NS": {
+      "cagr": -0.2415,
+      "buy_hold_cagr": 0.0074,
+      "sharpe": -1.4976,
+      "buy_hold_sharpe": 0.1442,
+      "max_drawdown": -0.2063,
+      "buy_hold_max_drawdown": -0.1547,
+      "win_rate": 0.2182,
+      "n_days": 220
+    },
+    "ASIANPAINT.NS": {
+      "cagr": -0.082,
+      "buy_hold_cagr": -0.0739,
+      "sharpe": -0.3731,
+      "buy_hold_sharpe": -0.1676,
+      "max_drawdown": -0.1676,
+      "buy_hold_max_drawdown": -0.2854,
+      "win_rate": 0.2182,
+      "n_days": 220
+    },
+    "AXISBANK.NS": {
+      "cagr": -0.0606,
+      "buy_hold_cagr": 0.037,
+      "sharpe": -0.2161,
+      "buy_hold_sharpe": 0.2698,
+      "max_drawdown": -0.2049,
+      "buy_hold_max_drawdown": -0.1723,
+      "win_rate": 0.3,
+      "n_days": 220
+    },
+    "BAJAJ-AUTO.NS": {
+      "cagr": -0.1703,
+      "buy_hold_cagr": 0.192,
+      "sharpe": -0.9405,
+      "buy_hold_sharpe": 0.8153,
+      "max_drawdown": -0.2191,
+      "buy_hold_max_drawdown": -0.2204,
+      "win_rate": 0.2591,
+      "n_days": 220
+    },
+    "BAJAJFINSV.NS": {
+      "cagr": -0.2019,
+      "buy_hold_cagr": -0.2131,
+      "sharpe": -1.2974,
+      "buy_hold_sharpe": -0.8079,
+      "max_drawdown": -0.2158,
+      "buy_hold_max_drawdown": -0.2297,
+      "win_rate": 0.25,
+      "n_days": 220
+    },
+    "BAJFINANCE.NS": {
+      "cagr": -0.0935,
+      "buy_hold_cagr": -0.0983,
+      "sharpe": -0.3222,
+      "buy_hold_sharpe": -0.1658,
+      "max_drawdown": -0.1589,
+      "buy_hold_max_drawdown": -0.2612,
+      "win_rate": 0.2818,
+      "n_days": 220
+    },
+    "BEL.NS": {
+      "cagr": -0.0438,
+      "buy_hold_cagr": -0.0691,
+      "sharpe": -0.0896,
+      "buy_hold_sharpe": -0.1391,
+      "max_drawdown": -0.1322,
+      "buy_hold_max_drawdown": -0.2149,
+      "win_rate": 0.3773,
+      "n_days": 220
+    },
+    "BHARTIARTL.NS": {
+      "cagr": -0.0598,
+      "buy_hold_cagr": -0.1208,
+      "sharpe": -0.2545,
+      "buy_hold_sharpe": -0.4719,
+      "max_drawdown": -0.163,
+      "buy_hold_max_drawdown": -0.1877,
+      "win_rate": 0.3,
+      "n_days": 220
+    },
+    "BPCL.NS": {
+      "cagr": -0.432,
+      "buy_hold_cagr": -0.1299,
+      "sharpe": -2.2094,
+      "buy_hold_sharpe": -0.2957,
+      "max_drawdown": -0.4174,
+      "buy_hold_max_drawdown": -0.3013,
+      "win_rate": 0.2545,
+      "n_days": 220
+    },
+    "BRITANNIA.NS": {
+      "cagr": -0.1978,
+      "buy_hold_cagr": -0.1782,
+      "sharpe": -1.5007,
+      "buy_hold_sharpe": -0.8567,
+      "max_drawdown": -0.1989,
+      "buy_hold_max_drawdown": -0.2199,
+      "win_rate": 0.2409,
+      "n_days": 220
+    },
+    "CIPLA.NS": {
+      "cagr": -0.144,
+      "buy_hold_cagr": -0.1723,
+      "sharpe": -0.9486,
+      "buy_hold_sharpe": -0.7696,
+      "max_drawdown": -0.1858,
+      "buy_hold_max_drawdown": -0.2258,
+      "win_rate": 0.25,
+      "n_days": 220
+    },
+    "COALINDIA.NS": {
+      "cagr": 0.2105,
+      "buy_hold_cagr": 0.1953,
+      "sharpe": 1.0048,
+      "buy_hold_sharpe": 0.8325,
+      "max_drawdown": -0.1067,
+      "buy_hold_max_drawdown": -0.1584,
+      "win_rate": 0.3273,
+      "n_days": 220
+    },
+    "DIVISLAB.NS": {
+      "cagr": 0.0318,
+      "buy_hold_cagr": 0.4611,
+      "sharpe": 0.2685,
+      "buy_hold_sharpe": 1.6337,
+      "max_drawdown": -0.1283,
+      "buy_hold_max_drawdown": -0.1544,
+      "win_rate": 0.2364,
+      "n_days": 220
+    },
+    "DRREDDY.NS": {
+      "cagr": -0.257,
+      "buy_hold_cagr": -0.0223,
+      "sharpe": -1.8785,
+      "buy_hold_sharpe": 0.0329,
+      "max_drawdown": -0.2806,
+      "buy_hold_max_drawdown": -0.1693,
+      "win_rate": 0.1818,
+      "n_days": 220
+    },
+    "EICHERMOT.NS": {
+      "cagr": -0.167,
+      "buy_hold_cagr": 0.0577,
+      "sharpe": -0.6319,
+      "buy_hold_sharpe": 0.3378,
+      "max_drawdown": -0.2576,
+      "buy_hold_max_drawdown": -0.1958,
+      "win_rate": 0.3091,
+      "n_days": 220
+    },
+    "GRASIM.NS": {
+      "cagr": 0.0338,
+      "buy_hold_cagr": -0.0247,
+      "sharpe": 0.2736,
+      "buy_hold_sharpe": 0.0206,
+      "max_drawdown": -0.1104,
+      "buy_hold_max_drawdown": -0.1549,
+      "win_rate": 0.3091,
+      "n_days": 220
+    },
+    "HCLTECH.NS": {
+      "cagr": -0.1374,
+      "buy_hold_cagr": -0.1073,
+      "sharpe": -0.7838,
+      "buy_hold_sharpe": -0.184,
+      "max_drawdown": -0.2047,
+      "buy_hold_max_drawdown": -0.3906,
+      "win_rate": 0.2273,
+      "n_days": 220
+    },
+    "HDFCBANK.NS": {
+      "cagr": -0.2443,
+      "buy_hold_cagr": -0.2993,
+      "sharpe": -1.6691,
+      "buy_hold_sharpe": -1.4314,
+      "max_drawdown": -0.2517,
+      "buy_hold_max_drawdown": -0.3077,
+      "win_rate": 0.2318,
+      "n_days": 220
+    },
+    "HDFCLIFE.NS": {
+      "cagr": -0.4482,
+      "buy_hold_cagr": -0.3073,
+      "sharpe": -2.8996,
+      "buy_hold_sharpe": -1.2606,
+      "max_drawdown": -0.4155,
+      "buy_hold_max_drawdown": -0.345,
+      "win_rate": 0.2682,
+      "n_days": 220
+    },
+    "HEROMOTOCO.NS": {
+      "cagr": -0.0858,
+      "buy_hold_cagr": -0.0333,
+      "sharpe": -0.389,
+      "buy_hold_sharpe": 0.02,
+      "max_drawdown": -0.2207,
+      "buy_hold_max_drawdown": -0.2334,
+      "win_rate": 0.2273,
+      "n_days": 220
+    },
+    "HINDALCO.NS": {
+      "cagr": 0.0972,
+      "buy_hold_cagr": 0.0567,
+      "sharpe": 0.6226,
+      "buy_hold_sharpe": 0.3345,
+      "max_drawdown": -0.1497,
+      "buy_hold_max_drawdown": -0.2284,
+      "win_rate": 0.2273,
+      "n_days": 220
+    },
+    "HINDUNILVR.NS": {
+      "cagr": -0.3794,
+      "buy_hold_cagr": -0.2518,
+      "sharpe": -2.5208,
+      "buy_hold_sharpe": -1.1361,
+      "max_drawdown": -0.36,
+      "buy_hold_max_drawdown": -0.2577,
+      "win_rate": 0.2091,
+      "n_days": 220
+    },
+    "ICICIBANK.NS": {
+      "cagr": -0.1254,
+      "buy_hold_cagr": 0.0257,
+      "sharpe": -0.7827,
+      "buy_hold_sharpe": 0.2257,
+      "max_drawdown": -0.1757,
+      "buy_hold_max_drawdown": -0.1608,
+      "win_rate": 0.2591,
+      "n_days": 220
+    },
+    "INDUSINDBK.NS": {
+      "cagr": -0.1,
+      "buy_hold_cagr": 0.1134,
+      "sharpe": -0.3583,
+      "buy_hold_sharpe": 0.4974,
+      "max_drawdown": -0.2195,
+      "buy_hold_max_drawdown": -0.2199,
+      "win_rate": 0.2364,
+      "n_days": 220
+    },
+    "INFY.NS": {
+      "cagr": -0.4088,
+      "buy_hold_cagr": -0.2798,
+      "sharpe": -1.9304,
+      "buy_hold_sharpe": -0.8412,
+      "max_drawdown": -0.4399,
+      "buy_hold_max_drawdown": -0.4042,
+      "win_rate": 0.2182,
+      "n_days": 220
+    },
+    "ITC.NS": {
+      "cagr": -0.1916,
+      "buy_hold_cagr": -0.3825,
+      "sharpe": -1.1992,
+      "buy_hold_sharpe": -1.7524,
+      "max_drawdown": -0.2609,
+      "buy_hold_max_drawdown": -0.3638,
+      "win_rate": 0.3,
+      "n_days": 220
+    },
+    "JSWSTEEL.NS": {
+      "cagr": -0.0599,
+      "buy_hold_cagr": -0.0026,
+      "sharpe": -0.208,
+      "buy_hold_sharpe": 0.1184,
+      "max_drawdown": -0.1146,
+      "buy_hold_max_drawdown": -0.1335,
+      "win_rate": 0.3014,
+      "n_days": 219
+    },
+    "KOTAKBANK.NS": {
+      "cagr": -0.1103,
+      "buy_hold_cagr": 0.0498,
+      "sharpe": -0.5997,
+      "buy_hold_sharpe": 0.3293,
+      "max_drawdown": -0.1981,
+      "buy_hold_max_drawdown": -0.1972,
+      "win_rate": 0.2636,
+      "n_days": 220
+    },
+    "LT.NS": {
+      "cagr": -0.1263,
+      "buy_hold_cagr": -0.0836,
+      "sharpe": -0.4851,
+      "buy_hold_sharpe": -0.1876,
+      "max_drawdown": -0.1966,
+      "buy_hold_max_drawdown": -0.2435,
+      "win_rate": 0.2818,
+      "n_days": 220
+    },
+    "M&M.NS": {
+      "cagr": 0.0199,
+      "buy_hold_cagr": -0.2054,
+      "sharpe": 0.1986,
+      "buy_hold_sharpe": -0.6733,
+      "max_drawdown": -0.2112,
+      "buy_hold_max_drawdown": -0.2665,
+      "win_rate": 0.3045,
+      "n_days": 220
+    },
+    "MARUTI.NS": {
+      "cagr": -0.0527,
+      "buy_hold_cagr": -0.3176,
+      "sharpe": -0.1952,
+      "buy_hold_sharpe": -1.3852,
+      "max_drawdown": -0.1437,
+      "buy_hold_max_drawdown": -0.3471,
+      "win_rate": 0.2818,
+      "n_days": 220
+    },
+    "NESTLEIND.NS": {
+      "cagr": -0.1139,
+      "buy_hold_cagr": 0.0143,
+      "sharpe": -0.7429,
+      "buy_hold_sharpe": 0.1764,
+      "max_drawdown": -0.1182,
+      "buy_hold_max_drawdown": -0.1716,
+      "win_rate": 0.1818,
+      "n_days": 220
+    },
+    "NTPC.NS": {
+      "cagr": -0.2804,
+      "buy_hold_cagr": -0.0798,
+      "sharpe": -2.3539,
+      "buy_hold_sharpe": -0.2974,
+      "max_drawdown": -0.2645,
+      "buy_hold_max_drawdown": -0.2368,
+      "win_rate": 0.1909,
+      "n_days": 220
+    },
+    "ONGC.NS": {
+      "cagr": 0.263,
+      "buy_hold_cagr": -0.085,
+      "sharpe": 1.2466,
+      "buy_hold_sharpe": -0.2285,
+      "max_drawdown": -0.1036,
+      "buy_hold_max_drawdown": -0.2676,
+      "win_rate": 0.3318,
+      "n_days": 220
+    },
+    "POWERGRID.NS": {
+      "cagr": -0.1682,
+      "buy_hold_cagr": -0.1431,
+      "sharpe": -1.0849,
+      "buy_hold_sharpe": -0.6055,
+      "max_drawdown": -0.1704,
+      "buy_hold_max_drawdown": -0.2341,
+      "win_rate": 0.3318,
+      "n_days": 220
+    },
+    "RELIANCE.NS": {
+      "cagr": -0.1164,
+      "buy_hold_cagr": -0.2128,
+      "sharpe": -0.646,
+      "buy_hold_sharpe": -0.9719,
+      "max_drawdown": -0.1627,
+      "buy_hold_max_drawdown": -0.2622,
+      "win_rate": 0.2727,
+      "n_days": 220
+    },
+    "SBILIFE.NS": {
+      "cagr": -0.0336,
+      "buy_hold_cagr": -0.1759,
+      "sharpe": -0.1522,
+      "buy_hold_sharpe": -0.7463,
+      "max_drawdown": -0.1097,
+      "buy_hold_max_drawdown": -0.2168,
+      "win_rate": 0.2727,
+      "n_days": 220
+    },
+    "SBIN.NS": {
+      "cagr": -0.16,
+      "buy_hold_cagr": 0.0459,
+      "sharpe": -0.9379,
+      "buy_hold_sharpe": 0.3051,
+      "max_drawdown": -0.1589,
+      "buy_hold_max_drawdown": -0.2211,
+      "win_rate": 0.2455,
+      "n_days": 220
+    },
+    "SHRIRAMFIN.NS": {
+      "cagr": 0.2444,
+      "buy_hold_cagr": 0.3424,
+      "sharpe": 0.9354,
+      "buy_hold_sharpe": 0.9611,
+      "max_drawdown": -0.1533,
+      "buy_hold_max_drawdown": -0.2105,
+      "win_rate": 0.2091,
+      "n_days": 220
+    },
+    "SUNPHARMA.NS": {
+      "cagr": -0.0809,
+      "buy_hold_cagr": 0.043,
+      "sharpe": -0.4332,
+      "buy_hold_sharpe": 0.3059,
+      "max_drawdown": -0.1425,
+      "buy_hold_max_drawdown": -0.1273,
+      "win_rate": 0.25,
+      "n_days": 220
+    },
+    "TATASTEEL.NS": {
+      "cagr": -0.1195,
+      "buy_hold_cagr": -0.0318,
+      "sharpe": -0.5166,
+      "buy_hold_sharpe": 0.0167,
+      "max_drawdown": -0.1621,
+      "buy_hold_max_drawdown": -0.2063,
+      "win_rate": 0.2682,
+      "n_days": 220
+    },
+    "TCS.NS": {
+      "cagr": -0.3403,
+      "buy_hold_cagr": -0.2236,
+      "sharpe": -1.7759,
+      "buy_hold_sharpe": -0.6534,
+      "max_drawdown": -0.3368,
+      "buy_hold_max_drawdown": -0.3846,
+      "win_rate": 0.2182,
+      "n_days": 220
+    },
+    "TECHM.NS": {
+      "cagr": -0.1981,
+      "buy_hold_cagr": 0.192,
+      "sharpe": -1.0289,
+      "buy_hold_sharpe": 0.7308,
+      "max_drawdown": -0.2905,
+      "buy_hold_max_drawdown": -0.2469,
+      "win_rate": 0.2409,
+      "n_days": 220
+    },
+    "TITAN.NS": {
+      "cagr": -0.0453,
+      "buy_hold_cagr": 0.2236,
+      "sharpe": -0.1948,
+      "buy_hold_sharpe": 0.9389,
+      "max_drawdown": -0.1132,
+      "buy_hold_max_drawdown": -0.1566,
+      "win_rate": 0.1818,
+      "n_days": 220
+    },
+    "TMPV.NS": {
+      "cagr": -0.2045,
+      "buy_hold_cagr": -0.3315,
+      "sharpe": -0.7478,
+      "buy_hold_sharpe": -1.0331,
+      "max_drawdown": -0.276,
+      "buy_hold_max_drawdown": -0.3399,
+      "win_rate": 0.2591,
+      "n_days": 220
+    },
+    "TRENT.NS": {
+      "cagr": -0.2019,
+      "buy_hold_cagr": -0.4239,
+      "sharpe": -0.2572,
+      "buy_hold_sharpe": -0.8386,
+      "max_drawdown": -0.5067,
+      "buy_hold_max_drawdown": -0.5369,
+      "win_rate": 0.2818,
+      "n_days": 220
+    },
+    "ULTRACEMCO.NS": {
+      "cagr": -0.1191,
+      "buy_hold_cagr": -0.0869,
+      "sharpe": -0.6813,
+      "buy_hold_sharpe": -0.2442,
+      "max_drawdown": -0.1379,
+      "buy_hold_max_drawdown": -0.2061,
+      "win_rate": 0.2318,
+      "n_days": 220
+    },
+    "WIPRO.NS": {
+      "cagr": -0.1043,
+      "buy_hold_cagr": -0.2858,
+      "sharpe": -0.535,
+      "buy_hold_sharpe": -1.1341,
+      "max_drawdown": -0.1939,
+      "buy_hold_max_drawdown": -0.4034,
+      "win_rate": 0.2591,
+      "n_days": 220
+    }
+  },
+  "per_symbol_sample": [
+    {
+      "symbol": "ADANIENT.NS",
+      "models": {
+        "persistence": {
+          "mape_pct": 1.7009,
+          "rmse": 62.0335,
+          "directional_accuracy": 0.0,
+          "n_samples": 221,
+          "directional_note": "Zero-return forecast; ~50% is random-walk expectation."
+        },
+        "momentum": {
+          "directional_accuracy": 1.0,
+          "n_samples": 221
+        },
+        "ma20": {
+          "mape_pct": 5.1651,
+          "rmse": 155.8139,
+          "directional_accuracy": 0.4682,
+          "n_samples": 221
+        },
+        "arima_111": {
+          "mape_pct": 14.8918,
+          "rmse": 415.3612,
+          "directional_accuracy": 0.4955,
+          "n_samples": 221
+        },
+        "legacy_lstm_close": {
+          "mape_pct": 1.7009,
+          "rmse": 62.0335,
+          "directional_accuracy": 0.0,
+          "n_samples": 221,
+          "directional_note": "Zero-return forecast; ~50% is random-walk expectation."
+        },
+        "lightgbm": {
+          "mape_pct": 1.9258,
+          "rmse": 71.8457,
+          "directional_accuracy": 0.5,
+          "n_samples": 221,
+          "directional_accuracy_return": 0.4977
+        }
+      },
+      "backtest_lightgbm": {
+        "cagr": 0.1579,
+        "buy_hold_cagr": 0.0743,
+        "sharpe": 0.6407,
+        "buy_hold_sharpe": 0.3785,
+        "max_drawdown": -0.2142,
+        "buy_hold_max_drawdown": -0.304,
+        "win_rate": 0.3091,
+        "n_days": 220,
+        "start_date": "2025-10-30",
+        "end_date": "2026-10-15",
+        "equity_curve": [
+          {
+            "date": "2025-10-30",
+            "strategy": 0.9943618844121097,
+            "buy_hold": 0.9958618844121097
+          },
+          {
+            "date": "2025-10-31",
+            "strategy": 0.9928703415854916,
+            "buy_hold": 0.9777725369625871
+          },
+          {
+            "date": "2025-11-03",
+            "strategy": 0.9857784181564807,
+            "buy_hold": 0.9722551136853139
+          },
+          {
+            "date": "2025-11-04",
+            "strategy": 0.96691794384888,
+            "buy_hold": 0.9536533749432669
+          },
+          {
+            "date": "2025-11-06",
+            "strategy": 0.9654675669331066,
+            "buy_hold": 0.91207546388835
+          },
+          {
+            "date": "2025-11-07",
+            "strategy": 0.9870056187091056,
+            "buy_hold": 0.9337905356332383
+          },
+          {
+            "date": "2025-11-10",
+            "strategy": 0.9855251102810421,
+            "buy_hold": 0.9057926783779634
+          },
+          {
+            "date": "2025-11-11",
+            "strategy": 0.98242555346422,
+            "buy_hold": 0.9043025755772343
+          },
+          {
+            "date": "2025-11-12",
+            "strategy": 0.9809519151340237,
+            "buy_hold": 0.9492731657801934
+          },
+          {
+            "date": "2025-11-13",
+            "strategy": 0.9809519151340237,
+            "buy_hold": 0.9506868382434691
+          },
+          {
+            "date": "2025-11-14",
+            "strategy": 0.9809519151340237,
+            "buy_hold": 0.961614258782149
+          },
+          {
+            "date": "2025-11-17",
+            "strategy": 0.9809519151340237,
+            "buy_hold": 0.9702845778691818
+          },
+          {
+            "date": "2025-11-18",
+            "strategy": 0.9809519151340237,
+            "buy_hold": 0.9603531582141676
+          },
+          {
+            "date": "2025-11-19",
+            "strategy": 0.9779910667801792,
+            "buy_hold": 0.9588950136905601
+          },
+          {
+            "date": "2025-11-20",
+            "strategy": 0.9832164315474886,
+            "buy_hold": 0.9640183490565809
+          },
+          {
+            "date": "2025-11-21",
+            "strategy": 0.9817416069001674,
+            "buy_hold": 0.9546386909812682
+          },
+          {
+            "date": "2025-11-24",
+            "strategy": 0.9709066550750759,
+            "buy_hold": 0.9455348174359354
+          },
+          {
+            "date": "2025-11-25",
+            "strategy": 0.9694502950924634,
+            "buy_hold": 0.9194056530534352
+          },
+          {
+            "date": "2025-11-26",
+            "strategy": 0.9605577330872754,
+            "buy_hold": 0.9123512484183299
+          },
+          {
+            "date": "2025-12-01",
+            "strategy": 0.9385665599412536,
+            "buy_hold": 0.891463722783123
+          },
+          {
+            "date": "2025-12-02",
+            "strategy": 0.9371587101013418,
+            "buy_hold": 0.8826358262875117
+          },
+          {
+            "date": "2025-12-03",
+            "strategy": 0.9371587101013418,
+            "buy_hold": 0.8630094012202862
+          },
+          {
+            "date": "2025-12-04",
+            "strategy": 0.9371587101013418,
+            "buy_hold": 0.8740837143218804
+          },
+          {
+            "date": "2025-12-05",
+            "strategy": 0.9558237730717255,
+            "buy_hold": 0.892803660185329
+          },
+          {
+            "date": "2025-12-08",
+            "strategy": 0.9543900374121179,
+            "buy_hold": 0.8734137456207773
+          },
+          {
+            "date": "2025-12-09",
+            "strategy": 0.9543900374121179,
+            "buy_hold": 0.8848427763464469
+          },
+          {
+            "date": "2025-12-10",
+            "strategy": 0.9543900374121179,
+            "buy_hold": 0.8716009797329655
+          },
+          {
+            "date": "2025-12-11",
+            "strategy": 0.9543900374121179,
+            "buy_hold": 0.8976512110213701
+          },
+          {
+            "date": "2025-12-12",
+            "strategy": 0.9549277608815131,
+            "buy_hold": 0.8995034434562299
+          },
+          {
+            "date": "2025-12-15",
+            "strategy": 0.9534633627914394,
+            "buy_hold": 0.8981240395069762
+          },
+          {
+            "date": "2025-12-16",
+            "strategy": 0.9520331677472523,
+            "buy_hold": 0.8859068329588022
+          },
+          {
+            "date": "2025-12-17",
+            "strategy": 0.9440829137749784,
+            "buy_hold": 0.8798376481018275
+          },
+          {
+            "date": "2025-12-18",
+            "strategy": 0.942666789404316,
+            "buy_hold": 0.8785765475338462
+          },
+          {
+            "date": "2025-12-19",
+            "strategy": 0.945354420072882,
+            "buy_hold": 0.8823993157848381
+          },
+          {
+            "date": "2025-12-22",
+            "strategy": 0.9556989400433483,
+            "buy_hold": 0.8920549509098724
+          },
+          {
+            "date": "2025-12-23",
+            "strategy": 0.9494922074355551,
+            "buy_hold": 0.8862615505828776
+          },
+          {
+            "date": "2025-12-24",
+            "strategy": 0.9480679691244018,
+            "buy_hold": 0.875975413303788
+          },
+          {
+            "date": "2025-12-26",
+            "strategy": 0.9480679691244018,
+            "buy_hold": 0.8788129617766492
+          },
+          {
+            "date": "2025-12-29",
+            "strategy": 0.9480679691244018,
+            "buy_hold": 0.8682904102547566
+          },
+          {
+            "date": "2025-12-30",
+            "strategy": 0.9515944844954531,
+            "buy_hold": 0.8728226137538991
+          },
+          {
+            "date": "2025-12-31",
+            "strategy": 0.95016709276871,
+            "buy_hold": 0.8826751965746888
+          },
+          {
+            "date": "2026-01-05",
+            "strategy": 0.9656265430140751,
+            "buy_hold": 0.8983605500096502
+          },
+          {
+            "date": "2026-01-06",
+            "strategy": 0.9569849405648122,
+            "buy_hold": 0.8903209255964143
+          },
+          {
+            "date": "2026-01-07",
+            "strategy": 0.9633390843580849,
+            "buy_hold": 0.8962324367849398
+          },
+          {
+            "date": "2026-01-08",
+            "strategy": 0.9378798805905366,
+            "buy_hold": 0.8725467329640486
+          },
+          {
+            "date": "2026-01-09",
+            "strategy": 0.9123360404388469,
+            "buy_hold": 0.8487822885688037
+          },
+          {
+            "date": "2026-01-12",
+            "strategy": 0.9199187568791808,
+            "buy_hold": 0.85583678946378
+          },
+          {
+            "date": "2026-01-13",
+            "strategy": 0.9143693830074883,
+            "buy_hold": 0.8506739875507113
+          },
+          {
+            "date": "2026-01-14",
+            "strategy": 0.9129978289329771,
+            "buy_hold": 0.8486246149003547
+          },
+          {
+            "date": "2026-01-21",
+            "strategy": 0.9129978289329771,
+            "buy_hold": 0.8008985858943678
+          },
+          {
+            "date": "2026-01-22",
+            "strategy": 0.935978537279298,
+            "buy_hold": 0.8222590362750516
+          },
+          {
+            "date": "2026-01-23",
+            "strategy": 0.836297533912184,
+            "buy_hold": 0.7346890733976708
+          },
+          {
+            "date": "2026-01-27",
+            "strategy": 0.8790500217788535,
+            "buy_hold": 0.772247220375905
+          },
+          {
+            "date": "2026-01-28",
+            "strategy": 0.8948410419830473,
+            "buy_hold": 0.786119663533248
+          },
+          {
+            "date": "2026-01-29",
+            "strategy": 0.9058319545117799,
+            "buy_hold": 0.7957752023984115
+          },
+          {
+            "date": "2026-01-30",
+            "strategy": 0.9063703401549547,
+            "buy_hold": 0.7962481752738237
+          },
+          {
+            "date": "2026-02-02",
+            "strategy": 0.8951551322336141,
+            "buy_hold": 0.7863955924530341
+          },
+          {
+            "date": "2026-02-03",
+            "strategy": 0.8938123995352637,
+            "buy_hold": 0.8680539960119542
+          },
+          {
+            "date": "2026-02-04",
+            "strategy": 0.8938123995352637,
+            "buy_hold": 0.8781429930755468
+          },
+          {
+            "date": "2026-02-05",
+            "strategy": 0.8958413235482451,
+            "buy_hold": 0.8814535625537556
+          },
+          {
+            "date": "2026-02-06",
+            "strategy": 0.8917557012219838,
+            "buy_hold": 0.877433557827396
+          },
+          {
+            "date": "2026-02-09",
+            "strategy": 0.8904180676701509,
+            "buy_hold": 0.8867739418754027
+          },
+          {
+            "date": "2026-02-10",
+            "strategy": 0.8804951843905585,
+            "buy_hold": 0.8782218299097713
+          },
+          {
+            "date": "2026-02-11",
+            "strategy": 0.8828659291545227,
+            "buy_hold": 0.8805864536371557
+          },
+          {
+            "date": "2026-02-12",
+            "strategy": 0.8739361399617659,
+            "buy_hold": 0.8716797203073198
+          },
+          {
+            "date": "2026-02-13",
+            "strategy": 0.8442228377564317,
+            "buy_hold": 0.8420431350107263
+          },
+          {
+            "date": "2026-02-18",
+            "strategy": 0.8736990172308454,
+            "buy_hold": 0.8714432098046458
+          },
+          {
+            "date": "2026-02-19",
+            "strategy": 0.8723884687049992,
+            "buy_hold": 0.8499645523025606
+          },
+          {
+            "date": "2026-02-20",
+            "strategy": 0.872738431797124,
+            "buy_hold": 0.8515804667544883
+          },
+          {
+            "date": "2026-02-23",
+            "strategy": 0.8714293241494283,
+            "buy_hold": 0.8634823259657638
+          },
+          {
+            "date": "2026-02-24",
+            "strategy": 0.8714293241494283,
+            "buy_hold": 0.8603295264158749
+          },
+          {
+            "date": "2026-02-25",
+            "strategy": 0.8714293241494283,
+            "buy_hold": 0.8795223970248004
+          },
+          {
+            "date": "2026-02-26",
+            "strategy": 0.8641478499436667,
+            "buy_hold": 0.8734925824550026
+          },
+          {
+            "date": "2026-02-27",
+            "strategy": 0.8628516281687512,
+            "buy_hold": 0.8519745546657405
+          },
+          {
+            "date": "2026-03-02",
+            "strategy": 0.8467095123533446,
+            "buy_hold": 0.8373138875559575
+          },
+          {
+            "date": "2026-03-04",
+            "strategy": 0.827540342745329,
+            "buy_hold": 0.818357431189835
+          },
+          {
+            "date": "2026-03-05",
+            "strategy": 0.8326016342851572,
+            "buy_hold": 0.8233625594344545
+          },
+          {
+            "date": "2026-03-06",
+            "strategy": 0.8313527318337295,
+            "buy_hold": 0.8039332264527905
+          },
+          {
+            "date": "2026-03-09",
+            "strategy": 0.8135185578650356,
+            "buy_hold": 0.7878931553937539
+          },
+          {
+            "date": "2026-03-10",
+            "strategy": 0.8124198939220325,
+            "buy_hold": 0.7868290987813986
+          },
+          {
+            "date": "2026-03-11",
+            "strategy": 0.8112012640811495,
+            "buy_hold": 0.778237568398655
+          },
+          {
+            "date": "2026-03-12",
+            "strategy": 0.8211992442375242,
+            "buy_hold": 0.7889966304232214
+          },
+          {
+            "date": "2026-03-13",
+            "strategy": 0.8044224990079362,
+            "buy_hold": 0.7728777706598956
+          },
+          {
+            "date": "2026-03-16",
+            "strategy": 0.8113547042587284,
+            "buy_hold": 0.779538135513684
+          },
+          {
+            "date": "2026-03-17",
+            "strategy": 0.8102882458239198,
+            "buy_hold": 0.7785134973184411
+          },
+          {
+            "date": "2026-03-18",
+            "strategy": 0.8233322112014828,
+            "buy_hold": 0.7910459549436427
+          },
+          {
+            "date": "2026-03-19",
+            "strategy": 0.8220972128846806,
+            "buy_hold": 0.7633010686289567
+          },
+          {
+            "date": "2026-03-20",
+            "strategy": 0.816746783831655,
+            "buy_hold": 0.7594782522480296
+          },
+          {
+            "date": "2026-03-23",
+            "strategy": 0.8155216636559076,
+            "buy_hold": 0.7223930300152722
+          },
+          {
+            "date": "2026-03-24",
+            "strategy": 0.8075802221228271,
+            "buy_hold": 0.716442052279699
+          },
+          {
+            "date": "2026-03-25",
+            "strategy": 0.8380993782493332,
+            "buy_hold": 0.7435170180232176
+          },
+          {
+            "date": "2026-03-27",
+            "strategy": 0.8098458614456101,
+            "buy_hold": 0.7184520065129435
+          },
+          {
+            "date": "2026-03-30",
+            "strategy": 0.7813258020305311,
+            "buy_hold": 0.693150532629931
+          },
+          {
+            "date": "2026-04-01",
+            "strategy": 0.8185084691884181,
+            "buy_hold": 0.7261370095619748
+          },
+          {
+            "date": "2026-04-02",
+            "strategy": 0.8148213054400811,
+            "buy_hold": 0.722865954760749
+          },
+          {
+            "date": "2026-04-06",
+            "strategy": 0.8450294861445862,
+            "buy_hold": 0.7496650397144168
+          },
+          {
+            "date": "2026-04-07",
+            "strategy": 0.8361002815379062,
+            "buy_hold": 0.7417435261627114
+          },
+          {
+            "date": "2026-04-08",
+            "strategy": 0.9079335966770895,
+            "buy_hold": 0.8054702078106227
+          },
+          {
+            "date": "2026-04-09",
+            "strategy": 0.9064675851883741,
+            "buy_hold": 0.8041696406955936
+          },
+          {
+            "date": "2026-04-10",
+            "strategy": 0.9270358533259382,
+            "buy_hold": 0.8224167099435009
+          },
+          {
+            "date": "2026-04-13",
+            "strategy": 0.9457827017421404,
+            "buy_hold": 0.839047912869416
+          },
+          {
+            "date": "2026-04-15",
+            "strategy": 0.9526239440161025,
+            "buy_hold": 0.8451170977263907
+          },
+          {
+            "date": "2026-04-16",
+            "strategy": 0.9789672297296892,
+            "buy_hold": 0.8684874542103833
+          },
+          {
+            "date": "2026-04-17",
+            "strategy": 0.985453118023521,
+            "buy_hold": 0.8742413879903304
+          },
+          {
+            "date": "2026-04-20",
+            "strategy": 0.9904731033336696,
+            "buy_hold": 0.8786948509151192
+          },
+          {
+            "date": "2026-04-21",
+            "strategy": 0.9888737391605021,
+            "buy_hold": 0.8772759804188177
+          },
+          {
+            "date": "2026-04-22",
+            "strategy": 0.9873904285517614,
+            "buy_hold": 0.8909907980376469
+          },
+          {
+            "date": "2026-04-23",
+            "strategy": 0.9873904285517614,
+            "buy_hold": 0.9064397372298051
+          },
+          {
+            "date": "2026-04-24",
+            "strategy": 0.9805859894150771,
+            "buy_hold": 0.9015528161065872
+          },
+          {
+            "date": "2026-04-27",
+            "strategy": 0.9952459552807416,
+            "buy_hold": 0.9150312194826135
+          },
+          {
+            "date": "2026-04-28",
+            "strategy": 0.9937530863478204,
+            "buy_hold": 0.9507369896361817
+          },
+          {
+            "date": "2026-04-29",
+            "strategy": 0.9978235566113945,
+            "buy_hold": 0.9560573689578287
+          },
+          {
+            "date": "2026-04-30",
+            "strategy": 0.9906254355613899,
+            "buy_hold": 0.9491605417313017
+          },
+          {
+            "date": "2026-05-04",
+            "strategy": 1.0224206196545322,
+            "buy_hold": 0.9796248656573183
+          },
+          {
+            "date": "2026-05-05",
+            "strategy": 1.0126722933687455,
+            "buy_hold": 0.9702845778691824
+          },
+          {
+            "date": "2026-05-06",
+            "strategy": 1.0448787814421625,
+            "buy_hold": 1.0011429897064512
+          },
+          {
+            "date": "2026-05-07",
+            "strategy": 1.0339376334275527,
+            "buy_hold": 0.9906598084717354
+          },
+          {
+            "date": "2026-05-08",
+            "strategy": 1.0323867269774114,
+            "buy_hold": 0.9875857494962004
+          },
+          {
+            "date": "2026-05-11",
+            "strategy": 1.0323867269774114,
+            "buy_hold": 0.9853393328902175
+          },
+          {
+            "date": "2026-05-12",
+            "strategy": 0.9916105975665056,
+            "buy_hold": 0.9478994411633201
+          },
+          {
+            "date": "2026-05-13",
+            "strategy": 1.0298699876395592,
+            "buy_hold": 0.9844723202334883
+          },
+          {
+            "date": "2026-05-14",
+            "strategy": 1.1184684915670455,
+            "buy_hold": 1.0691653162208956
+          },
+          {
+            "date": "2026-05-15",
+            "strategy": 1.11974656035916,
+            "buy_hold": 1.0703870465017002
+          },
+          {
+            "date": "2026-05-18",
+            "strategy": 1.1180669405186214,
+            "buy_hold": 1.0600615389354338
+          },
+          {
+            "date": "2026-05-19",
+            "strategy": 1.1310214188617667,
+            "buy_hold": 1.073934030222712
+          },
+          {
+            "date": "2026-05-20",
+            "strategy": 1.1226373562643845,
+            "buy_hold": 1.06597314638383
+          },
+          {
+            "date": "2026-05-21",
+            "strategy": 1.1196489714944198,
+            "buy_hold": 1.063135597910969
+          },
+          {
+            "date": "2026-05-22",
+            "strategy": 1.1278255158197308,
+            "buy_hold": 1.070899437794225
+          },
+          {
+            "date": "2026-05-27",
+            "strategy": 1.2339963041144497,
+            "buy_hold": 1.1717113416748934
+          },
+          {
+            "date": "2026-05-29",
+            "strategy": 1.2191787695757301,
+            "buy_hold": 1.157641710172118
+          },
+          {
+            "date": "2026-06-01",
+            "strategy": 1.2075572394558285,
+            "buy_hold": 1.1466067673577007
+          },
+          {
+            "date": "2026-06-02",
+            "strategy": 1.2319210200169548,
+            "buy_hold": 1.1697408058587613
+          },
+          {
+            "date": "2026-06-03",
+            "strategy": 1.2300731384869295,
+            "buy_hold": 1.1529912995515739
+          },
+          {
+            "date": "2026-06-04",
+            "strategy": 1.2480733642684114,
+            "buy_hold": 1.1715930382936208
+          },
+          {
+            "date": "2026-06-05",
+            "strategy": 1.279728577006345,
+            "buy_hold": 1.201308460424439
+          },
+          {
+            "date": "2026-06-08",
+            "strategy": 1.2468978043110819,
+            "buy_hold": 1.1704895151342178
+          },
+          {
+            "date": "2026-06-09",
+            "strategy": 1.2510541019550532,
+            "buy_hold": 1.1743911202194344
+          },
+          {
+            "date": "2026-06-10",
+            "strategy": 1.2491775208021207,
+            "buy_hold": 1.155158879323332
+          },
+          {
+            "date": "2026-06-11",
+            "strategy": 1.23779992818407,
+            "buy_hold": 1.1463703531148977
+          },
+          {
+            "date": "2026-06-12",
+            "strategy": 1.243802714036622,
+            "buy_hold": 1.1519297456958606
+          },
+          {
+            "date": "2026-06-15",
+            "strategy": 1.2527003572421758,
+            "buy_hold": 1.1601701681996857
+          },
+          {
+            "date": "2026-06-16",
+            "strategy": 1.2531686980160028,
+            "buy_hold": 1.1606039151777274
+          },
+          {
+            "date": "2026-06-17",
+            "strategy": 1.2512889449689788,
+            "buy_hold": 1.1638763657470803
+          },
+          {
+            "date": "2026-06-18",
+            "strategy": 1.2512889449689788,
+            "buy_hold": 1.1881246122532079
+          },
+          {
+            "date": "2026-06-23",
+            "strategy": 1.228442311621627,
+            "buy_hold": 1.1682134504880137
+          },
+          {
+            "date": "2026-06-24",
+            "strategy": 1.272722477401086,
+            "buy_hold": 1.210322619770141
+          },
+          {
+            "date": "2026-06-25",
+            "strategy": 1.2595794207405937,
+            "buy_hold": 1.1978239493596072
+          },
+          {
+            "date": "2026-06-29",
+            "strategy": 1.2282765088689958,
+            "buy_hold": 1.1680557768195643
+          },
+          {
+            "date": "2026-06-30",
+            "strategy": 1.2264340941056924,
+            "buy_hold": 1.1970353884976193
+          },
+          {
+            "date": "2026-07-01",
+            "strategy": 1.2680609871986337,
+            "buy_hold": 1.239460001376516
+          },
+          {
+            "date": "2026-07-02",
+            "strategy": 1.2817354821396416,
+            "buy_hold": 1.2528260694832623
+          },
+          {
+            "date": "2026-07-07",
+            "strategy": 1.2798128789164323,
+            "buy_hold": 1.2251081359324136
+          },
+          {
+            "date": "2026-07-08",
+            "strategy": 1.2530563997170534,
+            "buy_hold": 1.2013330066915044
+          },
+          {
+            "date": "2026-07-09",
+            "strategy": 1.2681495816662929,
+            "buy_hold": 1.215803175516879
+          },
+          {
+            "date": "2026-07-10",
+            "strategy": 1.298459141689487,
+            "buy_hold": 1.2448616240291586
+          },
+          {
+            "date": "2026-07-13",
+            "strategy": 1.3067664963454177,
+            "buy_hold": 1.2528260694832623
+          },
+          {
+            "date": "2026-07-14",
+            "strategy": 1.3048063466008997,
+            "buy_hold": 1.2573208278926449
+          },
+          {
+            "date": "2026-07-15",
+            "strategy": 1.2871779558711098,
+            "buy_hold": 1.2422199643934735
+          },
+          {
+            "date": "2026-07-16",
+            "strategy": 1.2852471889373032,
+            "buy_hold": 1.2425353117303721
+          },
+          {
+            "date": "2026-07-17",
+            "strategy": 1.2852471889373032,
+            "buy_hold": 1.24620213899059
+          },
+          {
+            "date": "2026-07-20",
+            "strategy": 1.2925092800076423,
+            "buy_hold": 1.2551129152350013
+          },
+          {
+            "date": "2026-07-21",
+            "strategy": 1.2922656234946788,
+            "buy_hold": 1.2548763084724566
+          },
+          {
+            "date": "2026-07-22",
+            "strategy": 1.2903272250594369,
+            "buy_hold": 1.2410764933876683
+          },
+          {
+            "date": "2026-07-23",
+            "strategy": 1.2903272250594369,
+            "buy_hold": 1.1867840972917763
+          },
+          {
+            "date": "2026-07-24",
+            "strategy": 1.2954220466744912,
+            "buy_hold": 1.1932502578561288
+          },
+          {
+            "date": "2026-07-27",
+            "strategy": 1.2997881444522388,
+            "buy_hold": 1.1972719952601638
+          },
+          {
+            "date": "2026-07-28",
+            "strategy": 1.2978384622355605,
+            "buy_hold": 1.1837481572250972
+          },
+          {
+            "date": "2026-07-29",
+            "strategy": 1.2978384622355605,
+            "buy_hold": 1.1925011635411886
+          },
+          {
+            "date": "2026-07-30",
+            "strategy": 1.2978384622355605,
+            "buy_hold": 1.202200500647588
+          },
+          {
+            "date": "2026-07-31",
+            "strategy": 1.2790360657633848,
+            "buy_hold": 1.1865869570762795
+          },
+          {
+            "date": "2026-08-03",
+            "strategy": 1.3038985378840553,
+            "buy_hold": 1.2096523622894253
+          },
+          {
+            "date": "2026-08-04",
+            "strategy": 1.2962485464623104,
+            "buy_hold": 1.2025553145315342
+          },
+          {
+            "date": "2026-08-05",
+            "strategy": 1.2962485464623104,
+            "buy_hold": 1.2025553145315342
+          },
+          {
+            "date": "2026-08-06",
+            "strategy": 1.286048557899984,
+            "buy_hold": 1.1930925841876796
+          },
+          {
+            "date": "2026-08-07",
+            "strategy": 1.2834985607594025,
+            "buy_hold": 1.190726901601716
+          },
+          {
+            "date": "2026-08-10",
+            "strategy": 1.2792485655250998,
+            "buy_hold": 1.1867840972917765
+          },
+          {
+            "date": "2026-08-11",
+            "strategy": 1.273086072435361,
+            "buy_hold": 1.1810670310423643
+          },
+          {
+            "date": "2026-08-12",
+            "strategy": 1.2689210563538145,
+            "buy_hold": 1.1772030635666495
+          },
+          {
+            "date": "2026-08-13",
+            "strategy": 1.2670176747692838,
+            "buy_hold": 1.1690020113500013
+          },
+          {
+            "date": "2026-08-14",
+            "strategy": 1.2670176747692838,
+            "buy_hold": 1.1966805746136728
+          },
+          {
+            "date": "2026-08-17",
+            "strategy": 1.2535118792078872,
+            "buy_hold": 1.185719559380067
+          },
+          {
+            "date": "2026-08-18",
+            "strategy": 1.2516316113890755,
+            "buy_hold": 1.1838269940593218
+          },
+          {
+            "date": "2026-08-19",
+            "strategy": 1.2516316113890755,
+            "buy_hold": 1.1790167920531698
+          },
+          {
+            "date": "2026-08-20",
+            "strategy": 1.2516316113890755,
+            "buy_hold": 1.1808304242798193
+          },
+          {
+            "date": "2026-08-21",
+            "strategy": 1.250631838919161,
+            "buy_hold": 1.181658451688855
+          },
+          {
+            "date": "2026-08-24",
+            "strategy": 1.2512995509893265,
+            "buy_hold": 1.1822893388823936
+          },
+          {
+            "date": "2026-08-25",
+            "strategy": 1.2494226016628427,
+            "buy_hold": 1.2262121403911708
+          },
+          {
+            "date": "2026-08-26",
+            "strategy": 1.24835195496399,
+            "buy_hold": 1.2270007012531585
+          },
+          {
+            "date": "2026-08-27",
+            "strategy": 1.2464794270315442,
+            "buy_hold": 1.2494746858198134
+          },
+          {
+            "date": "2026-08-28",
+            "strategy": 1.2464794270315442,
+            "buy_hold": 1.2492775456043164
+          },
+          {
+            "date": "2026-08-31",
+            "strategy": 1.2464794270315442,
+            "buy_hold": 1.127287218758738
+          },
+          {
+            "date": "2026-09-01",
+            "strategy": 1.2467022746401089,
+            "buy_hold": 1.129179687819612
+          },
+          {
+            "date": "2026-09-02",
+            "strategy": 1.2448322212281488,
+            "buy_hold": 1.1401801696002656
+          },
+          {
+            "date": "2026-09-03",
+            "strategy": 1.2448322212281488,
+            "buy_hold": 1.1438075303134358
+          },
+          {
+            "date": "2026-09-04",
+            "strategy": 1.2448322212281488,
+            "buy_hold": 1.1583959062602118
+          },
+          {
+            "date": "2026-09-09",
+            "strategy": 1.2448322212281488,
+            "buy_hold": 1.2241224348549284
+          },
+          {
+            "date": "2026-09-10",
+            "strategy": 1.2319388233094994,
+            "buy_hold": 1.213279723002595
+          },
+          {
+            "date": "2026-09-11",
+            "strategy": 1.2300909150745352,
+            "buy_hold": 1.2064981188414732
+          },
+          {
+            "date": "2026-09-15",
+            "strategy": 1.1754242668997246,
+            "buy_hold": 1.1546897087128172
+          },
+          {
+            "date": "2026-09-16",
+            "strategy": 1.1719725277937423,
+            "buy_hold": 1.151298858502321
+          },
+          {
+            "date": "2026-09-17",
+            "strategy": 1.1732568616511803,
+            "buy_hold": 1.1525605366295275
+          },
+          {
+            "date": "2026-09-18",
+            "strategy": 1.1714969763587035,
+            "buy_hold": 1.1907269016017157
+          },
+          {
+            "date": "2026-09-21",
+            "strategy": 1.1522836501206086,
+            "buy_hold": 1.172984282206988
+          },
+          {
+            "date": "2026-09-22",
+            "strategy": 1.1505552246454278,
+            "buy_hold": 1.1816584516888549
+          },
+          {
+            "date": "2026-09-23",
+            "strategy": 1.1505552246454278,
+            "buy_hold": 1.1801601667991037
+          },
+          {
+            "date": "2026-09-24",
+            "strategy": 1.113004290743789,
+            "buy_hold": 1.1434132498824423
+          },
+          {
+            "date": "2026-09-25",
+            "strategy": 1.119336901363538,
+            "buy_hold": 1.1499188769938422
+          },
+          {
+            "date": "2026-09-28",
+            "strategy": 1.0865608814539882,
+            "buy_hold": 1.1162473666909076
+          },
+          {
+            "date": "2026-09-29",
+            "strategy": 1.0849310401318073,
+            "buy_hold": 1.1721562547979525
+          },
+          {
+            "date": "2026-09-30",
+            "strategy": 1.0849310401318073,
+            "buy_hold": 1.1447537648438733
+          },
+          {
+            "date": "2026-10-01",
+            "strategy": 1.0849310401318073,
+            "buy_hold": 1.11060913727572
+          },
+          {
+            "date": "2026-10-05",
+            "strategy": 1.101483383429388,
+            "buy_hold": 1.12921915436666
+          },
+          {
+            "date": "2026-10-06",
+            "strategy": 1.096060540107778,
+            "buy_hold": 1.1236597617856972
+          },
+          {
+            "date": "2026-10-07",
+            "strategy": 1.0944164492976165,
+            "buy_hold": 1.0815112222163927
+          },
+          {
+            "date": "2026-10-08",
+            "strategy": 1.0944164492976165,
+            "buy_hold": 1.0235519988602828
+          },
+          {
+            "date": "2026-10-09",
+            "strategy": 1.1089633780814598,
+            "buy_hold": 1.038692328906502
+          },
+          {
+            "date": "2026-10-12",
+            "strategy": 1.1071112179132132,
+            "buy_hold": 1.0369575335140768
+          },
+          {
+            "date": "2026-10-13",
+            "strategy": 1.1344732822342622,
+            "buy_hold": 1.0625857615286833
+          },
+          {
+            "date": "2026-10-14",
+            "strategy": 1.1460916768086862,
+            "buy_hold": 1.0734679399280647
+          },
+          {
+            "date": "2026-10-15",
+            "strategy": 1.1365780564128045,
+            "buy_hold": 1.064557163683653
+          }
+        ]
+      },
+      "quantile_return_samples": {
+        "0.1": -0.007910735240616409,
+        "0.5": 0.0014697646758719902,
+        "0.9": 0.02282447724408455
+      },
+      "n_train": 880,
+      "n_test": 221
+    },
+    {
+      "symbol": "ADANIPORTS.NS",
+      "models": {
+        "persistence": {
+          "mape_pct": 1.4263,
+          "rmse": 31.0977,
+          "directional_accuracy": 0.0,
+          "n_samples": 221,
+          "directional_note": "Zero-return forecast; ~50% is random-walk expectation."
+        },
+        "momentum": {
+          "directional_accuracy": 1.0,
+          "n_samples": 221
+        },
+        "ma20": {
+          "mape_pct": 3.6311,
+          "rmse": 75.0775,
+          "directional_accuracy": 0.5294,
+          "n_samples": 221
+        },
+        "arima_111": {
+          "mape_pct": 12.1659,
+          "rmse": 253.1163,
+          "directional_accuracy": 0.5204,
+          "n_samples": 221
+        },
+        "legacy_lstm_close": {
+          "mape_pct": 1.4263,
+          "rmse": 31.0977,
+          "directional_accuracy": 0.0,
+          "n_samples": 221,
+          "directional_note": "Zero-return forecast; ~50% is random-walk expectation."
+        },
+        "lightgbm": {
+          "mape_pct": 1.6674,
+          "rmse": 37.3077,
+          "directional_accuracy": 0.5475,
+          "n_samples": 221,
+          "directional_accuracy_return": 0.5475
+        }
+      },
+      "backtest_lightgbm": {
+        "cagr": -0.2681,
+        "buy_hold_cagr": 0.2361,
+        "sharpe": -1.3108,
+        "buy_hold_sharpe": 0.8306,
+        "max_drawdown": -0.2948,
+        "buy_hold_max_drawdown": -0.1698,
+        "win_rate": 0.2773,
+        "n_days": 220,
+        "start_date": "2025-10-30",
+        "end_date": "2026-10-15",
+        "equity_curve": [
+          {
+            "date": "2025-10-30",
+            "strategy": 1.0006309088715208,
+            "buy_hold": 1.0021309088715207
+          },
+          {
+            "date": "2025-10-31",
+            "strategy": 0.9991299625082136,
+            "buy_hold": 0.9977316593451169
+          },
+          {
+            "date": "2025-11-03",
+            "strategy": 0.992950435024262,
+            "buy_hold": 0.9930573777274226
+          },
+          {
+            "date": "2025-11-04",
+            "strategy": 0.9914610093717257,
+            "buy_hold": 0.9928512721835205
+          },
+          {
+            "date": "2025-11-06",
+            "strategy": 0.9914610093717257,
+            "buy_hold": 0.987627179170094
+          },
+          {
+            "date": "2025-11-07",
+            "strategy": 0.9979094011042849,
+            "buy_hold": 0.9955320767130563
+          },
+          {
+            "date": "2025-11-10",
+            "strategy": 0.9955667214495106,
+            "buy_hold": 0.9931949780353506
+          },
+          {
+            "date": "2025-11-11",
+            "strategy": 1.0158927784239045,
+            "buy_hold": 1.013472612145936
+          },
+          {
+            "date": "2025-11-12",
+            "strategy": 1.0382859951138645,
+            "buy_hold": 1.0358124813675027
+          },
+          {
+            "date": "2025-11-13",
+            "strategy": 1.0367285661211938,
+            "buy_hold": 1.0303821985478911
+          },
+          {
+            "date": "2025-11-14",
+            "strategy": 1.0446485436945596,
+            "buy_hold": 1.0397992670192537
+          },
+          {
+            "date": "2025-11-17",
+            "strategy": 1.0411265465059083,
+            "buy_hold": 1.0362936190026952
+          },
+          {
+            "date": "2025-11-18",
+            "strategy": 1.0395648566861495,
+            "buy_hold": 1.0276326359955328
+          },
+          {
+            "date": "2025-11-19",
+            "strategy": 1.0395648566861495,
+            "buy_hold": 1.020208876087763
+          },
+          {
+            "date": "2025-11-20",
+            "strategy": 1.0428384508149906,
+            "buy_hold": 1.024951831465997
+          },
+          {
+            "date": "2025-11-21",
+            "strategy": 1.0412741931387681,
+            "buy_hold": 1.017184534230963
+          },
+          {
+            "date": "2025-11-24",
+            "strategy": 1.0440045582157214,
+            "buy_hold": 1.021377509688899
+          },
+          {
+            "date": "2025-11-25",
+            "strategy": 1.042599363838361,
+            "buy_hold": 1.0200027705438612
+          },
+          {
+            "date": "2025-11-26",
+            "strategy": 1.0410354647926037,
+            "buy_hold": 1.0353312594700277
+          },
+          {
+            "date": "2025-12-01",
+            "strategy": 1.0562693363250746,
+            "buy_hold": 1.0520346560657978
+          },
+          {
+            "date": "2025-12-02",
+            "strategy": 1.0546849323205871,
+            "buy_hold": 1.0435111048419976
+          },
+          {
+            "date": "2025-12-03",
+            "strategy": 1.0389301601418055,
+            "buy_hold": 1.0294885127757634
+          },
+          {
+            "date": "2025-12-04",
+            "strategy": 1.0444103302185066,
+            "buy_hold": 1.0349188798576576
+          },
+          {
+            "date": "2025-12-05",
+            "strategy": 1.0470463323320227,
+            "buy_hold": 1.0375309263643708
+          },
+          {
+            "date": "2025-12-08",
+            "strategy": 1.0269988895670308,
+            "buy_hold": 1.0176656718661552
+          },
+          {
+            "date": "2025-12-09",
+            "strategy": 1.038583302094093,
+            "buy_hold": 1.0291448069239328
+          },
+          {
+            "date": "2025-12-10",
+            "strategy": 1.0392076295729613,
+            "buy_hold": 1.0297634606047705
+          },
+          {
+            "date": "2025-12-11",
+            "strategy": 1.0376488181286019,
+            "buy_hold": 1.0338190885416272
+          },
+          {
+            "date": "2025-12-12",
+            "strategy": 1.0490629329272292,
+            "buy_hold": 1.046741805029548
+          },
+          {
+            "date": "2025-12-15",
+            "strategy": 1.0420360894928875,
+            "buy_hold": 1.039730508996431
+          },
+          {
+            "date": "2025-12-16",
+            "strategy": 1.0404730353586482,
+            "buy_hold": 1.0303821985478911
+          },
+          {
+            "date": "2025-12-17",
+            "strategy": 1.0300970918466343,
+            "buy_hold": 1.0216524575179062
+          },
+          {
+            "date": "2025-12-18",
+            "strategy": 1.0285519462088644,
+            "buy_hold": 1.0281137736307253
+          },
+          {
+            "date": "2025-12-19",
+            "strategy": 1.0274905452793468,
+            "buy_hold": 1.0285949955282006
+          },
+          {
+            "date": "2025-12-22",
+            "strategy": 1.0359361760041361,
+            "buy_hold": 1.0370497044668952
+          },
+          {
+            "date": "2025-12-23",
+            "strategy": 1.0255678928743193,
+            "buy_hold": 1.0266702764628648
+          },
+          {
+            "date": "2025-12-24",
+            "strategy": 1.0240295410350078,
+            "buy_hold": 1.0271514983603403
+          },
+          {
+            "date": "2025-12-26",
+            "strategy": 1.0240295410350078,
+            "buy_hold": 1.0222023531759212
+          },
+          {
+            "date": "2025-12-29",
+            "strategy": 0.9999760175176314,
+            "buy_hold": 0.9997250521709924
+          },
+          {
+            "date": "2025-12-30",
+            "strategy": 1.004651303973786,
+            "buy_hold": 1.0043991652641209
+          },
+          {
+            "date": "2025-12-31",
+            "strategy": 1.0031443270178255,
+            "buy_hold": 1.0103106699812079
+          },
+          {
+            "date": "2026-01-05",
+            "strategy": 1.0031443270178255,
+            "buy_hold": 1.026257896850495
+          },
+          {
+            "date": "2026-01-06",
+            "strategy": 0.9883360121557101,
+            "buy_hold": 1.0126477686589135
+          },
+          {
+            "date": "2026-01-07",
+            "strategy": 0.9868535081374766,
+            "buy_hold": 1.007217485839302
+          },
+          {
+            "date": "2026-01-08",
+            "strategy": 0.9868535081374766,
+            "buy_hold": 1.0071487278164792
+          },
+          {
+            "date": "2026-01-09",
+            "strategy": 0.9868535081374766,
+            "buy_hold": 0.9870085254892561
+          },
+          {
+            "date": "2026-01-12",
+            "strategy": 0.9905965004043309,
+            "buy_hold": 0.9922326185026827
+          },
+          {
+            "date": "2026-01-13",
+            "strategy": 0.9803713924768588,
+            "buy_hold": 0.9819906222820147
+          },
+          {
+            "date": "2026-01-14",
+            "strategy": 0.9813321651499344,
+            "buy_hold": 0.9829529818146827
+          },
+          {
+            "date": "2026-01-21",
+            "strategy": 0.9460590801866281,
+            "buy_hold": 0.9476216380823725
+          },
+          {
+            "date": "2026-01-22",
+            "strategy": 0.9446399915663483,
+            "buy_hold": 0.972092331913177
+          },
+          {
+            "date": "2026-01-23",
+            "strategy": 0.8725520584645118,
+            "buy_hold": 0.8993675778621414
+          },
+          {
+            "date": "2026-01-27",
+            "strategy": 0.8712432303768151,
+            "buy_hold": 0.9375171579073497
+          },
+          {
+            "date": "2026-01-28",
+            "strategy": 0.8712432303768151,
+            "buy_hold": 0.9498899787372557
+          },
+          {
+            "date": "2026-01-29",
+            "strategy": 0.8712432303768151,
+            "buy_hold": 0.9745669466365279
+          },
+          {
+            "date": "2026-01-30",
+            "strategy": 0.8711653546507576,
+            "buy_hold": 0.9759416857815657
+          },
+          {
+            "date": "2026-02-02",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 0.964462466461505
+          },
+          {
+            "date": "2026-02-03",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.0522408458719825
+          },
+          {
+            "date": "2026-02-04",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.0777426572582773
+          },
+          {
+            "date": "2026-02-05",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.0793235862095
+          },
+          {
+            "date": "2026-02-06",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.0659196478241038
+          },
+          {
+            "date": "2026-02-09",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.073480839515236
+          },
+          {
+            "date": "2026-02-10",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.0686692103764623
+          },
+          {
+            "date": "2026-02-11",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.067775608866617
+          },
+          {
+            "date": "2026-02-12",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.0611080186853301
+          },
+          {
+            "date": "2026-02-13",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.0441297585228353
+          },
+          {
+            "date": "2026-02-18",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.0659884901092094
+          },
+          {
+            "date": "2026-02-19",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.040211730893907
+          },
+          {
+            "date": "2026-02-20",
+            "strategy": 0.8698586066187816,
+            "buy_hold": 1.0389744235322316
+          },
+          {
+            "date": "2026-02-23",
+            "strategy": 0.8940482159267926,
+            "buy_hold": 1.0694253801029454
+          },
+          {
+            "date": "2026-02-24",
+            "strategy": 0.8938183573311668,
+            "buy_hold": 1.0691504322739378
+          },
+          {
+            "date": "2026-02-25",
+            "strategy": 0.8784749614643949,
+            "buy_hold": 1.0507972644418395
+          },
+          {
+            "date": "2026-02-26",
+            "strategy": 0.8910599837397101,
+            "buy_hold": 1.0658509740635642
+          },
+          {
+            "date": "2026-02-27",
+            "strategy": 0.8740501658876099,
+            "buy_hold": 1.0455044976678733
+          },
+          {
+            "date": "2026-03-02",
+            "strategy": 0.8449151838393382,
+            "buy_hold": 1.0106543758330384
+          },
+          {
+            "date": "2026-03-04",
+            "strategy": 0.8242850402731706,
+            "buy_hold": 0.9859774079337662
+          },
+          {
+            "date": "2026-03-05",
+            "strategy": 0.8230486127127609,
+            "buy_hold": 1.0305883883540765
+          },
+          {
+            "date": "2026-03-06",
+            "strategy": 0.8230486127127609,
+            "buy_hold": 1.0156035210174572
+          },
+          {
+            "date": "2026-03-09",
+            "strategy": 0.8230486127127609,
+            "buy_hold": 0.9769728033370563
+          },
+          {
+            "date": "2026-03-10",
+            "strategy": 0.8234354441963738,
+            "buy_hold": 0.9788974381401092
+          },
+          {
+            "date": "2026-03-11",
+            "strategy": 0.8157452144759474,
+            "buy_hold": 0.9697553174977542
+          },
+          {
+            "date": "2026-03-12",
+            "strategy": 0.8045856063993998,
+            "buy_hold": 0.95648881089572
+          },
+          {
+            "date": "2026-03-13",
+            "strategy": 0.7882221079894365,
+            "buy_hold": 0.9370359360098743
+          },
+          {
+            "date": "2026-03-16",
+            "strategy": 0.7944090372919625,
+            "buy_hold": 0.9443909378948216
+          },
+          {
+            "date": "2026-03-17",
+            "strategy": 0.7895520351779445,
+            "buy_hold": 0.93861694922338
+          },
+          {
+            "date": "2026-03-18",
+            "strategy": 0.810599091592227,
+            "buy_hold": 0.9636376229744824
+          },
+          {
+            "date": "2026-03-19",
+            "strategy": 0.8093831929548387,
+            "buy_hold": 0.9320868750877384
+          },
+          {
+            "date": "2026-03-20",
+            "strategy": 0.8137799136892329,
+            "buy_hold": 0.9385482754628404
+          },
+          {
+            "date": "2026-03-23",
+            "strategy": 0.7769469681357482,
+            "buy_hold": 0.8960681196517678
+          },
+          {
+            "date": "2026-03-24",
+            "strategy": 0.8011446576107654,
+            "buy_hold": 0.923975787738591
+          },
+          {
+            "date": "2026-03-25",
+            "strategy": 0.7999429406243492,
+            "buy_hold": 0.9457657613021424
+          },
+          {
+            "date": "2026-03-27",
+            "strategy": 0.7999429406243492,
+            "buy_hold": 0.91957662247447
+          },
+          {
+            "date": "2026-03-30",
+            "strategy": 0.7999429406243492,
+            "buy_hold": 0.9022545721978622
+          },
+          {
+            "date": "2026-04-01",
+            "strategy": 0.7999429406243492,
+            "buy_hold": 0.9522958354377842
+          },
+          {
+            "date": "2026-04-02",
+            "strategy": 0.7942391933102474,
+            "buy_hold": 0.9469342263787124
+          },
+          {
+            "date": "2026-04-06",
+            "strategy": 0.7997163506393157,
+            "buy_hold": 0.953464384776637
+          },
+          {
+            "date": "2026-04-07",
+            "strategy": 0.7961994301638312,
+            "buy_hold": 0.9492713250564181
+          },
+          {
+            "date": "2026-04-08",
+            "strategy": 0.837883227954903,
+            "buy_hold": 0.9989689667067927
+          },
+          {
+            "date": "2026-04-09",
+            "strategy": 0.8366264031129707,
+            "buy_hold": 0.994913423032219
+          },
+          {
+            "date": "2026-04-10",
+            "strategy": 0.8366264031129707,
+            "buy_hold": 1.0140912658267742
+          },
+          {
+            "date": "2026-04-13",
+            "strategy": 0.8366264031129707,
+            "buy_hold": 1.0072174858393024
+          },
+          {
+            "date": "2026-04-15",
+            "strategy": 0.8366264031129707,
+            "buy_hold": 1.0391806133384163
+          },
+          {
+            "date": "2026-04-16",
+            "strategy": 0.8366264031129707,
+            "buy_hold": 1.065301078405549
+          },
+          {
+            "date": "2026-04-17",
+            "strategy": 0.8481114296489699,
+            "buy_hold": 1.0815232531038437
+          },
+          {
+            "date": "2026-04-20",
+            "strategy": 0.8468392625044965,
+            "buy_hold": 1.0849601430975797
+          },
+          {
+            "date": "2026-04-21",
+            "strategy": 0.8468392625044965,
+            "buy_hold": 1.0957519507139801
+          },
+          {
+            "date": "2026-04-22",
+            "strategy": 0.8426472136968813,
+            "buy_hold": 1.091971354868414
+          },
+          {
+            "date": "2026-04-23",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.1018008872144294
+          },
+          {
+            "date": "2026-04-24",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.0895654981678857
+          },
+          {
+            "date": "2026-04-27",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.1193978010577617
+          },
+          {
+            "date": "2026-04-28",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.1256530116266787
+          },
+          {
+            "date": "2026-04-29",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.1418064283021507
+          },
+          {
+            "date": "2026-04-30",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.1391943817954375
+          },
+          {
+            "date": "2026-05-04",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.1978278700196991
+          },
+          {
+            "date": "2026-05-05",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.1857299970188007
+          },
+          {
+            "date": "2026-05-06",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.2017459819109104
+          },
+          {
+            "date": "2026-05-07",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.1910916060778725
+          },
+          {
+            "date": "2026-05-08",
+            "strategy": 0.841383242876336,
+            "buy_hold": 1.2100632590662428
+          },
+          {
+            "date": "2026-05-11",
+            "strategy": 0.8434189892211068,
+            "buy_hold": 1.2148061301821937
+          },
+          {
+            "date": "2026-05-12",
+            "strategy": 0.8421538607372752,
+            "buy_hold": 1.1604343754386905
+          },
+          {
+            "date": "2026-05-13",
+            "strategy": 0.8656335158233646,
+            "buy_hold": 1.1945284960716083
+          },
+          {
+            "date": "2026-05-14",
+            "strategy": 0.8643350655496296,
+            "buy_hold": 1.2189991899024126
+          },
+          {
+            "date": "2026-05-15",
+            "strategy": 0.8736148754117901,
+            "buy_hold": 1.2339152992162092
+          },
+          {
+            "date": "2026-05-18",
+            "strategy": 0.8700135075386571,
+            "buy_hold": 1.228828637986145
+          },
+          {
+            "date": "2026-05-19",
+            "strategy": 0.8687084872773492,
+            "buy_hold": 1.211712946040288
+          },
+          {
+            "date": "2026-05-20",
+            "strategy": 0.8722348271519993,
+            "buy_hold": 1.2184492099821147
+          },
+          {
+            "date": "2026-05-21",
+            "strategy": 0.882420653932381,
+            "buy_hold": 1.2326780761168168
+          },
+          {
+            "date": "2026-05-22",
+            "strategy": 0.8792714224183996,
+            "buy_hold": 1.228278826590413
+          },
+          {
+            "date": "2026-05-27",
+            "strategy": 0.897773044463592,
+            "buy_hold": 1.2541242595662552
+          },
+          {
+            "date": "2026-05-29",
+            "strategy": 0.8879809244022004,
+            "buy_hold": 1.2404453733518512
+          },
+          {
+            "date": "2026-06-01",
+            "strategy": 0.8866489530155972,
+            "buy_hold": 1.2259416436504245
+          },
+          {
+            "date": "2026-06-02",
+            "strategy": 0.8866489530155972,
+            "buy_hold": 1.2472504795787833
+          },
+          {
+            "date": "2026-06-03",
+            "strategy": 0.8800904949180594,
+            "buy_hold": 1.239895561956119
+          },
+          {
+            "date": "2026-06-04",
+            "strategy": 0.8787703591756824,
+            "buy_hold": 1.2310283048804886
+          },
+          {
+            "date": "2026-06-05",
+            "strategy": 0.8937920170902196,
+            "buy_hold": 1.2539179854977873
+          },
+          {
+            "date": "2026-06-08",
+            "strategy": 0.8924513290645844,
+            "buy_hold": 1.2407203211808586
+          },
+          {
+            "date": "2026-06-09",
+            "strategy": 0.8924513290645844,
+            "buy_hold": 1.2554303249507532
+          },
+          {
+            "date": "2026-06-10",
+            "strategy": 0.8885716439743624,
+            "buy_hold": 1.2518558346490891
+          },
+          {
+            "date": "2026-06-11",
+            "strategy": 0.8872387865084009,
+            "buy_hold": 1.2284162583737752
+          },
+          {
+            "date": "2026-06-12",
+            "strategy": 0.9025100272937209,
+            "buy_hold": 1.2514025035672438
+          },
+          {
+            "date": "2026-06-15",
+            "strategy": 0.8984776432192015,
+            "buy_hold": 1.245811279787349
+          },
+          {
+            "date": "2026-06-16",
+            "strategy": 0.9070402380631157,
+            "buy_hold": 1.2576840039684167
+          },
+          {
+            "date": "2026-06-17",
+            "strategy": 0.9103258820953218,
+            "buy_hold": 1.2622398128163945
+          },
+          {
+            "date": "2026-06-18",
+            "strategy": 0.9089603932721789,
+            "buy_hold": 1.2715585472036468
+          },
+          {
+            "date": "2026-06-23",
+            "strategy": 0.8789282716347615,
+            "buy_hold": 1.2314534923598548
+          },
+          {
+            "date": "2026-06-24",
+            "strategy": 0.8776098792273094,
+            "buy_hold": 1.2516786310682118
+          },
+          {
+            "date": "2026-06-25",
+            "strategy": 0.867920501658873,
+            "buy_hold": 1.2397368118151901
+          },
+          {
+            "date": "2026-06-29",
+            "strategy": 0.8583037760617255,
+            "buy_hold": 1.2260002901993026
+          },
+          {
+            "date": "2026-06-30",
+            "strategy": 0.8747826557483079,
+            "buy_hold": 1.249538706132424
+          },
+          {
+            "date": "2026-07-01",
+            "strategy": 0.8931462298368588,
+            "buy_hold": 1.2757692177409858
+          },
+          {
+            "date": "2026-07-02",
+            "strategy": 0.9100600480763135,
+            "buy_hold": 1.2999288994857139
+          },
+          {
+            "date": "2026-07-07",
+            "strategy": 0.8862357623505972,
+            "buy_hold": 1.2658983126140808
+          },
+          {
+            "date": "2026-07-08",
+            "strategy": 0.865842494678882,
+            "buy_hold": 1.2367685886387818
+          },
+          {
+            "date": "2026-07-09",
+            "strategy": 0.8645437309368637,
+            "buy_hold": 1.242566929109973
+          },
+          {
+            "date": "2026-07-10",
+            "strategy": 0.8766946264645877,
+            "buy_hold": 1.2618946745057553
+          },
+          {
+            "date": "2026-07-13",
+            "strategy": 0.8681583864621581,
+            "buy_hold": 1.2496078012043779
+          },
+          {
+            "date": "2026-07-14",
+            "strategy": 0.866856148882465,
+            "buy_hold": 1.2576149931587455
+          },
+          {
+            "date": "2026-07-15",
+            "strategy": 0.8689815860825769,
+            "buy_hold": 1.2625849511270335
+          },
+          {
+            "date": "2026-07-16",
+            "strategy": 0.8676988744303996,
+            "buy_hold": 1.2607212379544963
+          },
+          {
+            "date": "2026-07-17",
+            "strategy": 0.8729248312258155,
+            "buy_hold": 1.2683142807885537
+          },
+          {
+            "date": "2026-07-20",
+            "strategy": 0.8760603937042617,
+            "buy_hold": 1.2728700896365315
+          },
+          {
+            "date": "2026-07-21",
+            "strategy": 0.8772481111577652,
+            "buy_hold": 1.2745957811897264
+          },
+          {
+            "date": "2026-07-22",
+            "strategy": 0.8643732655605894,
+            "buy_hold": 1.2558893016055506
+          },
+          {
+            "date": "2026-07-23",
+            "strategy": 0.8630767056622485,
+            "buy_hold": 1.227656970942826
+          },
+          {
+            "date": "2026-07-24",
+            "strategy": 0.8568322225940066,
+            "buy_hold": 1.220616183110704
+          },
+          {
+            "date": "2026-07-27",
+            "strategy": 0.8578497686546337,
+            "buy_hold": 1.222065747162931
+          },
+          {
+            "date": "2026-07-28",
+            "strategy": 0.8565629940016518,
+            "buy_hold": 1.2250338860770564
+          },
+          {
+            "date": "2026-07-29",
+            "strategy": 0.8565629940016518,
+            "buy_hold": 1.1870686719067696
+          },
+          {
+            "date": "2026-07-30",
+            "strategy": 0.8275844338006176,
+            "buy_hold": 1.1486893086161722
+          },
+          {
+            "date": "2026-07-31",
+            "strategy": 0.8436975016770815,
+            "buy_hold": 1.1710542879980341
+          },
+          {
+            "date": "2026-08-03",
+            "strategy": 0.845935426084713,
+            "buy_hold": 1.1741605327937847
+          },
+          {
+            "date": "2026-08-04",
+            "strategy": 0.8487701060513456,
+            "buy_hold": 1.1780950758301558
+          },
+          {
+            "date": "2026-08-05",
+            "strategy": 0.8454381095496838,
+            "buy_hold": 1.1734702561725068
+          },
+          {
+            "date": "2026-08-06",
+            "strategy": 0.8441699523853593,
+            "buy_hold": 1.170018873066117
+          },
+          {
+            "date": "2026-08-07",
+            "strategy": 0.8441699523853593,
+            "buy_hold": 1.1689834581342
+          },
+          {
+            "date": "2026-08-10",
+            "strategy": 0.8441699523853593,
+            "buy_hold": 1.1603550003682257
+          },
+          {
+            "date": "2026-08-11",
+            "strategy": 0.8441699523853593,
+            "buy_hold": 1.151519425910955
+          },
+          {
+            "date": "2026-08-12",
+            "strategy": 0.8441699523853593,
+            "buy_hold": 1.1493105744277787
+          },
+          {
+            "date": "2026-08-13",
+            "strategy": 0.8441699523853593,
+            "buy_hold": 1.1444786380788332
+          },
+          {
+            "date": "2026-08-14",
+            "strategy": 0.8441699523853593,
+            "buy_hold": 1.173470256172507
+          },
+          {
+            "date": "2026-08-17",
+            "strategy": 0.8384345624147411,
+            "buy_hold": 1.1672577665810056
+          },
+          {
+            "date": "2026-08-18",
+            "strategy": 0.834170507555384,
+            "buy_hold": 1.1613214044904718
+          },
+          {
+            "date": "2026-08-19",
+            "strategy": 0.832919251794051,
+            "buy_hold": 1.1609762661798328
+          },
+          {
+            "date": "2026-08-20",
+            "strategy": 0.8386525359432214,
+            "buy_hold": 1.1707091496873951
+          },
+          {
+            "date": "2026-08-21",
+            "strategy": 0.8406304900374271,
+            "buy_hold": 1.1734702561725068
+          },
+          {
+            "date": "2026-08-24",
+            "strategy": 0.8268342481578685,
+            "buy_hold": 1.1542115215863955
+          },
+          {
+            "date": "2026-08-25",
+            "strategy": 0.8419655849060684,
+            "buy_hold": 1.175333969345044
+          },
+          {
+            "date": "2026-08-26",
+            "strategy": 0.8364273375872399,
+            "buy_hold": 1.167602904891644
+          },
+          {
+            "date": "2026-08-27",
+            "strategy": 0.835172696580859,
+            "buy_hold": 1.1831341288703978
+          },
+          {
+            "date": "2026-08-28",
+            "strategy": 0.835172696580859,
+            "buy_hold": 1.1786473308320913
+          },
+          {
+            "date": "2026-08-31",
+            "strategy": 0.777964577724094,
+            "buy_hold": 1.0996796685054377
+          },
+          {
+            "date": "2026-09-01",
+            "strategy": 0.8045299488056552,
+            "buy_hold": 1.1372307335554144
+          },
+          {
+            "date": "2026-09-02",
+            "strategy": 0.816835936924753,
+            "buy_hold": 1.1546256707067053
+          },
+          {
+            "date": "2026-09-03",
+            "strategy": 0.8333416434821551,
+            "buy_hold": 1.177957054210813
+          },
+          {
+            "date": "2026-09-04",
+            "strategy": 0.832091631016932,
+            "buy_hold": 1.1785093092127485
+          },
+          {
+            "date": "2026-09-09",
+            "strategy": 0.832091631016932,
+            "buy_hold": 1.2252410027683522
+          },
+          {
+            "date": "2026-09-10",
+            "strategy": 0.8275620054480862,
+            "buy_hold": 1.2204090664194067
+          },
+          {
+            "date": "2026-09-11",
+            "strategy": 0.8263206624399141,
+            "buy_hold": 1.218062109054605
+          },
+          {
+            "date": "2026-09-15",
+            "strategy": 0.8012927706386,
+            "buy_hold": 1.1829961072510553
+          },
+          {
+            "date": "2026-09-16",
+            "strategy": 0.8000908314826422,
+            "buy_hold": 1.1898988734638347
+          },
+          {
+            "date": "2026-09-17",
+            "strategy": 0.8056207780338176,
+            "buy_hold": 1.199907884472365
+          },
+          {
+            "date": "2026-09-18",
+            "strategy": 0.8044123468667669,
+            "buy_hold": 1.2590645572109718
+          },
+          {
+            "date": "2026-09-21",
+            "strategy": 0.8044123468667669,
+            "buy_hold": 1.233593333033359
+          },
+          {
+            "date": "2026-09-22",
+            "strategy": 0.8044123468667669,
+            "buy_hold": 1.2390465351939113
+          },
+          {
+            "date": "2026-09-23",
+            "strategy": 0.8044123468667669,
+            "buy_hold": 1.247536971340543
+          },
+          {
+            "date": "2026-09-24",
+            "strategy": 0.8044123468667669,
+            "buy_hold": 1.2323508856724283
+          },
+          {
+            "date": "2026-09-25",
+            "strategy": 0.8044222600213632,
+            "buy_hold": 1.2342145988449658
+          },
+          {
+            "date": "2026-09-28",
+            "strategy": 0.784491641790168,
+            "buy_hold": 1.2036353108174396
+          },
+          {
+            "date": "2026-09-29",
+            "strategy": 0.7833149043274827,
+            "buy_hold": 1.2576840039684156
+          },
+          {
+            "date": "2026-09-30",
+            "strategy": 0.7719508403218349,
+            "buy_hold": 1.2413244817490414
+          },
+          {
+            "date": "2026-10-01",
+            "strategy": 0.7459801877213941,
+            "buy_hold": 1.1995627461617258
+          },
+          {
+            "date": "2026-10-05",
+            "strategy": 0.7615196316228434,
+            "buy_hold": 1.2245507261470743
+          },
+          {
+            "date": "2026-10-06",
+            "strategy": 0.7655547517632282,
+            "buy_hold": 1.2310393432395434
+          },
+          {
+            "date": "2026-10-07",
+            "strategy": 0.7644064196355834,
+            "buy_hold": 1.2080530980460749
+          },
+          {
+            "date": "2026-10-08",
+            "strategy": 0.7448714367398442,
+            "buy_hold": 1.17899246914273
+          },
+          {
+            "date": "2026-10-09",
+            "strategy": 0.7679851288635046,
+            "buy_hold": 1.2155771300704612
+          },
+          {
+            "date": "2026-10-12",
+            "strategy": 0.7649323770735872,
+            "buy_hold": 1.2107451937215157
+          },
+          {
+            "date": "2026-10-13",
+            "strategy": 0.7688573436606239,
+            "buy_hold": 1.2169576833130171
+          },
+          {
+            "date": "2026-10-14",
+            "strategy": 0.7626209865669146,
+            "buy_hold": 1.2070866939238294
+          },
+          {
+            "date": "2026-10-15",
+            "strategy": 0.7614770550870642,
+            "buy_hold": 1.2032901725068006
+          }
+        ]
+      },
+      "quantile_return_samples": {
+        "0.1": -0.004715682009027098,
+        "0.5": 0.0014622237655892495,
+        "0.9": 0.02006292572820888
+      },
+      "n_train": 880,
+      "n_test": 221
+    },
+    {
+      "symbol": "APOLLOHOSP.NS",
+      "models": {
+        "persistence": {
+          "mape_pct": 0.9988,
+          "rmse": 110.1603,
+          "directional_accuracy": 0.0,
+          "n_samples": 221,
+          "directional_note": "Zero-return forecast; ~50% is random-walk expectation."
+        },
+        "momentum": {
+          "directional_accuracy": 1.0,
+          "n_samples": 221
+        },
+        "ma20": {
+          "mape_pct": 2.9149,
+          "rmse": 281.1057,
+          "directional_accuracy": 0.4615,
+          "n_samples": 221
+        },
+        "arima_111": {
+          "mape_pct": 7.299,
+          "rmse": 675.3524,
+          "directional_accuracy": 0.5158,
+          "n_samples": 221
+        },
+        "legacy_lstm_close": {
+          "mape_pct": 0.9988,
+          "rmse": 110.1603,
+          "directional_accuracy": 0.0,
+          "n_samples": 221,
+          "directional_note": "Zero-return forecast; ~50% is random-walk expectation."
+        },
+        "lightgbm": {
+          "mape_pct": 1.1992,
+          "rmse": 126.5033,
+          "directional_accuracy": 0.4525,
+          "n_samples": 221,
+          "directional_accuracy_return": 0.4525
+        }
+      },
+      "backtest_lightgbm": {
+        "cagr": -0.2415,
+        "buy_hold_cagr": 0.0074,
+        "sharpe": -1.4976,
+        "buy_hold_sharpe": 0.1442,
+        "max_drawdown": -0.2063,
+        "buy_hold_max_drawdown": -0.1547,
+        "win_rate": 0.2182,
+        "n_days": 220,
+        "start_date": "2025-10-30",
+        "end_date": "2026-10-15",
+        "equity_curve": [
+          {
+            "date": "2025-10-30",
+            "strategy": 0.989783329869023,
+            "buy_hold": 0.9912833298690229
+          },
+          {
+            "date": "2025-10-31",
+            "strategy": 0.9882986548742195,
+            "buy_hold": 0.9774129866855245
+          },
+          {
+            "date": "2025-11-03",
+            "strategy": 0.9882986548742195,
+            "buy_hold": 0.995673463504616
+          },
+          {
+            "date": "2025-11-04",
+            "strategy": 0.9882986548742195,
+            "buy_hold": 0.9938919338208534
+          },
+          {
+            "date": "2025-11-06",
+            "strategy": 0.9882986548742195,
+            "buy_hold": 0.9902652773131186
+          },
+          {
+            "date": "2025-11-07",
+            "strategy": 0.9882986548742195,
+            "buy_hold": 0.9724501673427003
+          },
+          {
+            "date": "2025-11-10",
+            "strategy": 0.9882986548742195,
+            "buy_hold": 0.9581344573105286
+          },
+          {
+            "date": "2025-11-11",
+            "strategy": 0.9830753751945013,
+            "buy_hold": 0.954507800802794
+          },
+          {
+            "date": "2025-11-12",
+            "strategy": 0.9826821794562678,
+            "buy_hold": 0.9541260310943298
+          },
+          {
+            "date": "2025-11-13",
+            "strategy": 0.9751463448034157,
+            "buy_hold": 0.9468091832277211
+          },
+          {
+            "date": "2025-11-14",
+            "strategy": 0.9725251681885123,
+            "buy_hold": 0.9442641764160999
+          },
+          {
+            "date": "2025-11-17",
+            "strategy": 0.9813060906024405,
+            "buy_hold": 0.9527899305483101
+          },
+          {
+            "date": "2025-11-18",
+            "strategy": 0.9679380770357682,
+            "buy_hold": 0.9398103833512279
+          },
+          {
+            "date": "2025-11-19",
+            "strategy": 0.977570891472539,
+            "buy_hold": 0.9491632740405754
+          },
+          {
+            "date": "2025-11-20",
+            "strategy": 0.9728527992270435,
+            "buy_hold": 0.9445822866952851
+          },
+          {
+            "date": "2025-11-21",
+            "strategy": 0.971393520028203,
+            "buy_hold": 0.9405102633388772
+          },
+          {
+            "date": "2025-11-24",
+            "strategy": 0.971393520028203,
+            "buy_hold": 0.935865616564308
+          },
+          {
+            "date": "2025-11-25",
+            "strategy": 0.9667664575847914,
+            "buy_hold": 0.9328115834747346
+          },
+          {
+            "date": "2025-11-26",
+            "strategy": 0.9750091513530998,
+            "buy_hold": 0.9407647764778532
+          },
+          {
+            "date": "2025-12-01",
+            "strategy": 0.9610954982163835,
+            "buy_hold": 0.9273398001430281
+          },
+          {
+            "date": "2025-12-02",
+            "strategy": 0.959653854969059,
+            "buy_hold": 0.9215499065321363
+          },
+          {
+            "date": "2025-12-03",
+            "strategy": 0.9505286351898702,
+            "buy_hold": 0.914169336947179
+          },
+          {
+            "date": "2025-12-04",
+            "strategy": 0.9491028422370854,
+            "buy_hold": 0.9163326363394058
+          },
+          {
+            "date": "2025-12-05",
+            "strategy": 0.9491028422370854,
+            "buy_hold": 0.9148692169348283
+          },
+          {
+            "date": "2025-12-08",
+            "strategy": 0.9353360166826659,
+            "buy_hold": 0.9029712571447898
+          },
+          {
+            "date": "2025-12-09",
+            "strategy": 0.9346769923802983,
+            "buy_hold": 0.9023350365864193
+          },
+          {
+            "date": "2025-12-10",
+            "strategy": 0.9251206238226358,
+            "buy_hold": 0.8931093401774901
+          },
+          {
+            "date": "2025-12-11",
+            "strategy": 0.9237329428869019,
+            "buy_hold": 0.8919640933411674
+          },
+          {
+            "date": "2025-12-12",
+            "strategy": 0.9344054271803796,
+            "buy_hold": 0.9036074777031601
+          },
+          {
+            "date": "2025-12-15",
+            "strategy": 0.933003819039609,
+            "buy_hold": 0.901762413168258
+          },
+          {
+            "date": "2025-12-16",
+            "strategy": 0.933003819039609,
+            "buy_hold": 0.897308620103386
+          },
+          {
+            "date": "2025-12-17",
+            "strategy": 0.9144036370265953,
+            "buy_hold": 0.8807660135387784
+          },
+          {
+            "date": "2025-12-18",
+            "strategy": 0.9130320315710555,
+            "buy_hold": 0.8803842438303143
+          },
+          {
+            "date": "2025-12-19",
+            "strategy": 0.9130320315710555,
+            "buy_hold": 0.8923458630496318
+          },
+          {
+            "date": "2025-12-22",
+            "strategy": 0.9170657707793523,
+            "buy_hold": 0.8976267303825715
+          },
+          {
+            "date": "2025-12-23",
+            "strategy": 0.9156901721231833,
+            "buy_hold": 0.9001081400539835
+          },
+          {
+            "date": "2025-12-24",
+            "strategy": 0.927067863398133,
+            "buy_hold": 0.9126423826914624
+          },
+          {
+            "date": "2025-12-26",
+            "strategy": 0.9256772616030358,
+            "buy_hold": 0.9106063398687235
+          },
+          {
+            "date": "2025-12-29",
+            "strategy": 0.9150397228269908,
+            "buy_hold": 0.9015079000292824
+          },
+          {
+            "date": "2025-12-30",
+            "strategy": 0.9136671632427503,
+            "buy_hold": 0.8894826836697558
+          },
+          {
+            "date": "2025-12-31",
+            "strategy": 0.9191589958799086,
+            "buy_hold": 0.8961633732670639
+          },
+          {
+            "date": "2026-01-05",
+            "strategy": 0.9244448487007183,
+            "buy_hold": 0.9013169840305155
+          },
+          {
+            "date": "2026-01-06",
+            "strategy": 0.9230581814276673,
+            "buy_hold": 0.9350384800071712
+          },
+          {
+            "date": "2026-01-07",
+            "strategy": 0.9341728048143272,
+            "buy_hold": 0.9476999169250682
+          },
+          {
+            "date": "2026-01-08",
+            "strategy": 0.923761762976002,
+            "buy_hold": 0.9371381199701191
+          },
+          {
+            "date": "2026-01-09",
+            "strategy": 0.9102148400104791,
+            "buy_hold": 0.9233950333561087
+          },
+          {
+            "date": "2026-01-12",
+            "strategy": 0.9088495177504635,
+            "buy_hold": 0.9249220499008954
+          },
+          {
+            "date": "2026-01-13",
+            "strategy": 0.9088495177504635,
+            "buy_hold": 0.9303938332326019
+          },
+          {
+            "date": "2026-01-14",
+            "strategy": 0.9026384046405276,
+            "buy_hold": 0.9254310761788476
+          },
+          {
+            "date": "2026-01-21",
+            "strategy": 0.8472823337945786,
+            "buy_hold": 0.8686772000390433
+          },
+          {
+            "date": "2026-01-22",
+            "strategy": 0.8460114102938868,
+            "buy_hold": 0.8649232869618205
+          },
+          {
+            "date": "2026-01-23",
+            "strategy": 0.8454892375155888,
+            "buy_hold": 0.8656868263787487
+          },
+          {
+            "date": "2026-01-27",
+            "strategy": 0.8443085365905132,
+            "buy_hold": 0.8644779201131473
+          },
+          {
+            "date": "2026-01-28",
+            "strategy": 0.8547482007262656,
+            "buy_hold": 0.8751669736375842
+          },
+          {
+            "date": "2026-01-29",
+            "strategy": 0.8452406624960165,
+            "buy_hold": 0.8654323132397725
+          },
+          {
+            "date": "2026-01-30",
+            "strategy": 0.8439728015022725,
+            "buy_hold": 0.885728832881603
+          },
+          {
+            "date": "2026-02-02",
+            "strategy": 0.8439728015022725,
+            "buy_hold": 0.8822930300835655
+          },
+          {
+            "date": "2026-02-03",
+            "strategy": 0.8439728015022725,
+            "buy_hold": 0.9020168640181649
+          },
+          {
+            "date": "2026-02-04",
+            "strategy": 0.8439728015022725,
+            "buy_hold": 0.9055163262454813
+          },
+          {
+            "date": "2026-02-05",
+            "strategy": 0.8434184296141355,
+            "buy_hold": 0.9062798033733397
+          },
+          {
+            "date": "2026-02-06",
+            "strategy": 0.8421533019697144,
+            "buy_hold": 0.9101609730200503
+          },
+          {
+            "date": "2026-02-09",
+            "strategy": 0.8477780069797478,
+            "buy_hold": 0.9176051397452167
+          },
+          {
+            "date": "2026-02-10",
+            "strategy": 0.8465063399692783,
+            "buy_hold": 0.9186231300120512
+          },
+          {
+            "date": "2026-02-11",
+            "strategy": 0.8790077117054028,
+            "buy_hold": 0.9552713402197224
+          },
+          {
+            "date": "2026-02-12",
+            "strategy": 0.8827546470334362,
+            "buy_hold": 0.9593433635761304
+          },
+          {
+            "date": "2026-02-13",
+            "strategy": 0.881430515062886,
+            "buy_hold": 0.9597887304248037
+          },
+          {
+            "date": "2026-02-18",
+            "strategy": 0.8935653730624005,
+            "buy_hold": 0.9744420472149907
+          },
+          {
+            "date": "2026-02-19",
+            "strategy": 0.8922250250028069,
+            "buy_hold": 0.9674339662671055
+          },
+          {
+            "date": "2026-02-20",
+            "strategy": 0.8922250250028069,
+            "buy_hold": 0.970364604709515
+          },
+          {
+            "date": "2026-02-23",
+            "strategy": 0.8922250250028069,
+            "buy_hold": 0.9802396023814611
+          },
+          {
+            "date": "2026-02-24",
+            "strategy": 0.8940761325558827,
+            "buy_hold": 0.9837436739999387
+          },
+          {
+            "date": "2026-02-25",
+            "strategy": 0.8927350183570489,
+            "buy_hold": 0.9917073938558442
+          },
+          {
+            "date": "2026-02-26",
+            "strategy": 0.8927350183570489,
+            "buy_hold": 0.9906880332294752
+          },
+          {
+            "date": "2026-02-27",
+            "strategy": 0.8927350183570489,
+            "buy_hold": 0.9966130318326429
+          },
+          {
+            "date": "2026-03-02",
+            "strategy": 0.8927350183570489,
+            "buy_hold": 0.9927904762005618
+          },
+          {
+            "date": "2026-03-04",
+            "strategy": 0.8927350183570489,
+            "buy_hold": 0.9767993147704024
+          },
+          {
+            "date": "2026-03-05",
+            "strategy": 0.8927350183570489,
+            "buy_hold": 0.9906880332294755
+          },
+          {
+            "date": "2026-03-06",
+            "strategy": 0.8927350183570489,
+            "buy_hold": 0.9842533231685886
+          },
+          {
+            "date": "2026-03-09",
+            "strategy": 0.8976945713873126,
+            "buy_hold": 0.9911976823981251
+          },
+          {
+            "date": "2026-03-10",
+            "strategy": 0.8963480295302316,
+            "buy_hold": 0.9942557642772318
+          },
+          {
+            "date": "2026-03-11",
+            "strategy": 0.8963480295302316,
+            "buy_hold": 0.9790928606074651
+          },
+          {
+            "date": "2026-03-12",
+            "strategy": 0.8822301551349694,
+            "buy_hold": 0.9651403581409737
+          },
+          {
+            "date": "2026-03-13",
+            "strategy": 0.8793765864332178,
+            "buy_hold": 0.9620186168325879
+          },
+          {
+            "date": "2026-03-16",
+            "strategy": 0.8723881700925176,
+            "buy_hold": 0.9543734432793559
+          },
+          {
+            "date": "2026-03-17",
+            "strategy": 0.8735528966596111,
+            "buy_hold": 0.9556476284900496
+          },
+          {
+            "date": "2026-03-18",
+            "strategy": 0.8722425673146218,
+            "buy_hold": 0.951952454005596
+          },
+          {
+            "date": "2026-03-19",
+            "strategy": 0.8722425673146218,
+            "buy_hold": 0.9240475113616828
+          },
+          {
+            "date": "2026-03-20",
+            "strategy": 0.8844653226519582,
+            "buy_hold": 0.9383822818491964
+          },
+          {
+            "date": "2026-03-23",
+            "strategy": 0.8581036636268493,
+            "buy_hold": 0.9104136174869346
+          },
+          {
+            "date": "2026-03-24",
+            "strategy": 0.8902900695756604,
+            "buy_hold": 0.9445621050366889
+          },
+          {
+            "date": "2026-03-25",
+            "strategy": 0.910406558616141,
+            "buy_hold": 0.9659048941830177
+          },
+          {
+            "date": "2026-03-27",
+            "strategy": 0.9066234555890618,
+            "buy_hold": 0.9618911733958907
+          },
+          {
+            "date": "2026-03-30",
+            "strategy": 0.8910106774027531,
+            "buy_hold": 0.9453266410787329
+          },
+          {
+            "date": "2026-04-01",
+            "strategy": 0.8773794826757919,
+            "buy_hold": 0.9308644894435918
+          },
+          {
+            "date": "2026-04-02",
+            "strategy": 0.8788206396198724,
+            "buy_hold": 0.9323934992386104
+          },
+          {
+            "date": "2026-04-06",
+            "strategy": 0.8854861152452175,
+            "buy_hold": 0.9394653019048442
+          },
+          {
+            "date": "2026-04-07",
+            "strategy": 0.8799015513605114,
+            "buy_hold": 0.9335403033016766
+          },
+          {
+            "date": "2026-04-08",
+            "strategy": 0.8889089143587503,
+            "buy_hold": 0.9430967546709492
+          },
+          {
+            "date": "2026-04-09",
+            "strategy": 0.8985168230196363,
+            "buy_hold": 0.9532903609346384
+          },
+          {
+            "date": "2026-04-10",
+            "strategy": 0.9021198034449948,
+            "buy_hold": 0.9571129788557892
+          },
+          {
+            "date": "2026-04-13",
+            "strategy": 0.902720290397537,
+            "buy_hold": 0.957750071461136
+          },
+          {
+            "date": "2026-04-15",
+            "strategy": 0.9013662099619407,
+            "buy_hold": 0.9737412328912955
+          },
+          {
+            "date": "2026-04-16",
+            "strategy": 0.8895167038431745,
+            "buy_hold": 0.96240088485361
+          },
+          {
+            "date": "2026-04-17",
+            "strategy": 0.8881824287874098,
+            "buy_hold": 0.9810041384235055
+          },
+          {
+            "date": "2026-04-20",
+            "strategy": 0.8881824287874098,
+            "buy_hold": 0.9756525107073362
+          },
+          {
+            "date": "2026-04-21",
+            "strategy": 0.8969418292158176,
+            "buy_hold": 0.9867380341606969
+          },
+          {
+            "date": "2026-04-22",
+            "strategy": 0.8955964164719938,
+            "buy_hold": 0.9762896033126829
+          },
+          {
+            "date": "2026-04-23",
+            "strategy": 0.8955964164719938,
+            "buy_hold": 0.9914525692715194
+          },
+          {
+            "date": "2026-04-24",
+            "strategy": 0.8955964164719938,
+            "buy_hold": 0.9852726837949571
+          },
+          {
+            "date": "2026-04-27",
+            "strategy": 0.8955964164719938,
+            "buy_hold": 0.9970590215720134
+          },
+          {
+            "date": "2026-04-28",
+            "strategy": 0.8860123647358709,
+            "buy_hold": 0.9878847759346931
+          },
+          {
+            "date": "2026-04-29",
+            "strategy": 0.8846833461887671,
+            "buy_hold": 0.982278323634199
+          },
+          {
+            "date": "2026-04-30",
+            "strategy": 0.8750362548812894,
+            "buy_hold": 0.9730404185675998
+          },
+          {
+            "date": "2026-05-04",
+            "strategy": 0.8737237004989675,
+            "buy_hold": 0.985909776400304
+          },
+          {
+            "date": "2026-05-05",
+            "strategy": 0.8763088868542769,
+            "buy_hold": 0.9903057652084531
+          },
+          {
+            "date": "2026-05-06",
+            "strategy": 0.8749944235239955,
+            "buy_hold": 0.9888404771317832
+          },
+          {
+            "date": "2026-05-07",
+            "strategy": 0.8823072418310973,
+            "buy_hold": 0.998588031367032
+          },
+          {
+            "date": "2026-05-08",
+            "strategy": 0.9115786407282275,
+            "buy_hold": 1.0317171582904172
+          },
+          {
+            "date": "2026-05-11",
+            "strategy": 0.9102112727671352,
+            "buy_hold": 1.0298058804743766
+          },
+          {
+            "date": "2026-05-12",
+            "strategy": 0.9102112727671352,
+            "buy_hold": 1.0222244286394933
+          },
+          {
+            "date": "2026-05-13",
+            "strategy": 0.906803731844339,
+            "buy_hold": 1.0199308828024307
+          },
+          {
+            "date": "2026-05-14",
+            "strategy": 0.9197750448973653,
+            "buy_hold": 1.0345204155851992
+          },
+          {
+            "date": "2026-05-15",
+            "strategy": 0.9156400833901512,
+            "buy_hold": 1.0298696021927254
+          },
+          {
+            "date": "2026-05-18",
+            "strategy": 0.9086162699166568,
+            "buy_hold": 1.0219695417660988
+          },
+          {
+            "date": "2026-05-19",
+            "strategy": 0.9072533455117818,
+            "buy_hold": 1.022670356089794
+          },
+          {
+            "date": "2026-05-20",
+            "strategy": 0.9072533455117818,
+            "buy_hold": 1.029359890735006
+          },
+          {
+            "date": "2026-05-21",
+            "strategy": 0.9072533455117818,
+            "buy_hold": 1.0586663997372403
+          },
+          {
+            "date": "2026-05-22",
+            "strategy": 0.9117890708026044,
+            "buy_hold": 1.0655470995374978
+          },
+          {
+            "date": "2026-05-27",
+            "strategy": 0.9104213871964005,
+            "buy_hold": 1.0540793080631148
+          },
+          {
+            "date": "2026-05-29",
+            "strategy": 0.9104213871964005,
+            "buy_hold": 1.0418470428357576
+          },
+          {
+            "date": "2026-06-01",
+            "strategy": 0.9104213871964005,
+            "buy_hold": 1.0331825086561566
+          },
+          {
+            "date": "2026-06-02",
+            "strategy": 0.9069224239814282,
+            "buy_hold": 1.0307615193823967
+          },
+          {
+            "date": "2026-06-03",
+            "strategy": 0.9055620403454561,
+            "buy_hold": 1.0563729161892472
+          },
+          {
+            "date": "2026-06-04",
+            "strategy": 0.9055620403454561,
+            "buy_hold": 1.0510849479023567
+          },
+          {
+            "date": "2026-06-05",
+            "strategy": 0.9055620403454561,
+            "buy_hold": 1.0581567505685907
+          },
+          {
+            "date": "2026-06-08",
+            "strategy": 0.9055620403454561,
+            "buy_hold": 1.0650374503688484
+          },
+          {
+            "date": "2026-06-09",
+            "strategy": 0.9221340153304559,
+            "buy_hold": 1.0861254149308526
+          },
+          {
+            "date": "2026-06-10",
+            "strategy": 0.9207508143074603,
+            "buy_hold": 1.0816019826860062
+          },
+          {
+            "date": "2026-06-11",
+            "strategy": 0.9207508143074603,
+            "buy_hold": 1.082175415862074
+          },
+          {
+            "date": "2026-06-12",
+            "strategy": 0.9207508143074603,
+            "buy_hold": 1.0828125084674207
+          },
+          {
+            "date": "2026-06-15",
+            "strategy": 0.9207508143074603,
+            "buy_hold": 1.0790536122646184
+          },
+          {
+            "date": "2026-06-16",
+            "strategy": 0.9207508143074603,
+            "buy_hold": 1.0691148928743237
+          },
+          {
+            "date": "2026-06-17",
+            "strategy": 0.9234299739086954,
+            "buy_hold": 1.0738294279851461
+          },
+          {
+            "date": "2026-06-18",
+            "strategy": 0.9220448289478325,
+            "buy_hold": 1.0717907067324082
+          },
+          {
+            "date": "2026-06-23",
+            "strategy": 0.9289926117859779,
+            "buy_hold": 1.0814745392493084
+          },
+          {
+            "date": "2026-06-24",
+            "strategy": 0.927599122868299,
+            "buy_hold": 1.0924326815550416
+          },
+          {
+            "date": "2026-06-25",
+            "strategy": 0.927599122868299,
+            "buy_hold": 1.094789949110453
+          },
+          {
+            "date": "2026-06-29",
+            "strategy": 0.927599122868299,
+            "buy_hold": 1.102817390684707
+          },
+          {
+            "date": "2026-06-30",
+            "strategy": 0.927599122868299,
+            "buy_hold": 1.1062577405848357
+          },
+          {
+            "date": "2026-07-01",
+            "strategy": 0.927599122868299,
+            "buy_hold": 1.0981665150031632
+          },
+          {
+            "date": "2026-07-02",
+            "strategy": 0.927599122868299,
+            "buy_hold": 1.108041574964179
+          },
+          {
+            "date": "2026-07-07",
+            "strategy": 0.927599122868299,
+            "buy_hold": 1.1260077359287277
+          },
+          {
+            "date": "2026-07-08",
+            "strategy": 0.927599122868299,
+            "buy_hold": 1.1153681399256679
+          },
+          {
+            "date": "2026-07-09",
+            "strategy": 0.9359569233621174,
+            "buy_hold": 1.1270908182734454
+          },
+          {
+            "date": "2026-07-10",
+            "strategy": 0.9354807339171103,
+            "buy_hold": 1.1265173850973773
+          },
+          {
+            "date": "2026-07-13",
+            "strategy": 0.9340775128162346,
+            "buy_hold": 1.1190633766991913
+          },
+          {
+            "date": "2026-07-14",
+            "strategy": 0.9452264322205735,
+            "buy_hold": 1.1340988369322609
+          },
+          {
+            "date": "2026-07-15",
+            "strategy": 0.9438085925722427,
+            "buy_hold": 1.1383675068818522
+          },
+          {
+            "date": "2026-07-16",
+            "strategy": 0.9375332530410105,
+            "buy_hold": 1.1325061054188936
+          },
+          {
+            "date": "2026-07-17",
+            "strategy": 0.9361269531614491,
+            "buy_hold": 1.124606107281337
+          },
+          {
+            "date": "2026-07-20",
+            "strategy": 0.9361269531614491,
+            "buy_hold": 1.1346722701083287
+          },
+          {
+            "date": "2026-07-21",
+            "strategy": 0.9369828821065482,
+            "buy_hold": 1.1374117433956923
+          },
+          {
+            "date": "2026-07-22",
+            "strategy": 0.9355774077833885,
+            "buy_hold": 1.1388771560505018
+          },
+          {
+            "date": "2026-07-23",
+            "strategy": 0.9355774077833885,
+            "buy_hold": 1.1291931989554622
+          },
+          {
+            "date": "2026-07-24",
+            "strategy": 0.9282093090991895,
+            "buy_hold": 1.1219940774306707
+          },
+          {
+            "date": "2026-07-27",
+            "strategy": 0.9268169951355408,
+            "buy_hold": 1.1268359314000511
+          },
+          {
+            "date": "2026-07-28",
+            "strategy": 0.9316624763793463,
+            "buy_hold": 1.1344173832349345
+          },
+          {
+            "date": "2026-07-29",
+            "strategy": 0.9302649826647773,
+            "buy_hold": 1.1384948257404102
+          },
+          {
+            "date": "2026-07-30",
+            "strategy": 0.9343876760700185,
+            "buy_hold": 1.1452480821039706
+          },
+          {
+            "date": "2026-07-31",
+            "strategy": 0.9329860945559135,
+            "buy_hold": 1.1412980830351922
+          },
+          {
+            "date": "2026-08-03",
+            "strategy": 0.9173163007547297,
+            "buy_hold": 1.123841571239293
+          },
+          {
+            "date": "2026-08-04",
+            "strategy": 0.9412372333078116,
+            "buy_hold": 1.1531480802415275
+          },
+          {
+            "date": "2026-08-05",
+            "strategy": 0.93982537745785,
+            "buy_hold": 1.135309362713676
+          },
+          {
+            "date": "2026-08-06",
+            "strategy": 0.9452190683814773,
+            "buy_hold": 1.1435279071539064
+          },
+          {
+            "date": "2026-08-07",
+            "strategy": 0.9438012397789052,
+            "buy_hold": 1.139769010951104
+          },
+          {
+            "date": "2026-08-10",
+            "strategy": 0.9438012397789052,
+            "buy_hold": 1.1355642495870706
+          },
+          {
+            "date": "2026-08-11",
+            "strategy": 0.9252822876294607,
+            "buy_hold": 1.114985934193716
+          },
+          {
+            "date": "2026-08-12",
+            "strategy": 0.9090511440603254,
+            "buy_hold": 1.0954270417158
+          },
+          {
+            "date": "2026-08-13",
+            "strategy": 0.9093683213297066,
+            "buy_hold": 1.0958092474477523
+          },
+          {
+            "date": "2026-08-14",
+            "strategy": 0.9443562410269671,
+            "buy_hold": 1.137970476351301
+          },
+          {
+            "date": "2026-08-17",
+            "strategy": 0.9342991990564989,
+            "buy_hold": 1.1258515149418091
+          },
+          {
+            "date": "2026-08-18",
+            "strategy": 0.9333993584591412,
+            "buy_hold": 1.1247671868156968
+          },
+          {
+            "date": "2026-08-19",
+            "strategy": 0.9319992594214526,
+            "buy_hold": 1.116220129821634
+          },
+          {
+            "date": "2026-08-20",
+            "strategy": 0.9290035475161693,
+            "buy_hold": 1.1143066095990828
+          },
+          {
+            "date": "2026-08-21",
+            "strategy": 0.9276100421948951,
+            "buy_hold": 1.108948752975939
+          },
+          {
+            "date": "2026-08-24",
+            "strategy": 0.9271789964379129,
+            "buy_hold": 1.1100968651094698
+          },
+          {
+            "date": "2026-08-25",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.1339520838839436
+          },
+          {
+            "date": "2026-08-26",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.1183250020664408
+          },
+          {
+            "date": "2026-08-27",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.1225985305634723
+          },
+          {
+            "date": "2026-08-28",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.1275098991346875
+          },
+          {
+            "date": "2026-08-31",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.135163980024893
+          },
+          {
+            "date": "2026-09-01",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.116857969895818
+          },
+          {
+            "date": "2026-09-02",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.1122655213616948
+          },
+          {
+            "date": "2026-09-03",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.1088211849611023
+          },
+          {
+            "date": "2026-09-04",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.1034633283379585
+          },
+          {
+            "date": "2026-09-09",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.1439023890412108
+          },
+          {
+            "date": "2026-09-10",
+            "strategy": 0.9257882279432561,
+            "buy_hold": 1.135355332047148
+          },
+          {
+            "date": "2026-09-11",
+            "strategy": 0.9177421920520863,
+            "buy_hold": 1.1271909790975954
+          },
+          {
+            "date": "2026-09-15",
+            "strategy": 0.9163655787640083,
+            "buy_hold": 1.1116276812875108
+          },
+          {
+            "date": "2026-09-16",
+            "strategy": 0.9131507277072726,
+            "buy_hold": 1.1093952410278676
+          },
+          {
+            "date": "2026-09-17",
+            "strategy": 0.920710878617975,
+            "buy_hold": 1.1185801380961142
+          },
+          {
+            "date": "2026-09-18",
+            "strategy": 0.9391912475108032,
+            "buy_hold": 1.1410321087073838
+          },
+          {
+            "date": "2026-09-21",
+            "strategy": 0.9357786793913889,
+            "buy_hold": 1.136886148225189
+          },
+          {
+            "date": "2026-09-22",
+            "strategy": 0.9277460190487676,
+            "buy_hold": 1.1271271950901771
+          },
+          {
+            "date": "2026-09-23",
+            "strategy": 0.9522640084605596,
+            "buy_hold": 1.1569143265545603
+          },
+          {
+            "date": "2026-09-24",
+            "strategy": 0.9508356124478688,
+            "buy_hold": 1.1338882998765254
+          },
+          {
+            "date": "2026-09-25",
+            "strategy": 0.9508356124478688,
+            "buy_hold": 1.1339520838839439
+          },
+          {
+            "date": "2026-09-28",
+            "strategy": 0.9508356124478688,
+            "buy_hold": 1.130252611453678
+          },
+          {
+            "date": "2026-09-29",
+            "strategy": 0.9278384833969147,
+            "buy_hold": 1.1046114404714895
+          },
+          {
+            "date": "2026-09-30",
+            "strategy": 0.8749584404870662,
+            "buy_hold": 1.0416566251495494
+          },
+          {
+            "date": "2026-10-01",
+            "strategy": 0.8736460028263356,
+            "buy_hold": 1.037574448674773
+          },
+          {
+            "date": "2026-10-05",
+            "strategy": 0.8563846600998719,
+            "buy_hold": 1.0186305984715145
+          },
+          {
+            "date": "2026-10-06",
+            "strategy": 0.8488235932824592,
+            "buy_hold": 1.009637053425523
+          },
+          {
+            "date": "2026-10-07",
+            "strategy": 0.8490917162192467,
+            "buy_hold": 1.009955973462615
+          },
+          {
+            "date": "2026-10-08",
+            "strategy": 0.822172173365763,
+            "buy_hold": 0.9779364017385886
+          },
+          {
+            "date": "2026-10-09",
+            "strategy": 0.8209389151057144,
+            "buy_hold": 1.0240522391020768
+          },
+          {
+            "date": "2026-10-12",
+            "strategy": 0.7938853857658564,
+            "buy_hold": 0.9918413153557952
+          },
+          {
+            "date": "2026-10-13",
+            "strategy": 0.7926945576872076,
+            "buy_hold": 1.004087844780124
+          },
+          {
+            "date": "2026-10-14",
+            "strategy": 0.7867721091410721,
+            "buy_hold": 0.9980921480827963
+          },
+          {
+            "date": "2026-10-15",
+            "strategy": 0.7855919509773606,
+            "buy_hold": 1.006447853054604
+          }
+        ]
+      },
+      "quantile_return_samples": {
+        "0.1": -0.0037975602287613148,
+        "0.5": 0.0017008816234580673,
+        "0.9": 0.009416877405299376
+      },
+      "n_train": 880,
+      "n_test": 221
+    }
+  ]
+}

@@ -1,22 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { useCallback, useEffect, useState } from "react";
 import { ArrowUpIcon, ArrowDownIcon } from "lucide-react";
 import { formatINR } from "@/lib/format";
+import { DisclaimerBanner } from "@/components/trading/disclaimer-banner";
+import { SiteNav } from "@/components/trading/site-nav";
+import { CandlestickChart, type OhlcBar } from "@/components/trading/candlestick-chart";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-  "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8000";
+
+const WATCHLIST_KEY = "nse_watchlist_v1";
+const DEFAULT_WATCH = ["RELIANCE", "TCS", "INFY"];
 
 type SymbolEntry = {
   symbol: string;
@@ -25,272 +20,224 @@ type SymbolEntry = {
   sector: string;
 };
 
-export default function StockDashboard() {
+export default function TradingDeskPage() {
   const [symbols, setSymbols] = useState<SymbolEntry[]>([]);
-  const [symbolsError, setSymbolsError] = useState<string | null>(null);
+  const [watchlist, setWatchlist] = useState<string[]>(DEFAULT_WATCH);
   const [selectedStock, setSelectedStock] = useState("RELIANCE");
-  const [chartData, setChartData] = useState<{ date: string; price: number }[]>(
-    []
-  );
+  const [bars, setBars] = useState<OhlcBar[]>([]);
   const [loading, setLoading] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
 
-  const [stockData, setStockData] = useState({
-    symbol: "RELIANCE",
+  const [quote, setQuote] = useState({
     price: 0,
     change: 0,
     changePercent: 0,
-    previousClose: 0,
     asOf: "",
   });
 
-  const [aiPrediction, setAiPrediction] = useState({
-    nextDayPrice: 0,
+  const [prediction, setPrediction] = useState({
+    price: 0,
+    p10: 0,
+    p50: 0,
+    p90: 0,
     confidence: 0,
+    direction: "up",
   });
 
   useEffect(() => {
+    const saved = localStorage.getItem(WATCHLIST_KEY);
+    if (saved) {
+      try {
+        setWatchlist(JSON.parse(saved));
+      } catch {
+        /* ignore */
+      }
+    }
     fetch(`${API_BASE}/symbols`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Failed to load symbols (${res.status})`);
-        }
-        return res.json();
-      })
-      .then((data: { symbols?: SymbolEntry[] }) => {
-        const list = data.symbols ?? [];
-        setSymbols(list);
-        setSymbolsError(null);
-        if (list.length > 0) {
-          const hasReliance = list.some((s) => s.symbol === "RELIANCE");
-          if (!hasReliance && !list.some((s) => s.symbol === selectedStock)) {
-            setSelectedStock(list[0].symbol);
-          }
-        }
-      })
-      .catch((err: Error) => {
-        setSymbolsError(err.message || "Could not load symbol list.");
-        setSymbols([]);
-      });
+      .then((r) => r.json())
+      .then((d) => d.symbols && setSymbols(d.symbols))
+      .catch(() => setDataError("API unavailable"));
   }, []);
 
-  useEffect(() => {
-    if (!selectedStock) return;
+  const persistWatch = useCallback((list: string[]) => {
+    setWatchlist(list);
+    localStorage.setItem(WATCHLIST_KEY, JSON.stringify(list));
+  }, []);
 
+  const toggleWatch = (sym: string) => {
+    if (watchlist.includes(sym)) {
+      persistWatch(watchlist.filter((s) => s !== sym));
+    } else {
+      persistWatch([...watchlist, sym]);
+    }
+  };
+
+  useEffect(() => {
     setLoading(true);
     setDataError(null);
 
-    const quotePromise = fetch(
-      `${API_BASE}/realtime?symbol=${encodeURIComponent(selectedStock)}`
-    )
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Quote unavailable (${res.status})`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setStockData({
-            symbol: data.symbol,
-            price: data.price,
-            change: data.change,
-            changePercent: data.change_percent,
-            previousClose: data.previous_close,
-            asOf: data.as_of ?? "",
+    fetch(`${API_BASE}/realtime?symbol=${selectedStock}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.price != null) {
+          setQuote({
+            price: d.price,
+            change: d.change,
+            changePercent: d.change_percent,
+            asOf: d.as_of || "",
           });
         }
       });
 
-    const predictPromise = fetch(
-      `${API_BASE}/predict?symbol=${encodeURIComponent(selectedStock)}`
-    )
-      .then((res) => {
-        if (!res.ok) {
-          return null;
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data?.predicted_price != null) {
-          setAiPrediction({
-            nextDayPrice: data.predicted_price,
-            confidence: data.confidence ?? 0,
+    fetch(`${API_BASE}/predict?symbol=${selectedStock}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.predicted_price) {
+          setPrediction({
+            price: d.predicted_price,
+            p10: d.interval?.p10 ?? d.predicted_price,
+            p50: d.interval?.p50 ?? d.predicted_price,
+            p90: d.interval?.p90 ?? d.predicted_price,
+            confidence: d.confidence ?? 0,
+            direction: d.direction ?? "up",
           });
         }
       });
 
-    const chartPromise = fetch(
-      `${API_BASE}/chart?symbol=${encodeURIComponent(selectedStock)}`
-    )
-      .then((res) => {
-        if (!res.ok) {
-          return null;
-        }
-        return res.json();
+    fetch(`${API_BASE}/ohlcv?symbol=${selectedStock}&tail=120`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.bars) setBars(d.bars);
       })
-      .then((data) => {
-        if (data?.chart_data) {
-          setChartData(data.chart_data);
-        } else {
-          setChartData([]);
-        }
-      });
-
-    Promise.all([quotePromise, predictPromise, chartPromise])
-      .catch((err: Error) => {
-        setDataError(err.message || "Failed to load market data.");
-      })
+      .catch(() =>
+        fetch(`${API_BASE}/chart?symbol=${selectedStock}`)
+          .then((r) => r.json())
+          .then((d) => {
+            if (d.chart_data) {
+              setBars(
+                d.chart_data.map((c: { date: string; price: number }) => ({
+                  date: c.date,
+                  open: c.price,
+                  high: c.price,
+                  low: c.price,
+                  close: c.price,
+                }))
+              );
+            }
+          })
+      )
       .finally(() => setLoading(false));
   }, [selectedStock]);
 
-  const selectedMeta = symbols.find((s) => s.symbol === selectedStock);
-
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
-      <div className="container mx-auto px-4 py-8 flex-1">
-        <header className="mb-8 text-center">
+    <div className="min-h-screen bg-gray-900 text-gray-100">
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-6 text-center">
           <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">
-            Indian Stock Market Predictor
+            NSE Trading Desk
           </h1>
+          <p className="text-gray-400 mt-2">Paper research · predictions · backtest</p>
         </header>
+        <SiteNav />
+        <DisclaimerBanner />
 
-        <div className="max-w-md mx-auto mb-8">
-          {symbolsError && (
-            <p className="text-red-400 text-sm mb-2 text-center" role="alert">
-              {symbolsError}
-            </p>
-          )}
-          <select
-            value={selectedStock}
-            onChange={(e) => setSelectedStock(e.target.value)}
-            disabled={symbols.length === 0 && !!symbolsError}
-            className="w-full p-3 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {symbols.length > 0
-              ? symbols.map((stock) => (
-                  <option key={stock.symbol} value={stock.symbol}>
-                    {stock.name} ({stock.symbol})
-                  </option>
-                ))
-              : (
-                <option value="RELIANCE">RELIANCE</option>
-              )}
-          </select>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
+          <aside className="lg:col-span-1 bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <h2 className="font-semibold text-gray-300 mb-3">Watchlist</h2>
+            <ul className="space-y-2 text-sm">
+              {watchlist.map((s) => (
+                <li key={s}>
+                  <button
+                    type="button"
+                    className={`w-full text-left px-2 py-1 rounded ${
+                      selectedStock === s ? "bg-blue-900/60 text-white" : "hover:bg-gray-700"
+                    }`}
+                    onClick={() => setSelectedStock(s)}
+                  >
+                    {s}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <select
+              className="w-full mt-4 p-2 rounded bg-gray-900 border border-gray-600 text-sm"
+              value={selectedStock}
+              onChange={(e) => setSelectedStock(e.target.value)}
+            >
+              {symbols.map((s) => (
+                <option key={s.symbol} value={s.symbol}>
+                  {s.name} ({s.symbol})
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className="mt-2 w-full text-xs text-blue-400 hover:underline"
+              onClick={() => toggleWatch(selectedStock)}
+            >
+              {watchlist.includes(selectedStock) ? "Remove from watchlist" : "Add to watchlist"}
+            </button>
+          </aside>
 
-        {dataError && (
-          <p
-            className="text-amber-400 text-sm text-center mb-6 max-w-lg mx-auto"
-            role="alert"
-          >
-            {dataError}
-          </p>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-400 mb-2">
-              Latest close
-            </h2>
-            <h3 className="text-2xl font-bold">
-              {selectedMeta?.name ?? selectedStock}
-            </h3>
-            <p className="text-sm text-gray-500">{selectedStock} · NSE</p>
-            <div className="mt-2 text-5xl font-bold tracking-tighter">
-              {loading && stockData.price === 0
-                ? "…"
-                : formatINR(stockData.price)}
-            </div>
-            <div className="flex mt-2 items-center">
-              {stockData.change >= 0 ? (
-                <span className="text-green-500 flex items-center">
-                  <ArrowUpIcon className="w-5 h-5 mr-1" />
-                  {formatINR(stockData.change)} ({stockData.changePercent}%)
-                </span>
-              ) : (
-                <span className="text-red-500 flex items-center">
-                  <ArrowDownIcon className="w-5 h-5 mr-1" />
-                  {formatINR(Math.abs(stockData.change))} (
-                  {Math.abs(stockData.changePercent)}%)
-                </span>
-              )}
-            </div>
-            {stockData.asOf && (
-              <div className="text-sm text-gray-400 mt-2">
-                As of session: {stockData.asOf}
+          <div className="lg:col-span-3 space-y-6">
+            {dataError && <p className="text-red-400">{dataError}</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <h2 className="text-gray-400 text-sm">Latest close (EOD)</h2>
+                <p className="text-2xl font-bold">{selectedStock}</p>
+                <p className="text-4xl font-bold mt-2">{formatINR(quote.price)}</p>
+                <div className="flex items-center mt-2">
+                  {quote.change >= 0 ? (
+                    <span className="text-green-500 flex items-center text-sm">
+                      <ArrowUpIcon className="w-4 h-4 mr-1" />
+                      {quote.change} ({quote.changePercent}%)
+                    </span>
+                  ) : (
+                    <span className="text-red-500 flex items-center text-sm">
+                      <ArrowDownIcon className="w-4 h-4 mr-1" />
+                      {Math.abs(quote.change)} ({Math.abs(quote.changePercent)}%)
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">As of {quote.asOf}</p>
               </div>
-            )}
-          </div>
 
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-400 mb-2">
-              AI Predicted Price
-            </h2>
-            <h3 className="text-2xl font-bold">Next Trading Day</h3>
-            <div className="mt-2 text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
-              {loading ? "…" : formatINR(aiPrediction.nextDayPrice)}
-            </div>
-            <div className="mt-4 flex items-center">
-              <div className="w-full bg-gray-700 rounded-full h-2.5">
-                <div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  style={{ width: `${aiPrediction.confidence * 100}%` }}
-                ></div>
+              <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <h2 className="text-gray-400 text-sm">Next session (champion model)</h2>
+                <p className="text-4xl font-bold text-purple-400 mt-2">
+                  {loading ? "…" : formatINR(prediction.p50 || prediction.price)}
+                </p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Band {formatINR(prediction.p10)} – {formatINR(prediction.p90)}
+                </p>
+                <p className="text-sm mt-2 capitalize">
+                  Signal:{" "}
+                  <span className={prediction.direction === "up" ? "text-green-400" : "text-red-400"}>
+                    {prediction.direction}
+                  </span>
+                </p>
+                <div className="mt-3 w-full bg-gray-700 rounded-full h-2">
+                  <div
+                    className="bg-blue-500 h-2 rounded-full"
+                    style={{ width: `${Math.min(100, prediction.confidence * 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Directional accuracy on holdout: {(prediction.confidence * 100).toFixed(1)}%
+                </p>
               </div>
-              <span className="ml-2 text-sm text-gray-400 whitespace-nowrap">
-                {(aiPrediction.confidence * 100).toFixed(0)}% confidence
-              </span>
             </div>
-          </div>
-        </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-          <h2 className="text-xl font-semibold mb-6">Last 60 sessions</h2>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={chartData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="date" stroke="#9CA3AF" />
-                <YAxis
-                  stroke="#9CA3AF"
-                  tickFormatter={(v) => formatINR(v)}
-                  width={90}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1F2937",
-                    borderColor: "#374151",
-                    color: "#F9FAFB",
-                  }}
-                  formatter={(value: number) => [formatINR(value), "Close"]}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="price"
-                  name="Close (INR)"
-                  stroke="#3B82F6"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+              <h2 className="text-lg font-semibold mb-4">OHLC · last 120 sessions</h2>
+              <CandlestickChart
+                bars={bars}
+                prediction={{ p10: prediction.p10, p50: prediction.p50, p90: prediction.p90 }}
+              />
+            </div>
           </div>
         </div>
       </div>
-
-      <footer className="border-t border-gray-800 py-6 px-4 text-center text-sm text-gray-500">
-        <p>
-          This app is for educational purposes only and is not trading or
-          investment advice. Model confidence is derived as 1 − test MAPE and
-          does not guarantee future performance.
-        </p>
-      </footer>
     </div>
   );
 }
