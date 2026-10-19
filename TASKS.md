@@ -32,11 +32,21 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ---
 
-## Phase 3+ (backlog)
+## Phase 3 — Evaluation + UI smoke + research foundations
 
-- [ ] Walk-forward / rolling retrain methodology (document + optional script)
-- [ ] Frontend smoke test (Playwright) with mocked API
-- [ ] Indian cost model + backtest module
+- [x] **P3-1** [WALK_FORWARD.md](WALK_FORWARD.md), [`walk_forward.py`](backend/walk_forward.py), [`walk_forward_report.py`](backend/scripts/walk_forward_report.py); tests
+- [x] **P3-2** Playwright smoke tests (`frontend/e2e/`) with mocked `/api/*`; CI job `frontend-e2e`
+- [x] **P3-3** [BACKTEST_SPEC.md](BACKTEST_SPEC.md) + [`india_costs.py`](backend/india_costs.py) (not wired to paper book)
+- [x] **P3-4** [AGENTS.md](AGENTS.md), [VISION.md](VISION.md)
+
+**Out of scope (unchanged):** licensed NSE feed, Docker manifests, full backtest engine, `PRD.md`.
+
+---
+
+## Phase 4+ (backlog)
+
+- [ ] Backtest engine implementing [BACKTEST_SPEC.md](BACKTEST_SPEC.md)
+- [ ] Walk-forward **retrain** job (scheduled / manual)
 - [ ] Licensed India daily data feed
 - [ ] Docker / production deploy manifests
-- [ ] Program docs: `AGENTS.md`, `VISION.md`, `PRD.md`, etc.
+- [ ] `PRD.md` and deeper compliance copy

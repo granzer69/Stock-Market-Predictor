@@ -1,5 +1,28 @@
 # Progress log
 
+## 2026-10-19 — Phase 3 kicked off (complete slice)
+
+**Branch:** `cursor/india-lstm-desk-1e7e`  
+**Scope:** Walk-forward docs/tools, Playwright UI smoke, India cost spec, agent vision docs.
+
+### Delivered
+
+- [WALK_FORWARD.md](WALK_FORWARD.md), `backend/walk_forward.py`, `backend/scripts/walk_forward_report.py`
+- [BACKTEST_SPEC.md](BACKTEST_SPEC.md), `backend/india_costs.py`
+- Playwright: `frontend/e2e/smoke.spec.ts` (mocked API), CI `frontend-e2e` job
+- [AGENTS.md](AGENTS.md), [VISION.md](VISION.md)
+
+### Verification
+
+- `python3 -m pytest -q` → **26 passed** (target after Phase 3)
+- `cd frontend && pnpm test:e2e` → 3 smoke tests
+
+### Next
+
+Phase 4: backtest engine, Docker, licensed data (see [TASKS.md](TASKS.md)).
+
+---
+
 ## 2026-10-19 — Phase 2 complete
 
 **Branch:** `cursor/india-lstm-desk-1e7e`  
