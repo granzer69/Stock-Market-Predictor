@@ -1,0 +1,16 @@
+# One-click API deploy: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: bharat-desk-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: YF_DISABLE_CURL_CFFI
+        value: "1"
+      - key: CORS_ORIGINS
+        value: https://bharat-desk.vercel.app,https://bharat-desk-ribhusiri-4839s-projects.vercel.app,http://localhost:3000
+      - key: MARKET_DATA_FAILOVER
+        value: "true"
