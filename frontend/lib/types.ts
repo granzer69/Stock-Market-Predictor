@@ -144,17 +144,42 @@ export type BacktestSummary = {
   turnover_ratio: number
 }
 
+export type EquityCurvePoint = {
+  time: string
+  equity: number
+}
+
+export type BacktestBenchmark = {
+  kind: string
+  ending_equity: number
+  total_return: number
+  max_drawdown: number
+  equity_curve: EquityCurvePoint[]
+}
+
 export type BacktestReport = {
   symbol: string
   ticker: string
   name: string
   period: string
   strategy: BacktestSummary
-  benchmark: {
-    kind: string
-    ending_equity: number
-    total_return: number
-    max_drawdown: number
-  }
+  equity_curve: EquityCurvePoint[]
+  benchmark: BacktestBenchmark
   disclaimer: string
+}
+
+export type PortfolioBacktestReport = {
+  kind: "portfolio"
+  symbols: string[]
+  period: string
+  strategy: BacktestSummary
+  equity_curve: EquityCurvePoint[]
+  benchmark: BacktestBenchmark
+  disclaimer: string
+}
+
+export type RuntimeConfig = {
+  market_data_provider: "yahoo" | "nse_csv"
+  market_data_label: string
+  research_portfolio_max_symbols: number
 }

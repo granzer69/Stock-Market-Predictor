@@ -1,5 +1,22 @@
 # Progress log
 
+## 2026-10-19 — Phase 6 complete
+
+**Branch:** `cursor/india-lstm-desk-1e7e`
+
+### Delivered
+
+- Backtest `equity_curve` in API; `BacktestEquityChart` on Research page
+- Portfolio backtest endpoint + shared-cash engine; Single/Portfolio toggle in UI
+- `GET /api/config` for `MARKET_DATA_PROVIDER` visibility; `.env.example`
+
+### Verification
+
+- `python3 -m pytest -q` → **42 passed**
+- `pnpm test:e2e` → **4** tests
+
+---
+
 ## 2026-10-19 — Phase 5 complete
 
 **Branch:** `cursor/india-lstm-desk-1e7e`  

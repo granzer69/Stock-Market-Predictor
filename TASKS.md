@@ -66,8 +66,17 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ---
 
-## Phase 6+ (backlog)
+## Phase 6 — Research UX + portfolio backtest + config flags
 
-- [ ] Backtest equity curve chart in UI
-- [ ] Multi-symbol portfolio backtest in API
-- [ ] Feature flags for `nse_csv` per environment in hosted deploy
+- [x] **P6-1** Equity curves in backtest API + Recharts on `/research`
+- [x] **P6-2** `GET /api/research/backtest/portfolio` (shared cash) + UI portfolio mode
+- [x] **P6-3** `app_config.py`, `GET /api/config`, `.env.example`, compose comments
+- [x] **P6-4** Batched LSTM inference in backtest signal path (faster API backtests)
+
+---
+
+## Phase 7+ (backlog)
+
+- [ ] More Nifty names in portfolio picker (not fixed quintet)
+- [ ] Export backtest JSON/CSV from UI
+- [ ] Production TLS + custom domain runbook

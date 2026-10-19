@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { mockBacktest, mockGlobals, mockOrders, mockOverview, mockPortfolio } from "./mocks"
+import { mockBacktest, mockConfig, mockGlobals, mockOrders, mockOverview, mockPortfolio, mockPortfolioBacktest } from "./mocks"
 
 async function mockApi(page: import("@playwright/test").Page) {
   await page.route("**/api/**", async (route) => {
@@ -20,8 +20,16 @@ async function mockApi(page: import("@playwright/test").Page) {
       await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockOrders) })
       return
     }
+    if (path.includes("/api/research/backtest/portfolio")) {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockPortfolioBacktest) })
+      return
+    }
     if (path.includes("/api/research/backtest/")) {
       await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockBacktest) })
+      return
+    }
+    if (path.endsWith("/api/config")) {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockConfig) })
       return
     }
     await route.fulfill({ status: 404, body: "not mocked" })

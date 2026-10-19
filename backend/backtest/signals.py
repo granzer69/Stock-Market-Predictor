@@ -37,15 +37,16 @@ def predicted_returns_from_windows(
         return hold_signals(n), out
 
     returns = log_returns(closes)
-    signals: list[str] = []
-    for index in range(n):
-        if index < WINDOW:
-            signals.append("HOLD")
-            continue
-        window = returns[index - WINDOW : index]
-        pred = float(predictor._predict_scaled(window.reshape(1, WINDOW))[0])
-        out[index] = pred
-        signals.append(signal_from_move(pred, threshold))
+    signals: list[str] = ["HOLD"] * WINDOW
+    if n <= WINDOW:
+        return signals + hold_signals(n - WINDOW), out
+
+    windows = np.stack([returns[index - WINDOW : index] for index in range(WINDOW, n)])
+    preds = predictor._predict_scaled(windows)
+    for offset, pred in enumerate(preds):
+        index = WINDOW + offset
+        out[index] = float(pred)
+        signals.append(signal_from_move(float(pred), threshold))
     return signals, out
 
 

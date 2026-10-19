@@ -31,13 +31,15 @@ docker run -p 8000:8000 \
   bharat-desk-api
 ```
 
-Optional licensed data:
+Optional licensed data (see `.env.example`):
 
 ```bash
 -e MARKET_DATA_PROVIDER=nse_csv \
 -e NSE_CSV_DIR=/data/nse_daily \
 -v /path/to/csvs:/data/nse_daily:ro
 ```
+
+The UI reads `GET /api/config` to show **Data: Yahoo Finance** vs **NSE CSV bundle**. No frontend env flag is required for provider selection.
 
 ## Single VM (demo)
 

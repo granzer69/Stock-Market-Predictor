@@ -53,6 +53,18 @@ export const mockPortfolio: Portfolio = {
 
 export const mockOrders: { orders: Order[] } = { orders: [] }
 
+export const mockConfig = {
+  market_data_provider: "yahoo",
+  market_data_label: "Yahoo Finance",
+  research_portfolio_max_symbols: 10,
+}
+
+const mockCurve = [
+  { time: "2024-01-01", equity: 1_000_000 },
+  { time: "2024-06-01", equity: 1_020_000 },
+  { time: "2024-12-01", equity: 1_010_000 },
+]
+
 export const mockBacktest = {
   symbol: "RELIANCE.NS",
   ticker: "RELIANCE",
@@ -70,11 +82,23 @@ export const mockBacktest = {
     total_costs_inr: 1200,
     turnover_ratio: 0.1,
   },
+  equity_curve: mockCurve,
   benchmark: {
     kind: "buy_and_hold",
     ending_equity: 1_020_000,
     total_return: 0.02,
     max_drawdown: -0.015,
+    equity_curve: mockCurve.map((p) => ({ ...p, equity: p.equity + 10_000 })),
   },
   disclaimer: "Offline simulation with India delivery costs; not investment advice.",
+}
+
+export const mockPortfolioBacktest = {
+  kind: "portfolio",
+  symbols: ["RELIANCE.NS", "TCS.NS"],
+  period: "2y",
+  strategy: mockBacktest.strategy,
+  equity_curve: mockCurve,
+  benchmark: mockBacktest.benchmark,
+  disclaimer: "Shared-cash multi-name simulation; not investment advice.",
 }

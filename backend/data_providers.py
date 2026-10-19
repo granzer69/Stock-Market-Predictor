@@ -76,8 +76,9 @@ class LicensedIndiaDailyProvider:
 
 
 def get_history_provider() -> HistoryProvider:
-    mode = os.environ.get("MARKET_DATA_PROVIDER", "yahoo").strip().lower()
-    if mode in {"nse_csv", "licensed", "csv"}:
+    from app_config import market_data_provider
+
+    if market_data_provider() == "nse_csv":
         return LicensedIndiaDailyProvider()
     return YahooHistoryProvider()
 

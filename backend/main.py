@@ -9,11 +9,12 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from app_config import public_config
 from data_providers import provider_fetcher
 from market_data import HISTORY_PERIODS, PriceCache, bars_from_frame, sma_series
-from research import backtest_from_frame
 from portfolio import PaperBook
 from predictor import Predictor
+from research import backtest_from_frame, portfolio_backtest
 from universe import GLOBALS, NIFTY_50, resolve
 
 ROOT = Path(__file__).resolve().parent
@@ -58,6 +59,11 @@ def _listing_quote(series, quote: dict, prediction: dict | None = None) -> dict:
 @app.get("/api/health")
 def health():
     return {"ok": True, "model": predictor.ready}
+
+
+@app.get("/api/config")
+def runtime_config():
+    return public_config()
 
 
 @app.get("/api/market/overview")
@@ -108,6 +114,34 @@ def history(symbol: str, period: str = Query(default="2y")):
         "sma20": sma_series(frame, 20),
         "sma50": sma_series(frame, 50),
     }
+
+
+@app.get("/api/research/backtest/portfolio")
+def research_portfolio_backtest(
+    period: str = Query(default="2y"),
+    symbols: str = Query(default="RELIANCE,TCS,HDFCBANK,INFY,ITC"),
+):
+    if period not in HISTORY_PERIODS:
+        raise HTTPException(status_code=400, detail=f"period must be one of {', '.join(HISTORY_PERIODS)}")
+    if not predictor.ready:
+        raise HTTPException(status_code=503, detail="Model is not trained yet")
+    tickers = [part.strip() for part in symbols.split(",") if part.strip()]
+    resolved: list[str] = []
+    for raw in tickers:
+        series = resolve(raw)
+        if series is None or series.kind != "equity":
+            raise HTTPException(status_code=400, detail=f"Unknown or non-equity symbol: {raw}")
+        resolved.append(series.symbol)
+    if len(resolved) < 2:
+        raise HTTPException(status_code=400, detail="Provide at least two symbols")
+    frames = market.get_histories(resolved, period)
+    missing = [symbol for symbol in resolved if symbol not in frames]
+    if missing:
+        raise HTTPException(status_code=404, detail=f"No history for {', '.join(missing)}")
+    try:
+        return portfolio_backtest(frames, predictor, period, resolved)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.get("/api/research/backtest/{symbol}")

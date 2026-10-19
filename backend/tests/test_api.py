@@ -49,6 +49,22 @@ def test_history_invalid_period(client):
     assert response.status_code == 400
 
 
+def test_runtime_config(client):
+    response = client.get("/api/config")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["market_data_provider"] in {"yahoo", "nse_csv"}
+
+
+def test_research_portfolio_backtest(client):
+    response = client.get("/api/research/backtest/portfolio?period=1y&symbols=RELIANCE,TCS")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["kind"] == "portfolio"
+    assert len(body["symbols"]) == 2
+    assert len(body["equity_curve"]) > 0
+
+
 def test_research_backtest(client):
     response = client.get("/api/research/backtest/RELIANCE?period=1y")
     assert response.status_code == 200

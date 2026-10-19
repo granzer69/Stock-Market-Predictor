@@ -10,3 +10,5 @@ def test_backtest_from_frame_returns_strategy_and_benchmark():
     assert payload["symbol"] == "RELIANCE.NS"
     assert "strategy" in payload and "benchmark" in payload
     assert payload["benchmark"]["kind"] == "buy_and_hold"
+    assert len(payload["equity_curve"]) > 0
+    assert len(payload["benchmark"]["equity_curve"]) > 0

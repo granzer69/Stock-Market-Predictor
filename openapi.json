@@ -21,6 +21,22 @@
         }
       }
     },
+    "/api/config": {
+      "get": {
+        "summary": "Runtime Config",
+        "operationId": "runtime_config_api_config_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/market/overview": {
       "get": {
         "summary": "Overview",
@@ -75,6 +91,54 @@
               "type": "string",
               "default": "2y",
               "title": "Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/research/backtest/portfolio": {
+      "get": {
+        "summary": "Research Portfolio Backtest",
+        "operationId": "research_portfolio_backtest_api_research_backtest_portfolio_get",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2y",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "symbols",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "RELIANCE,TCS,HDFCBANK,INFY,ITC",
+              "title": "Symbols"
             }
           }
         ],

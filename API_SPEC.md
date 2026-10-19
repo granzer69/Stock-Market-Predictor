@@ -114,6 +114,16 @@ Macro and index tape (see [backend/universe.py](backend/universe.py) `GLOBALS`).
 
 ---
 
+## `GET /api/config`
+
+Public runtime flags (no secrets).
+
+**Response 200:** `market_data_provider` (`yahoo` | `nse_csv`), `market_data_label`, `research_portfolio_max_symbols`.
+
+Set `MARKET_DATA_PROVIDER` / `NSE_CSV_DIR` on the API host (see `.env.example`).
+
+---
+
 ## `GET /api/research/backtest/{symbol}`
 
 Offline long-only backtest of LSTM signals on cached daily history (India delivery costs). Does not mutate the paper book.
@@ -129,10 +139,21 @@ Offline long-only backtest of LSTM signals on cached daily history (India delive
 | `name` | string | Company name |
 | `period` | string | History window used |
 | `strategy` | object | `ending_equity`, `total_return`, `cagr`, `max_drawdown`, `sharpe`, `hit_rate`, `trade_count`, `total_costs_inr`, … |
-| `benchmark` | object | `kind` = `buy_and_hold`, `ending_equity`, `total_return`, `max_drawdown` |
+| `equity_curve` | array | `{ time, equity }[]` (downsampled) |
+| `benchmark` | object | `kind` = `buy_and_hold`, `ending_equity`, `total_return`, `max_drawdown`, `equity_curve` |
 | `disclaimer` | string | Research-only notice |
 
 **Errors:** `400` (bad period / short history), `404` (unknown symbol / no data), `503` (model not loaded).
+
+---
+
+## `GET /api/research/backtest/portfolio`
+
+Shared-cash backtest across multiple Nifty 50 names (max 10).
+
+**Query:** `period` (default `2y`), `symbols` comma-separated tickers (default `RELIANCE,TCS,HDFCBANK,INFY,ITC`).
+
+**Response 200:** `kind` = `portfolio`, `symbols`, `strategy`, `equity_curve`, `benchmark` (`equal_weight_buy_hold`), `disclaimer`.
 
 ---
 
