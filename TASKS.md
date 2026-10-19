@@ -1,51 +1,34 @@
 # Tasks — Bharat Desk program
 
-**Phase 0:** Audit only (no application code changes). **Status:** complete — see [PROGRESS.md](PROGRESS.md).
-
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ---
 
 ## Phase 0 — Repository audit
 
-- [x] Inspect frontend routes, components, API client, Next rewrites
-- [x] Inventory FastAPI routes and lifespan dependencies
-- [x] Trace LSTM train/infer path and artifact layout
-- [x] Document market-data source, cache TTLs, env flags
-- [x] Run `pytest`; record pass count
-- [x] Read committed `metrics.json` (no invented metrics)
-- [x] Note legacy Streamlit/US assets
-- [x] Write [CODEBASE_AUDIT.md](CODEBASE_AUDIT.md), [ARCHITECTURE.md](ARCHITECTURE.md), [PROGRESS.md](PROGRESS.md)
-- [ ] **User approval** before any Phase 1 application code
+- [x] Inspect frontend, backend, ML, tests, deployment
+- [x] Publish [CODEBASE_AUDIT.md](CODEBASE_AUDIT.md), [ARCHITECTURE.md](ARCHITECTURE.md)
+- [x] User approval to proceed
 
 ---
 
-## Phase 1 — Proposed smallest safe slice (awaiting approval)
+## Phase 1 — Hardening (smallest safe slice)
 
-**Goal:** Harden what exists without changing product behavior or model architecture.
+- [x] **P1-1** FastAPI smoke tests with mocked market + predictor (`backend/tests/test_api.py`, `conftest.py`) — **20** total pytest tests, no live Yahoo in API tests
+- [x] **P1-2** [API_SPEC.md](API_SPEC.md) from `backend/main.py`
+- [x] **P1-3** [MODEL_CARD.md](MODEL_CARD.md) from `metrics.json` + training code
+- [x] **P1-4** GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — `pytest` on push/PR
 
-| ID | Task | Acceptance criteria (measurable) |
-|----|------|----------------------------------|
-| P1-1 | Add FastAPI smoke tests (`httpx`/`TestClient`) with **mocked** `PriceCache` + fixed `Predictor` fixture | `pytest` ≥ **10** tests; `/api/health`, `/api/portfolio`, order rejection paths covered; **no** live Yahoo in CI |
-| P1-2 | Document API contract in `API_SPEC.md` generated from `backend/main.py` only | Every route in audit table has request/response fields; no undocumented endpoints |
-| P1-3 | Add `MODEL_CARD.md` from `metrics.json` + `train_lstm.py` facts | Holdout accuracy, MAE vs naive, train date, feature list, known limitations copied from audit |
-| P1-4 | CI workflow: `pytest` on push | GitHub Action job green on PR |
-
-**Explicitly out of scope for P1:** retrain LSTM, new features, broker integration, shuffle=False retrain, walk-forward backtest.
+**Out of scope (unchanged):** LSTM retrain, new features, broker integration.
 
 ---
 
-## Phase 2+ (backlog — not scheduled)
+## Phase 2+ (backlog)
 
-- [ ] Walk-forward training protocol; disable `shuffle` for temporal splits
-- [ ] `API_SPEC.md` / OpenAPI export alignment with frontend types
-- [ ] Frontend smoke test (Playwright) against mocked API
-- [ ] Indian cost model + backtest module per future `BACKTESTING_SPEC.md`
-- [ ] Replace Yahoo with licensed daily feed (TBD vendor)
-- [ ] Deployment: Docker + health/readiness for both processes
-
----
-
-## Missing program docs (repo gap)
-
-The following were named in the program charter but **are not in the repository** yet: `AGENTS.md`, `VISION.md`, `CURSOR_WORKFLOW.md`, `PRD.md`, `API_SPEC.md`, `BACKTESTING_SPEC.md`, etc. Phase 1 can add them incrementally from verified sources only.
+- [ ] Walk-forward training; `shuffle=False` for temporal integrity
+- [ ] OpenAPI export aligned with `API_SPEC.md` and frontend types
+- [ ] Frontend smoke test (Playwright) with mocked API
+- [ ] Indian cost model + backtest module
+- [ ] Licensed India daily data feed
+- [ ] Docker / production deploy manifests
+- [ ] Program docs: `AGENTS.md`, `VISION.md`, `PRD.md`, etc.
