@@ -28,6 +28,22 @@ pnpm dev
 
 Open `http://localhost:3000`.
 
+### Docker (demo)
+
+```bash
+docker compose up --build
+```
+
+API on port 8000, UI on 3000 (`API_ORIGIN` rewrites `/api` to the API container).
+
+### Research CLI
+
+```bash
+python backend/scripts/run_backtest.py --symbol RELIANCE.NS
+python backend/scripts/walk_forward_report.py
+WF_AS_OF_DATE=2024-06-01 python backend/scripts/walk_forward_retrain.py
+```
+
 ## Layout
 
 ```text

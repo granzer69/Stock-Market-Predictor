@@ -21,6 +21,8 @@ Indian **Nifty 50** research desk: daily-close LSTM hints, macro tape, **INR pap
 ```bash
 python -m pytest -q
 python backend/scripts/export_openapi.py
+python backend/scripts/run_backtest.py --symbol RELIANCE.NS
+docker compose up --build
 python -m uvicorn main:app --app-dir backend --host 0.0.0.0 --port 8000
 cd frontend && pnpm install && pnpm dev --hostname 0.0.0.0 --port 3000
 cd frontend && pnpm test:e2e

@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
+const apiOrigin = process.env.API_ORIGIN || "http://127.0.0.1:8000"
+
 const nextConfig = {
+  output: "standalone",
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -13,7 +16,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://127.0.0.1:8000/api/:path*",
+        destination: `${apiOrigin}/api/:path*`,
       },
     ]
   },

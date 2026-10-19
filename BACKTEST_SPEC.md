@@ -27,13 +27,20 @@ Paper trading in the app fills at **last close** with **no** statutory costs. Th
 - CAGR, max drawdown, Sharpe (daily), hit rate, turnover, total costs.
 - Benchmark: equal-weight Nifty 50 buy-and-hold on same calendar.
 
-## Module layout (future)
+## Module layout (implemented Phase 4)
 
 ```
 backend/backtest/
-  engine.py      # event loop over dates
-  signals.py     # adapter from predictor or CSV
-  report.py      # JSON + optional equity curve
+  engine.py      # long-only backtest at daily close
+  signals.py     # LSTM → BUY/HOLD/SELL series
+  report.py      # CAGR, drawdown, Sharpe, equal-weight benchmark
+backend/scripts/run_backtest.py   # CLI (Yahoo + committed model)
+```
+
+Run:
+
+```bash
+python backend/scripts/run_backtest.py --symbol RELIANCE.NS
 ```
 
 ## Paper book parity

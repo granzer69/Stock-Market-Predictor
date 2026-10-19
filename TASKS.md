@@ -43,10 +43,21 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ---
 
-## Phase 4+ (backlog)
+## Phase 4 — Backtest, retrain CLI, deploy sketch
 
-- [ ] Backtest engine implementing [BACKTEST_SPEC.md](BACKTEST_SPEC.md)
-- [ ] Walk-forward **retrain** job (scheduled / manual)
-- [ ] Licensed India daily data feed
-- [ ] Docker / production deploy manifests
-- [ ] `PRD.md` and deeper compliance copy
+- [x] **P4-1** `backend/backtest/` engine + `run_backtest.py`; tests; spec updated
+- [x] **P4-2** `train_and_save()` + `walk_forward_retrain.py` (truncated history, separate artifact dir)
+- [x] **P4-3** `data_providers.py` (`YahooHistoryProvider`, `LicensedIndiaDailyProvider` stub)
+- [x] **P4-4** `docker-compose.yml`, `backend/Dockerfile`, `frontend/Dockerfile` (standalone Next)
+- [x] **P4-5** [PRD.md](PRD.md)
+
+**Out of scope (unchanged):** real licensed NSE integration, scheduled cloud retrain, production TLS/HA.
+
+---
+
+## Phase 5+ (backlog)
+
+- [ ] Implement `LicensedIndiaDailyProvider` against vendor CSV/API
+- [ ] API route or UI panel for backtest summary (optional)
+- [ ] Scheduled walk-forward retrain in CI/cron (artifact promotion policy)
+- [ ] Production deploy (Vercel + container API, or single VM compose)

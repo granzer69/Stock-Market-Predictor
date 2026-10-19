@@ -1,5 +1,27 @@
 # Progress log
 
+## 2026-10-19 — Phase 4 complete
+
+**Branch:** `cursor/india-lstm-desk-1e7e`  
+**Scope:** Backtest engine, walk-forward retrain CLI, Docker compose, PRD, data provider stub.
+
+### Delivered
+
+- `backend/backtest/` (`engine`, `signals`, `report`), `backend/scripts/run_backtest.py`
+- `train_and_save()` in `train_lstm.py`, `backend/scripts/walk_forward_retrain.py`
+- `backend/data_providers.py`, [PRD.md](PRD.md), `docker-compose.yml` + Dockerfiles
+- [BACKTEST_SPEC.md](BACKTEST_SPEC.md) updated for implemented layout
+
+### Verification
+
+- `python3 -m pytest -q` → **31 passed** (target)
+
+### Next
+
+Phase 5: licensed data adapter, optional backtest UI (see [TASKS.md](TASKS.md)).
+
+---
+
 ## 2026-10-19 — Phase 3 kicked off (complete slice)
 
 **Branch:** `cursor/india-lstm-desk-1e7e`  
