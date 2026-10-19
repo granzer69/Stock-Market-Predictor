@@ -161,6 +161,16 @@ def canonicalize(symbol: str) -> tuple[str, dict]:
     raise HTTPException(status_code=404, detail=f"Unknown symbol: {symbol}")
 
 
+@app.get("/")
+def root():
+    return {
+        "service": "Bharat Desk API",
+        "health": "/api/health",
+        "docs": "/docs",
+        "disclaimer": DISCLAIMER,
+    }
+
+
 @app.get("/api/health")
 def api_health():
     return {"ok": True, "model": predictor.ready, "disclaimer": DISCLAIMER}
