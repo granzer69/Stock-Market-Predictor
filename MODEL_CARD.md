@@ -17,12 +17,13 @@ Values below are taken from committed `metrics.json` unless labeled as structura
 | Optimizer | Adam, lr=1e-3 |
 | Loss | MSE on scaled target |
 | Training epochs | 8 (default), early stopping on `val_loss` |
+| `model.fit` shuffle | **false** (time-ordered pooled rows; `validation_split=0.1` on tail) |
 | Input window | **60** trading days |
 | Input features | **1** — daily log return of close, clipped to ±0.2 |
 | Target | Next-day log return |
 | Scaler | `StandardScaler` fit on all training-window return values (pooled across symbols) |
 | Universe | Nifty 50 (`.NS`), 5y daily history via Yahoo at train time |
-| Pooled training rows | **46,635** (per `metrics.json`) |
+| Pooled training rows | **46,636** (per `metrics.json`) |
 | Symbols in holdout eval | **50** |
 
 ---
@@ -32,11 +33,11 @@ Values below are taken from committed `metrics.json` unless labeled as structura
 | Metric | Value |
 |--------|--------|
 | Holdout fraction | 0.2 (last 20% of each symbol’s windows, time-ordered) |
-| Directional accuracy | **0.4820** (~48.2%) |
-| MAE (log return) | **0.012032** |
-| Naive MAE (predict 0 return) | **0.012005** |
+| Directional accuracy | **0.4870** (~48.7%) |
+| MAE (log return) | **0.012052** |
+| Naive MAE (predict 0 return) | **0.011988** |
 | Signal threshold (BUY/SELL) | **0.003** (0.3% move) |
-| Last trained (UTC) | **2026-10-18T19:18:36.779819+00:00** |
+| Last trained (UTC) | **2026-10-19T06:34:07.092506+00:00** |
 
 The model’s holdout error is **not better** than predicting zero return on average. Directional accuracy is **below 50%**.
 
@@ -64,7 +65,7 @@ Per-symbol holdout stats are in `metrics.json` under `per_symbol`.
 ## Known limitations (code + metrics)
 
 1. **Data:** Yahoo Finance via `yfinance`; unofficial, may lag or fail; `YF_DISABLE_CURL_CFFI=1` in API process.
-2. **Training:** `model.fit(..., shuffle=True)` shuffles windows across time and symbols (optimistic train/val; holdout slice is temporal per symbol).
+2. **Training:** Pooled rows concatenate symbols; holdout is the temporal tail per symbol, but train/val split is still a single global timeline after pooling.
 3. **Single global model** for all tickers; no per-sector heads.
 4. **Confidence** shown in API/UI is holdout **directional hit rate**, not calibrated probability.
 5. **Comparison chart** on symbol page replays one-step predictions on recent history for UX; not a fresh OOS test.

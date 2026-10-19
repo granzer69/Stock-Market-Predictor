@@ -88,13 +88,14 @@ def main() -> None:
     )
     model.compile(optimizer=keras.optimizers.Adam(1e-3), loss="mse")
     epochs = int(os.environ.get("LSTM_EPOCHS", "8"))
+    # Keep time order: last 10% of pooled rows is validation; no shuffle.
     model.fit(
         x_scaled,
         y_scaled,
         epochs=epochs,
         batch_size=512,
         validation_split=0.1,
-        shuffle=True,
+        shuffle=False,
         verbose=2,
         callbacks=[
             keras.callbacks.EarlyStopping(
@@ -124,6 +125,8 @@ def main() -> None:
     metrics = {
         "window": WINDOW,
         "holdout_fraction": 0.2,
+        "training_shuffle": False,
+        "fit_validation_split": 0.1,
         "mae_log_return": float(np.mean(np.abs(actual - predicted))),
         "naive_mae_log_return": float(np.mean(np.abs(actual))),
         "directional_accuracy": directional_accuracy(actual, predicted),

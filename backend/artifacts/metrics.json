@@ -1,262 +1,264 @@
 {
   "window": 60,
   "holdout_fraction": 0.2,
-  "mae_log_return": 0.01203204297908337,
-  "naive_mae_log_return": 0.012004768897115744,
-  "directional_accuracy": 0.4820013778849466,
+  "training_shuffle": false,
+  "fit_validation_split": 0.1,
+  "mae_log_return": 0.012051809898621074,
+  "naive_mae_log_return": 0.011987893123182505,
+  "directional_accuracy": 0.4870381534751529,
   "signal_threshold": 0.003,
-  "trained_at": "2026-10-18T19:18:36.779819+00:00",
+  "trained_at": "2026-10-19T06:34:07.092506+00:00",
   "symbols": 50,
-  "train_rows": 46635,
+  "train_rows": 46636,
   "per_symbol": {
     "ADANIENT.NS": {
-      "directional_accuracy": 0.4829059829059829,
-      "mae_log_return": 0.01617225677599536,
+      "directional_accuracy": 0.47863247863247865,
+      "mae_log_return": 0.01615278311692051,
       "n": 236
     },
     "ADANIPORTS.NS": {
-      "directional_accuracy": 0.4978723404255319,
-      "mae_log_return": 0.013433686588025254,
+      "directional_accuracy": 0.48936170212765956,
+      "mae_log_return": 0.013500141548075238,
       "n": 236
     },
     "APOLLOHOSP.NS": {
-      "directional_accuracy": 0.4723404255319149,
-      "mae_log_return": 0.009420931067289,
+      "directional_accuracy": 0.46382978723404256,
+      "mae_log_return": 0.009545050953086791,
       "n": 236
     },
     "ASIANPAINT.NS": {
-      "directional_accuracy": 0.4808510638297872,
-      "mae_log_return": 0.011162555742467814,
+      "directional_accuracy": 0.4765957446808511,
+      "mae_log_return": 0.011154199124913574,
       "n": 236
     },
     "AXISBANK.NS": {
-      "directional_accuracy": 0.49572649572649574,
-      "mae_log_return": 0.011014243392288216,
+      "directional_accuracy": 0.5,
+      "mae_log_return": 0.01119133413134801,
       "n": 236
     },
     "BSE.NS": {
-      "directional_accuracy": 0.4978723404255319,
-      "mae_log_return": 0.018929470205858813,
+      "directional_accuracy": 0.5063829787234042,
+      "mae_log_return": 0.01882896823721491,
       "n": 236
     },
     "BAJAJ-AUTO.NS": {
       "directional_accuracy": 0.5148936170212766,
-      "mae_log_return": 0.011890135813417113,
+      "mae_log_return": 0.011798789239784157,
       "n": 236
     },
     "BAJFINANCE.NS": {
       "directional_accuracy": 0.47639484978540775,
-      "mae_log_return": 0.014085579301343604,
+      "mae_log_return": 0.01412138422400309,
       "n": 236
     },
     "BAJAJFINSV.NS": {
-      "directional_accuracy": 0.47413793103448276,
-      "mae_log_return": 0.01150859719115689,
+      "directional_accuracy": 0.4827586206896552,
+      "mae_log_return": 0.011565031126816524,
       "n": 236
     },
     "BEL.NS": {
-      "directional_accuracy": 0.48497854077253216,
-      "mae_log_return": 0.011616326629221643,
+      "directional_accuracy": 0.4978540772532189,
+      "mae_log_return": 0.011572617524840763,
       "n": 236
     },
     "BHARTIARTL.NS": {
-      "directional_accuracy": 0.4978723404255319,
-      "mae_log_return": 0.010194817156223782,
+      "directional_accuracy": 0.49361702127659574,
+      "mae_log_return": 0.010171934439802107,
       "n": 236
     },
     "CIPLA.NS": {
-      "directional_accuracy": 0.45726495726495725,
-      "mae_log_return": 0.008723512358496194,
+      "directional_accuracy": 0.4658119658119658,
+      "mae_log_return": 0.008763234506140286,
       "n": 236
     },
     "COALINDIA.NS": {
       "directional_accuracy": 0.5085470085470085,
-      "mae_log_return": 0.01067382291310124,
+      "mae_log_return": 0.010563538027533985,
       "n": 236
     },
     "DRREDDY.NS": {
-      "directional_accuracy": 0.4808510638297872,
-      "mae_log_return": 0.010503258054577561,
+      "directional_accuracy": 0.4851063829787234,
+      "mae_log_return": 0.010539250793242874,
       "n": 236
     },
     "EICHERMOT.NS": {
-      "directional_accuracy": 0.48717948717948717,
-      "mae_log_return": 0.01242634996121589,
+      "directional_accuracy": 0.5042735042735043,
+      "mae_log_return": 0.012442491079644244,
       "n": 236
     },
     "ETERNAL.NS": {
-      "directional_accuracy": 0.48497854077253216,
-      "mae_log_return": 0.016351948182633417,
+      "directional_accuracy": 0.4827586206896552,
+      "mae_log_return": 0.016302038709969217,
       "n": 236
     },
     "GRASIM.NS": {
-      "directional_accuracy": 0.4978723404255319,
-      "mae_log_return": 0.010510826400225506,
+      "directional_accuracy": 0.502127659574468,
+      "mae_log_return": 0.010482788952079405,
       "n": 236
     },
     "HCLTECH.NS": {
-      "directional_accuracy": 0.49145299145299143,
-      "mae_log_return": 0.013714407068114411,
+      "directional_accuracy": 0.5,
+      "mae_log_return": 0.013762408383598584,
       "n": 236
     },
     "HDFCBANK.NS": {
-      "directional_accuracy": 0.41201716738197425,
-      "mae_log_return": 0.010508363995907103,
+      "directional_accuracy": 0.4206008583690987,
+      "mae_log_return": 0.010665670057259595,
       "n": 236
     },
     "HDFCLIFE.NS": {
-      "directional_accuracy": 0.47639484978540775,
-      "mae_log_return": 0.011816157084248727,
+      "directional_accuracy": 0.4678111587982833,
+      "mae_log_return": 0.01189471056505069,
       "n": 236
     },
     "HINDALCO.NS": {
-      "directional_accuracy": 0.548936170212766,
-      "mae_log_return": 0.014394334564976125,
+      "directional_accuracy": 0.5659574468085107,
+      "mae_log_return": 0.014310429563220324,
       "n": 236
     },
     "HINDUNILVR.NS": {
-      "directional_accuracy": 0.451063829787234,
-      "mae_log_return": 0.01054544977460425,
+      "directional_accuracy": 0.4553191489361702,
+      "mae_log_return": 0.010641117395565176,
       "n": 236
     },
     "ICICIBANK.NS": {
-      "directional_accuracy": 0.4851063829787234,
-      "mae_log_return": 0.009758647164613094,
+      "directional_accuracy": 0.4808510638297872,
+      "mae_log_return": 0.00981825954375987,
       "n": 236
     },
     "ITC.NS": {
       "directional_accuracy": 0.43776824034334766,
-      "mae_log_return": 0.0098361833169249,
+      "mae_log_return": 0.009924475648570777,
       "n": 236
     },
     "INFY.NS": {
-      "directional_accuracy": 0.4553191489361702,
-      "mae_log_return": 0.01462343886390078,
+      "directional_accuracy": 0.44680851063829785,
+      "mae_log_return": 0.014720691775762634,
       "n": 236
     },
     "INDIGO.NS": {
-      "directional_accuracy": 0.4765957446808511,
-      "mae_log_return": 0.01571971555583572,
+      "directional_accuracy": 0.4851063829787234,
+      "mae_log_return": 0.01571969412528923,
       "n": 236
     },
     "JSWSTEEL.NS": {
-      "directional_accuracy": 0.5148936170212766,
-      "mae_log_return": 0.011596531599376642,
+      "directional_accuracy": 0.5191489361702127,
+      "mae_log_return": 0.011581246179390839,
       "n": 236
     },
     "JIOFIN.NS": {
-      "directional_accuracy": 0.4861111111111111,
-      "mae_log_return": 0.014284789256678155,
+      "directional_accuracy": 0.4791666666666667,
+      "mae_log_return": 0.014042793906717026,
       "n": 144
     },
     "KOTAKBANK.NS": {
       "directional_accuracy": 0.5085470085470085,
-      "mae_log_return": 0.01009261199324619,
+      "mae_log_return": 0.01013370071854575,
       "n": 236
     },
     "LT.NS": {
-      "directional_accuracy": 0.4595744680851064,
-      "mae_log_return": 0.01118311070481444,
+      "directional_accuracy": 0.48936170212765956,
+      "mae_log_return": 0.011226720241591135,
       "n": 236
     },
     "M&M.NS": {
-      "directional_accuracy": 0.49145299145299143,
-      "mae_log_return": 0.013380937057012238,
+      "directional_accuracy": 0.47435897435897434,
+      "mae_log_return": 0.013384105067853636,
       "n": 236
     },
     "MARUTI.NS": {
-      "directional_accuracy": 0.4808510638297872,
-      "mae_log_return": 0.011395641359650596,
+      "directional_accuracy": 0.4978723404255319,
+      "mae_log_return": 0.011373716474164734,
       "n": 236
     },
     "MAXHEALTH.NS": {
-      "directional_accuracy": 0.4765957446808511,
-      "mae_log_return": 0.012378787739141778,
+      "directional_accuracy": 0.4978723404255319,
+      "mae_log_return": 0.012400267409993494,
       "n": 236
     },
     "NTPC.NS": {
-      "directional_accuracy": 0.5021834061135371,
-      "mae_log_return": 0.009177074666541591,
+      "directional_accuracy": 0.4978165938864629,
+      "mae_log_return": 0.009181586318286498,
       "n": 236
     },
     "NESTLEIND.NS": {
-      "directional_accuracy": 0.47435897435897434,
-      "mae_log_return": 0.009771228659071384,
+      "directional_accuracy": 0.45726495726495725,
+      "mae_log_return": 0.009885338442996924,
       "n": 236
     },
     "ONGC.NS": {
-      "directional_accuracy": 0.4978540772532189,
-      "mae_log_return": 0.010742045231463786,
+      "directional_accuracy": 0.5236051502145923,
+      "mae_log_return": 0.010703464900732781,
       "n": 236
     },
     "POWERGRID.NS": {
-      "directional_accuracy": 0.5042735042735043,
-      "mae_log_return": 0.00954305570390243,
+      "directional_accuracy": 0.5085470085470085,
+      "mae_log_return": 0.009458341121408063,
       "n": 236
     },
     "RELIANCE.NS": {
-      "directional_accuracy": 0.4658119658119658,
-      "mae_log_return": 0.010268609673183136,
+      "directional_accuracy": 0.47863247863247865,
+      "mae_log_return": 0.010280989923401778,
       "n": 236
     },
     "SBILIFE.NS": {
       "directional_accuracy": 0.4765957446808511,
-      "mae_log_return": 0.009946541642898675,
+      "mae_log_return": 0.010014339038659009,
       "n": 236
     },
     "SHRIRAMFIN.NS": {
       "directional_accuracy": 0.5,
-      "mae_log_return": 0.01663602541938151,
+      "mae_log_return": 0.016678090568165743,
       "n": 236
     },
     "SBIN.NS": {
-      "directional_accuracy": 0.49145299145299143,
-      "mae_log_return": 0.010727366013947139,
+      "directional_accuracy": 0.5042735042735043,
+      "mae_log_return": 0.010766726335551233,
       "n": 236
     },
     "SUNPHARMA.NS": {
-      "directional_accuracy": 0.5085470085470085,
-      "mae_log_return": 0.008828395233821059,
+      "directional_accuracy": 0.5213675213675214,
+      "mae_log_return": 0.00883883301023283,
       "n": 236
     },
     "TCS.NS": {
-      "directional_accuracy": 0.4553191489361702,
-      "mae_log_return": 0.013526881088448328,
+      "directional_accuracy": 0.46382978723404256,
+      "mae_log_return": 0.013572945527880067,
       "n": 236
     },
     "TATACONSUM.NS": {
-      "directional_accuracy": 0.4553191489361702,
-      "mae_log_return": 0.011185189097489551,
+      "directional_accuracy": 0.46808510638297873,
+      "mae_log_return": 0.011226025965106306,
       "n": 236
     },
     "TMPV.NS": {
-      "directional_accuracy": 0.4248927038626609,
-      "mae_log_return": 0.014604763104618262,
+      "directional_accuracy": 0.43776824034334766,
+      "mae_log_return": 0.014673052289778601,
       "n": 236
     },
     "TATASTEEL.NS": {
-      "directional_accuracy": 0.4808510638297872,
-      "mae_log_return": 0.012449985478429742,
+      "directional_accuracy": 0.4765957446808511,
+      "mae_log_return": 0.012424280421915186,
       "n": 236
     },
     "TECHM.NS": {
-      "directional_accuracy": 0.521551724137931,
-      "mae_log_return": 0.01369804889064803,
+      "directional_accuracy": 0.5387931034482759,
+      "mae_log_return": 0.013720050812052565,
       "n": 236
     },
     "TITAN.NS": {
-      "directional_accuracy": 0.5042735042735043,
-      "mae_log_return": 0.010668649808553178,
+      "directional_accuracy": 0.5,
+      "mae_log_return": 0.010605448773952145,
       "n": 236
     },
     "TRENT.NS": {
-      "directional_accuracy": 0.41025641025641024,
-      "mae_log_return": 0.01564273514701261,
+      "directional_accuracy": 0.4358974358974359,
+      "mae_log_return": 0.01582865616895396,
       "n": 236
     },
     "ULTRACEMCO.NS": {
-      "directional_accuracy": 0.4829059829059829,
-      "mae_log_return": 0.011216318489034635,
+      "directional_accuracy": 0.5042735042735043,
+      "mae_log_return": 0.011212888828471705,
       "n": 236
     }
   }

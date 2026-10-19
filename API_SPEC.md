@@ -1,6 +1,7 @@
 # API specification — Bharat Desk
 
-**Source of truth:** [backend/main.py](backend/main.py) (as of Phase 1).  
+**Source of truth:** [backend/main.py](backend/main.py).  
+**Machine-readable schema:** [openapi.json](openapi.json) (regenerated in CI via `backend/scripts/export_openapi.py`).  
 **Base URL (dev):** `http://localhost:8000` or same-origin `http://localhost:3000/api` via Next.js rewrite.
 
 All successful JSON responses use `application/json`. Errors use FastAPI `{"detail": ...}`.

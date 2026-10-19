@@ -23,10 +23,18 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ---
 
-## Phase 2+ (backlog)
+## Phase 2 — Training integrity + OpenAPI
 
-- [ ] Walk-forward training; `shuffle=False` for temporal integrity
-- [ ] OpenAPI export aligned with `API_SPEC.md` and frontend types
+- [x] **P2-1** `shuffle=False` in `model.fit`; record `training_shuffle` / `fit_validation_split` in `metrics.json`; retrain artifacts
+- [x] **P2-2** `backend/scripts/export_openapi.py` → repo-root `openapi.json`; CI export step; tests (`test_train_samples.py`, `test_openapi_export.py`) — **22** pytest tests
+
+**Out of scope (unchanged):** walk-forward backtest module, Playwright, licensed data, Docker.
+
+---
+
+## Phase 3+ (backlog)
+
+- [ ] Walk-forward / rolling retrain methodology (document + optional script)
 - [ ] Frontend smoke test (Playwright) with mocked API
 - [ ] Indian cost model + backtest module
 - [ ] Licensed India daily data feed
