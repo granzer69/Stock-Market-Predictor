@@ -21,7 +21,9 @@ The UI rewrites `/api/*` to the API origin (`API_ORIGIN` / `NEXT_PUBLIC_API_URL`
 
 Repo [`vercel.json`](vercel.json) sets `rootDirectory: frontend`. Local dev still uses `next.config.mjs` rewrites to `http://127.0.0.1:8000` when `API_ORIGIN` is unset in middleware (middleware returns 503 on Vercel only when unset).
 
-The FastAPI + TensorFlow API **cannot** run on Vercel serverless; use a container VM (Fly, Railway, ECS) per the API section below.
+The FastAPI + TensorFlow API **cannot** run on Vercel serverless; use a container host per the API section below.
+
+**Quick API on Render:** push [`render.yaml`](render.yaml), create a Blueprint from the repo on [Render](https://render.com), then set Vercel `API_ORIGIN` to the Render service URL (e.g. `https://bharat-desk-api.onrender.com`) and update `CORS_ORIGINS` on the API service.
 
 ## API container
 
