@@ -11,12 +11,17 @@ The UI rewrites `/api/*` to the API origin (`API_ORIGIN` / `NEXT_PUBLIC_API_URL`
 
 ## Vercel (frontend)
 
-1. Import the repo; set **Root Directory** to `frontend`.
-2. Environment variable for preview/production:
-   - `API_ORIGIN` = `https://api.yourdomain.com` (HTTPS API base, no trailing slash)
-3. Build command: `pnpm build` · Output: Next default (standalone optional).
+**Live project (production):** [bharat-desk.vercel.app](https://bharat-desk.vercel.app) — Vercel project `bharat-desk`, root directory `frontend`, connected to `granzer69/Stock-Market-Predictor` `main`.
 
-Example [`vercel.json`](vercel.json) sets the rewrite when `API_ORIGIN` is injected at deploy time via project settings (see file comments).
+1. Import the repo (or use the existing project); set **Root Directory** to `frontend`.
+2. **Required** environment variable (Production + Preview):
+   - `API_ORIGIN` = `https://api.yourdomain.com` (HTTPS API base, **no trailing slash**)
+3. `frontend/middleware.ts` proxies `/api/*` to `API_ORIGIN` at **runtime** (change the env var and redeploy; no code change).
+4. On the API host, set `CORS_ORIGINS` to include your Vercel URL (e.g. `https://bharat-desk.vercel.app`).
+
+Repo [`vercel.json`](vercel.json) sets `rootDirectory: frontend`. Local dev still uses `next.config.mjs` rewrites to `http://127.0.0.1:8000` when `API_ORIGIN` is unset in middleware (middleware returns 503 on Vercel only when unset).
+
+The FastAPI + TensorFlow API **cannot** run on Vercel serverless; use a container VM (Fly, Railway, ECS) per the API section below.
 
 ## API container
 
