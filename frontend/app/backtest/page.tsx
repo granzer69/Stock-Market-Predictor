@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import { DisclaimerBanner } from "@/components/trading/disclaimer-banner";
 import { SiteNav } from "@/components/trading/site-nav";
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8000";
+import { apiGet, ApiError } from "@/lib/api";
 
 export default function BacktestPage() {
   const [symbol, setSymbol] = useState("RELIANCE");
@@ -14,13 +12,13 @@ export default function BacktestPage() {
 
   useEffect(() => {
     setErr(null);
-    fetch(`${API_BASE}/backtest?symbol=${symbol}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(String(r.status));
-        return r.json();
-      })
+    apiGet<Record<string, unknown>>(`/backtest?symbol=${encodeURIComponent(symbol)}`)
       .then(setData)
-      .catch(() => setErr("Backtest not available for this symbol yet."));
+      .catch((e: unknown) => {
+        setErr(
+          e instanceof ApiError ? e.message : "Backtest not available for this symbol yet.",
+        );
+      });
   }, [symbol]);
 
   const m = (data?.metrics || {}) as Record<string, number>;
