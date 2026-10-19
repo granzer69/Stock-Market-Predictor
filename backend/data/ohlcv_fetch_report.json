@@ -1,0 +1,13 @@
+{
+  "symbols_kept": 50,
+  "symbols_dropped": [],
+  "panel_rows": 61850,
+  "macro_columns": [
+    "Date",
+    "nifty",
+    "india_vix",
+    "usd_inr",
+    "crude",
+    "sp500"
+  ]
+}

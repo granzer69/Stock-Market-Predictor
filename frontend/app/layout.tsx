@@ -7,8 +7,9 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Bharat Desk",
-  description: "Nifty 50 LSTM forecasts and an INR paper trading book",
+  title: "Bharat Desk — NSE Paper Research",
+  description:
+    "Nifty 50 desk with world tape, LightGBM forecasts, evaluation baselines, and ₹10L paper book. Not investment advice.",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

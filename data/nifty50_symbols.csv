@@ -1,0 +1,51 @@
+nse_symbol,yahoo_symbol,name,sector
+RELIANCE,RELIANCE.NS,Reliance Industries,Energy
+TCS,TCS.NS,Tata Consultancy Services,IT
+HDFCBANK,HDFCBANK.NS,HDFC Bank,Financial Services
+ICICIBANK,ICICIBANK.NS,ICICI Bank,Financial Services
+INFY,INFY.NS,Infosys,IT
+LT,LT.NS,Larsen & Toubro,Capital Goods
+ITC,ITC.NS,ITC,FMCG
+SBIN,SBIN.NS,State Bank of India,Financial Services
+BHARTIARTL,BHARTIARTL.NS,Bharti Airtel,Telecom
+KOTAKBANK,KOTAKBANK.NS,Kotak Mahindra Bank,Financial Services
+HINDUNILVR,HINDUNILVR.NS,Hindustan Unilever,FMCG
+AXISBANK,AXISBANK.NS,Axis Bank,Financial Services
+BAJFINANCE,BAJFINANCE.NS,Bajaj Finance,Financial Services
+ASIANPAINT,ASIANPAINT.NS,Asian Paints,Consumer Durables
+MARUTI,MARUTI.NS,Maruti Suzuki,Automobile
+HCLTECH,HCLTECH.NS,HCL Technologies,IT
+SUNPHARMA,SUNPHARMA.NS,Sun Pharmaceutical,Pharma
+TITAN,TITAN.NS,Titan Company,Consumer Durables
+NTPC,NTPC.NS,NTPC,Power
+ULTRACEMCO,ULTRACEMCO.NS,UltraTech Cement,Cement
+WIPRO,WIPRO.NS,Wipro,IT
+ONGC,ONGC.NS,Oil and Natural Gas Corp,Oil & Gas
+NESTLEIND,NESTLEIND.NS,Nestle India,FMCG
+POWERGRID,POWERGRID.NS,Power Grid Corp,Power
+TMPV,TMPV.NS,Tata Motors Passenger Vehicles,Automobile
+M&M,M&M.NS,Mahindra & Mahindra,Automobile
+TECHM,TECHM.NS,Tech Mahindra,IT
+ADANIENT,ADANIENT.NS,Adani Enterprises,Metals & Mining
+JSWSTEEL,JSWSTEEL.NS,JSW Steel,Metals & Mining
+INDUSINDBK,INDUSINDBK.NS,IndusInd Bank,Financial Services
+GRASIM,GRASIM.NS,Grasim Industries,Cement
+COALINDIA,COALINDIA.NS,Coal India,Oil & Gas
+TATASTEEL,TATASTEEL.NS,Tata Steel,Metals & Mining
+HINDALCO,HINDALCO.NS,Hindalco Industries,Metals & Mining
+BAJAJFINSV,BAJAJFINSV.NS,Bajaj Finserv,Financial Services
+SBILIFE,SBILIFE.NS,SBI Life Insurance,Financial Services
+BPCL,BPCL.NS,Bharat Petroleum,Oil & Gas
+DIVISLAB,DIVISLAB.NS,Divi's Laboratories,Pharma
+BRITANNIA,BRITANNIA.NS,Britannia Industries,FMCG
+EICHERMOT,EICHERMOT.NS,Eicher Motors,Automobile
+DRREDDY,DRREDDY.NS,Dr. Reddy's Laboratories,Pharma
+CIPLA,CIPLA.NS,Cipla,Pharma
+APOLLOHOSP,APOLLOHOSP.NS,Apollo Hospitals,Healthcare
+HEROMOTOCO,HEROMOTOCO.NS,Hero MotoCorp,Automobile
+ADANIPORTS,ADANIPORTS.NS,Adani Ports,Services
+BAJAJ-AUTO,BAJAJ-AUTO.NS,Bajaj Auto,Automobile
+TRENT,TRENT.NS,Trent,Consumer Services
+BEL,BEL.NS,Bharat Electronics,Capital Goods
+SHRIRAMFIN,SHRIRAMFIN.NS,Shriram Finance,Financial Services
+HDFCLIFE,HDFCLIFE.NS,HDFC Life Insurance,Financial Services

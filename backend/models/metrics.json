@@ -1,0 +1,308 @@
+{
+  "trained_at": "2026-10-18T19:15:58.684316+00:00",
+  "window_days": 60,
+  "epochs": 15,
+  "pooled_test_mape_pct": 1.3925,
+  "symbols": {
+    "ADANIENT.NS": {
+      "mape_pct": 1.7926,
+      "confidence": 0.9821,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "ADANIPORTS.NS": {
+      "mape_pct": 1.4045,
+      "confidence": 0.986,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "APOLLOHOSP.NS": {
+      "mape_pct": 1.0359,
+      "confidence": 0.9896,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "ASIANPAINT.NS": {
+      "mape_pct": 1.1598,
+      "confidence": 0.9884,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "AXISBANK.NS": {
+      "mape_pct": 1.1742,
+      "confidence": 0.9883,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "BAJAJ-AUTO.NS": {
+      "mape_pct": 1.4397,
+      "confidence": 0.9856,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "BAJAJFINSV.NS": {
+      "mape_pct": 1.262,
+      "confidence": 0.9874,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "BAJFINANCE.NS": {
+      "mape_pct": 1.4906,
+      "confidence": 0.9851,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "BEL.NS": {
+      "mape_pct": 1.3212,
+      "confidence": 0.9868,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "BHARTIARTL.NS": {
+      "mape_pct": 1.1838,
+      "confidence": 0.9882,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "BPCL.NS": {
+      "mape_pct": 1.5157,
+      "confidence": 0.9848,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "BRITANNIA.NS": {
+      "mape_pct": 1.1504,
+      "confidence": 0.9885,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "CIPLA.NS": {
+      "mape_pct": 1.124,
+      "confidence": 0.9888,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "COALINDIA.NS": {
+      "mape_pct": 1.3624,
+      "confidence": 0.9864,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "DIVISLAB.NS": {
+      "mape_pct": 1.6622,
+      "confidence": 0.9834,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "DRREDDY.NS": {
+      "mape_pct": 1.223,
+      "confidence": 0.9878,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "EICHERMOT.NS": {
+      "mape_pct": 1.252,
+      "confidence": 0.9875,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "GRASIM.NS": {
+      "mape_pct": 1.0949,
+      "confidence": 0.9891,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "HCLTECH.NS": {
+      "mape_pct": 1.5154,
+      "confidence": 0.9848,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "HDFCBANK.NS": {
+      "mape_pct": 1.1188,
+      "confidence": 0.9888,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "HDFCLIFE.NS": {
+      "mape_pct": 1.2658,
+      "confidence": 0.9873,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "HEROMOTOCO.NS": {
+      "mape_pct": 1.4315,
+      "confidence": 0.9857,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "HINDALCO.NS": {
+      "mape_pct": 2.3946,
+      "confidence": 0.9761,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "HINDUNILVR.NS": {
+      "mape_pct": 1.0847,
+      "confidence": 0.9892,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "ICICIBANK.NS": {
+      "mape_pct": 1.1526,
+      "confidence": 0.9885,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "INDUSINDBK.NS": {
+      "mape_pct": 1.393,
+      "confidence": 0.9861,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "INFY.NS": {
+      "mape_pct": 1.4774,
+      "confidence": 0.9852,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "ITC.NS": {
+      "mape_pct": 1.2162,
+      "confidence": 0.9878,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "JSWSTEEL.NS": {
+      "mape_pct": 1.1429,
+      "confidence": 0.9886,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "KOTAKBANK.NS": {
+      "mape_pct": 1.0667,
+      "confidence": 0.9893,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "LT.NS": {
+      "mape_pct": 1.1443,
+      "confidence": 0.9886,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "M&M.NS": {
+      "mape_pct": 1.5651,
+      "confidence": 0.9843,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "MARUTI.NS": {
+      "mape_pct": 1.3133,
+      "confidence": 0.9869,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "NESTLEIND.NS": {
+      "mape_pct": 1.0488,
+      "confidence": 0.9895,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "NTPC.NS": {
+      "mape_pct": 1.3675,
+      "confidence": 0.9863,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "ONGC.NS": {
+      "mape_pct": 1.3723,
+      "confidence": 0.9863,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "POWERGRID.NS": {
+      "mape_pct": 1.3332,
+      "confidence": 0.9867,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "RELIANCE.NS": {
+      "mape_pct": 1.1088,
+      "confidence": 0.9889,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "SBILIFE.NS": {
+      "mape_pct": 1.0644,
+      "confidence": 0.9894,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "SBIN.NS": {
+      "mape_pct": 1.5759,
+      "confidence": 0.9842,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "SHRIRAMFIN.NS": {
+      "mape_pct": 3.9375,
+      "confidence": 0.9606,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "SUNPHARMA.NS": {
+      "mape_pct": 1.046,
+      "confidence": 0.9895,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "TATASTEEL.NS": {
+      "mape_pct": 1.3603,
+      "confidence": 0.9864,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "TCS.NS": {
+      "mape_pct": 1.5269,
+      "confidence": 0.9847,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "TECHM.NS": {
+      "mape_pct": 1.4511,
+      "confidence": 0.9855,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "TITAN.NS": {
+      "mape_pct": 1.6387,
+      "confidence": 0.9836,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "TMPV.NS": {
+      "mape_pct": 1.4878,
+      "confidence": 0.9851,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "TRENT.NS": {
+      "mape_pct": 1.8639,
+      "confidence": 0.9814,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "ULTRACEMCO.NS": {
+      "mape_pct": 1.2444,
+      "confidence": 0.9876,
+      "train_rows": 989,
+      "test_rows": 248
+    },
+    "WIPRO.NS": {
+      "mape_pct": 1.2662,
+      "confidence": 0.9873,
+      "train_rows": 989,
+      "test_rows": 248
+    }
+  }
+}

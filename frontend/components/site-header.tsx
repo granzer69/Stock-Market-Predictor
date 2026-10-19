@@ -11,6 +11,8 @@ const links = [
   { href: "/", label: "Markets" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/research", label: "Research" },
+  { href: "/evaluation", label: "Evaluation" },
+  { href: "/backtest", label: "Backtest" },
 ]
 
 export function SiteHeader() {

@@ -1,10 +1,12 @@
-export function formatInr(value: number) {
+export function formatINR(value: number) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 2,
   }).format(value)
 }
+
+export const formatInr = formatINR
 
 export function formatNumber(value: number, digits = 2) {
   return new Intl.NumberFormat("en-IN", {
@@ -14,7 +16,7 @@ export function formatNumber(value: number, digits = 2) {
 }
 
 export function formatPrice(value: number, unit: string) {
-  if (unit === "INR") return formatInr(value)
+  if (unit === "INR") return formatINR(value)
   if (unit === "USD") {
     return new Intl.NumberFormat("en-US", {
       style: "currency",

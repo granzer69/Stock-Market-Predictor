@@ -14,6 +14,18 @@ export type ModelSummary = {
   symbols: number | null
   window: number
   signal_threshold: number
+  production_model?: string
+  champion_model?: string
+  champion_directional_accuracy?: number
+  baselines?: {
+    persistence_mape_pct?: number
+    lightgbm_mape_pct?: number
+    lightgbm_directional_accuracy?: number
+    arima_directional_accuracy?: number
+    ma20_directional_accuracy?: number
+    legacy_lstm_mape_pct?: number
+  }
+  honest_note?: string
 }
 
 export type Quote = {
