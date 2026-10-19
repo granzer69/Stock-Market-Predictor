@@ -6,6 +6,9 @@ export const config = {
 
 export function middleware(request: NextRequest) {
   const apiOrigin = process.env.API_ORIGIN?.replace(/\/$/, "")
+  if (!apiOrigin && !process.env.VERCEL) {
+    return NextResponse.next()
+  }
   if (!apiOrigin) {
     return NextResponse.json(
       {
