@@ -11,7 +11,7 @@ export function MarketTape({ series }: { series: Quote[] }) {
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto bg-[#0c1118] px-4 py-2">
+    <div className="scrollbar-tape flex gap-2 overflow-x-auto bg-[#0c1118] px-4 pb-1 pt-2">
       {series.map((item) => (
         <div key={item.symbol} className="min-w-[150px] shrink-0 rounded-md border border-white/5 px-3 py-2">
           <div className="truncate text-[11px] uppercase tracking-wide text-[#8b9bb0]">{item.name}</div>

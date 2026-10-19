@@ -83,6 +83,28 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .scrollbar-tape {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 155, 176, 0.45) #0c1118;
+  }
+
+  .scrollbar-tape::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .scrollbar-tape::-webkit-scrollbar-track {
+    background: #0c1118;
+  }
+
+  .scrollbar-tape::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 9999px;
+  }
+
+  .scrollbar-tape::-webkit-scrollbar-thumb:hover {
+    background: rgba(227, 179, 65, 0.35);
+  }
 }
 
 @layer base {
