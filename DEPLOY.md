@@ -23,7 +23,7 @@ Repo [`vercel.json`](vercel.json) sets `rootDirectory: frontend`. Local dev stil
 
 The FastAPI + TensorFlow API **cannot** run on Vercel serverless; use a container host per the API section below.
 
-**Quick API on Render:** push [`render.yaml`](render.yaml), create a Blueprint from the repo on [Render](https://render.com), then set Vercel `API_ORIGIN` to the Render service URL (e.g. `https://bharat-desk-api.onrender.com`) and update `CORS_ORIGINS` on the API service.
+**Quick API on Render (free tier):** push [`render.yaml`](render.yaml) (no disk — paper portfolio resets on restart), create a **Blueprint** from the repo on [Render](https://render.com), then set Vercel `API_ORIGIN` to the Render service URL (e.g. `https://bharat-desk-api.onrender.com`). Update `CORS_ORIGINS` on Render if your Vercel hostname differs. Paid Render plans can attach a disk + `PAPER_DB_PATH` for a persistent paper book.
 
 ## API container
 
