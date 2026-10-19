@@ -49,6 +49,15 @@ def test_history_invalid_period(client):
     assert response.status_code == 400
 
 
+def test_research_backtest(client):
+    response = client.get("/api/research/backtest/RELIANCE?period=1y")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["ticker"] == "RELIANCE"
+    assert "strategy" in body and "benchmark" in body
+    assert body["strategy"]["trade_count"] >= 0
+
+
 def test_predict_equity(client):
     response = client.get("/api/predict/TCS")
     assert response.status_code == 200

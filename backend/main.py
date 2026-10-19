@@ -9,7 +9,9 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from data_providers import provider_fetcher
 from market_data import HISTORY_PERIODS, PriceCache, bars_from_frame, sma_series
+from research import backtest_from_frame
 from portfolio import PaperBook
 from predictor import Predictor
 from universe import GLOBALS, NIFTY_50, resolve
@@ -24,7 +26,7 @@ predictor: Predictor
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     global market, book, predictor
-    market = PriceCache(ROOT / "cache")
+    market = PriceCache(ROOT / "cache", fetcher=provider_fetcher())
     book = PaperBook(ROOT / "paper_trading.db")
     predictor = Predictor(ROOT / "artifacts")
     predictor.load()
@@ -106,6 +108,26 @@ def history(symbol: str, period: str = Query(default="2y")):
         "sma20": sma_series(frame, 20),
         "sma50": sma_series(frame, 50),
     }
+
+
+@app.get("/api/research/backtest/{symbol}")
+def research_backtest(symbol: str, period: str = Query(default="2y")):
+    if period not in HISTORY_PERIODS:
+        raise HTTPException(status_code=400, detail=f"period must be one of {', '.join(HISTORY_PERIODS)}")
+    series = resolve(symbol)
+    if series is None or series.kind != "equity":
+        raise HTTPException(status_code=404, detail="Unknown Nifty 50 symbol")
+    if not predictor.ready:
+        raise HTTPException(status_code=503, detail="Model is not trained yet")
+    frame = market.get_history(series.symbol, period)
+    if frame is None or frame.empty:
+        raise HTTPException(status_code=404, detail="No history for symbol")
+    try:
+        payload = backtest_from_frame(series.symbol, frame, predictor, period)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    payload.update({"ticker": series.ticker, "name": series.name})
+    return payload
 
 
 @app.get("/api/predict/{symbol}")

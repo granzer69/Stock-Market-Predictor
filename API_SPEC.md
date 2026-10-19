@@ -114,6 +114,28 @@ Macro and index tape (see [backend/universe.py](backend/universe.py) `GLOBALS`).
 
 ---
 
+## `GET /api/research/backtest/{symbol}`
+
+Offline long-only backtest of LSTM signals on cached daily history (India delivery costs). Does not mutate the paper book.
+
+**Query:** `period` — same set as history (`6mo`, `1y`, `2y`, `5y`); default `2y`.
+
+**Response 200**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `symbol` | string | NSE symbol |
+| `ticker` | string | Short ticker |
+| `name` | string | Company name |
+| `period` | string | History window used |
+| `strategy` | object | `ending_equity`, `total_return`, `cagr`, `max_drawdown`, `sharpe`, `hit_rate`, `trade_count`, `total_costs_inr`, … |
+| `benchmark` | object | `kind` = `buy_and_hold`, `ending_equity`, `total_return`, `max_drawdown` |
+| `disclaimer` | string | Research-only notice |
+
+**Errors:** `400` (bad period / short history), `404` (unknown symbol / no data), `503` (model not loaded).
+
+---
+
 ## `GET /api/predict/{symbol}`
 
 Nifty 50 **equity** only.

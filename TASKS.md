@@ -55,9 +55,19 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ---
 
-## Phase 5+ (backlog)
+## Phase 5 — Data adapter, research UI, retrain ops, deploy docs
 
-- [ ] Implement `LicensedIndiaDailyProvider` against vendor CSV/API
-- [ ] API route or UI panel for backtest summary (optional)
-- [ ] Scheduled walk-forward retrain in CI/cron (artifact promotion policy)
-- [ ] Production deploy (Vercel + container API, or single VM compose)
+- [x] **P5-1** `LicensedIndiaDailyProvider` (CSV bundle + `NSE_CSV_DIR` / `MARKET_DATA_PROVIDER=nse_csv`)
+- [x] **P5-2** `GET /api/research/backtest/{symbol}` + `/research` UI panel
+- [x] **P5-3** [RETRAIN_POLICY.md](RETRAIN_POLICY.md) + [`.github/workflows/model-retrain.yml`](.github/workflows/model-retrain.yml) (artifact upload, no auto-promote)
+- [x] **P5-4** [DEPLOY.md](DEPLOY.md), [vercel.json](vercel.json)
+
+**Out of scope (unchanged):** vendor API SDK, auto-promotion of CI models, managed TLS appliances.
+
+---
+
+## Phase 6+ (backlog)
+
+- [ ] Backtest equity curve chart in UI
+- [ ] Multi-symbol portfolio backtest in API
+- [ ] Feature flags for `nse_csv` per environment in hosted deploy

@@ -84,6 +84,26 @@ def summarize_result(result: BacktestResult) -> dict[str, Any]:
     }
 
 
+def buy_and_hold_benchmark(
+    dates: list[str],
+    closes: np.ndarray,
+    starting_cash: float,
+) -> list[dict]:
+    """Single-symbol buy at first close, hold through series."""
+    if not dates:
+        return []
+    price0 = float(closes[0])
+    if price0 <= 0:
+        return []
+    qty = int(starting_cash // price0)
+    cash = starting_cash - qty * price0
+    curve: list[dict] = []
+    for day, price in zip(dates, closes):
+        equity = cash + qty * float(price)
+        curve.append({"time": day, "equity": round(equity, 2)})
+    return curve
+
+
 def equal_weight_buy_hold(
     frames: dict[str, pd.DataFrame],
     starting_cash: float,

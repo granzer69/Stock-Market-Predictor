@@ -52,3 +52,29 @@ export const mockPortfolio: Portfolio = {
 }
 
 export const mockOrders: { orders: Order[] } = { orders: [] }
+
+export const mockBacktest = {
+  symbol: "RELIANCE.NS",
+  ticker: "RELIANCE",
+  name: "Reliance Industries",
+  period: "2y",
+  strategy: {
+    starting_cash: 1_000_000,
+    ending_equity: 1_010_000,
+    total_return: 0.01,
+    cagr: 0.005,
+    max_drawdown: -0.02,
+    sharpe: 0.4,
+    hit_rate: 0.5,
+    trade_count: 4,
+    total_costs_inr: 1200,
+    turnover_ratio: 0.1,
+  },
+  benchmark: {
+    kind: "buy_and_hold",
+    ending_equity: 1_020_000,
+    total_return: 0.02,
+    max_drawdown: -0.015,
+  },
+  disclaimer: "Offline simulation with India delivery costs; not investment advice.",
+}

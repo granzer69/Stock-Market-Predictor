@@ -30,6 +30,12 @@ def _ohlc_frame(rows: int = 80, close: float = 1000.0) -> pd.DataFrame:
 class FakePredictor:
     ready = True
 
+    def _predict_scaled(self, windows):
+        import numpy as np
+
+        count = len(windows) if hasattr(windows, "__len__") else 1
+        return np.zeros(count, dtype=np.float64)
+
     def summary(self):
         return {
             "directional_accuracy": 0.482,

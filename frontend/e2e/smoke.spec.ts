@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { mockGlobals, mockOrders, mockOverview, mockPortfolio } from "./mocks"
+import { mockBacktest, mockGlobals, mockOrders, mockOverview, mockPortfolio } from "./mocks"
 
 async function mockApi(page: import("@playwright/test").Page) {
   await page.route("**/api/**", async (route) => {
@@ -18,6 +18,10 @@ async function mockApi(page: import("@playwright/test").Page) {
     }
     if (path.endsWith("/api/orders")) {
       await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockOrders) })
+      return
+    }
+    if (path.includes("/api/research/backtest/")) {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockBacktest) })
       return
     }
     await route.fulfill({ status: 404, body: "not mocked" })
@@ -39,6 +43,12 @@ test("portfolio page loads paper book", async ({ page }) => {
   await page.goto("/portfolio")
   await expect(page.getByRole("heading", { name: "Paper portfolio" })).toBeVisible()
   await expect(page.getByRole("heading", { name: "Equity" })).toBeVisible()
+})
+
+test("research page shows backtest metrics", async ({ page }) => {
+  await page.goto("/research")
+  await expect(page.getByRole("heading", { name: "Research backtest" })).toBeVisible()
+  await expect(page.getByText("Strategy equity")).toBeVisible()
 })
 
 test("header shows product name and disclaimer", async ({ page }) => {

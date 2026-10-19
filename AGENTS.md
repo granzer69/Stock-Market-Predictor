@@ -13,7 +13,9 @@ Indian **Nifty 50** research desk: daily-close LSTM hints, macro tape, **INR pap
 | Model | `backend/train_lstm.py`, `predictor.py`, `artifacts/` |
 | Paper book | `backend/portfolio.py` |
 | UI | `frontend/` (Next.js 15) |
-| API contract | [API_SPEC.md](API_SPEC.md), [openapi.json](openapi.json) |
+| API contract | [API_SPEC.md](API_SPEC.md), [openapi.json](openapi.json) (incl. `/api/research/backtest`) |
+| Licensed CSV | `NSE_CSV_DIR`, `MARKET_DATA_PROVIDER=nse_csv` — [backend/data/nse_daily/README.md](backend/data/nse_daily/README.md) |
+| Deploy / retrain | [DEPLOY.md](DEPLOY.md), [RETRAIN_POLICY.md](RETRAIN_POLICY.md) |
 | Model facts | [MODEL_CARD.md](MODEL_CARD.md) |
 
 ## Commands

@@ -1,5 +1,28 @@
 # Progress log
 
+## 2026-10-19 — Phase 5 complete
+
+**Branch:** `cursor/india-lstm-desk-1e7e`  
+**Scope:** NSE CSV provider, research API/UI, retrain workflow, deploy guide.
+
+### Delivered
+
+- `LicensedIndiaDailyProvider`, sample `backend/data/nse_daily/`, `MARKET_DATA_PROVIDER` wiring in `PriceCache`
+- `GET /api/research/backtest/{symbol}`, `frontend/app/research`, Playwright coverage
+- `RETRAIN_POLICY.md`, monthly `model-retrain.yml` (artifact only)
+- `DEPLOY.md`, `vercel.json`
+
+### Verification
+
+- `python3 -m pytest -q` → **36 passed**
+- `cd frontend && pnpm test:e2e` → **4** tests
+
+### Next
+
+Phase 6 backlog in [TASKS.md](TASKS.md).
+
+---
+
 ## 2026-10-19 — Phase 4 complete
 
 **Branch:** `cursor/india-lstm-desk-1e7e`  

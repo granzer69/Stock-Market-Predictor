@@ -18,10 +18,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 BACKEND = REPO_ROOT / "backend"
 sys.path.insert(0, str(BACKEND))
 
-from backtest.engine import BacktestConfig, run_long_only_backtest  # noqa: E402
-from backtest.report import equal_weight_buy_hold, max_drawdown, summarize_result  # noqa: E402
-from backtest.signals import frame_to_closes, predicted_returns_from_windows  # noqa: E402
-from data_providers import YahooHistoryProvider  # noqa: E402
+from backtest.report import equal_weight_buy_hold, max_drawdown  # noqa: E402
+from data_providers import get_history_provider  # noqa: E402
+from research import backtest_from_frame  # noqa: E402
 from predictor import Predictor  # noqa: E402
 from universe import NIFTY_50  # noqa: E402
 
@@ -41,8 +40,7 @@ def main() -> int:
     elif not args.all:
         symbols = [symbols[0]]
 
-    provider = YahooHistoryProvider()
-    frames = provider.fetch(symbols, args.period)
+    frames = get_history_provider().fetch(symbols, args.period)
     if not frames:
         print("No history returned.", file=sys.stderr)
         return 1
@@ -53,14 +51,16 @@ def main() -> int:
         print("Train model first (backend/train_lstm.py).", file=sys.stderr)
         return 1
 
-    config = BacktestConfig()
     per_symbol = {}
     for symbol, frame in sorted(frames.items()):
-        dates, closes = frame_to_closes(frame)
-        signals, _ = predicted_returns_from_windows(predictor, closes)
-        result = run_long_only_backtest(dates, closes, signals, config)
-        per_symbol[symbol] = summarize_result(result)
+        try:
+            per_symbol[symbol] = backtest_from_frame(symbol, frame, predictor, args.period)
+        except ValueError:
+            continue
 
+    from backtest.engine import BacktestConfig
+
+    config = BacktestConfig()
     bench_dates, bench_curve = equal_weight_buy_hold(frames, config.starting_cash)
     benchmark = {
         "dates": len(bench_dates),
