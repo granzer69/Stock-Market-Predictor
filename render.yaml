@@ -7,6 +7,10 @@ services:
     dockerContext: .
     plan: free
     healthCheckPath: /api/health
+    disk:
+      name: bharat-desk-data
+      mountPath: /app/backend/data/paper
+      sizeGB: 1
     envVars:
       - key: YF_DISABLE_CURL_CFFI
         value: "1"
@@ -14,3 +18,5 @@ services:
         value: https://bharat-desk.vercel.app,https://bharat-desk-ribhusiri-4839s-projects.vercel.app,http://localhost:3000
       - key: MARKET_DATA_FAILOVER
         value: "true"
+      - key: PAPER_DB_PATH
+        value: /app/backend/data/paper/paper_trading.db

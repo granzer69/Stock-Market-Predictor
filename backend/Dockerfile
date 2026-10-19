@@ -16,4 +16,5 @@ COPY backend /app/backend
 WORKDIR /app/backend
 
 EXPOSE 8000
-CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Render (and others) set PORT; default 8000 for local Docker Compose.
+CMD ["sh", "-c", "python -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
