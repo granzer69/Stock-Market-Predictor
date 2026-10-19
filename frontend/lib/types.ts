@@ -142,3 +142,63 @@ export type Order = {
   notional: number
   created_at: string
 }
+
+export type BacktestSummary = {
+  starting_cash: number
+  ending_equity: number
+  total_return: number
+  cagr: number
+  max_drawdown: number
+  sharpe: number
+  hit_rate: number
+  trade_count: number
+  total_costs_inr: number
+  turnover_ratio: number
+}
+
+export type EquityCurvePoint = {
+  time: string
+  equity: number
+}
+
+export type BacktestBenchmark = {
+  kind: string
+  ending_equity: number
+  total_return: number
+  max_drawdown: number
+  equity_curve: EquityCurvePoint[]
+}
+
+export type BacktestReport = {
+  symbol: string
+  ticker: string
+  name: string
+  period: string
+  strategy: BacktestSummary
+  equity_curve: EquityCurvePoint[]
+  benchmark: BacktestBenchmark
+  disclaimer: string
+}
+
+export type PortfolioBacktestReport = {
+  kind: "portfolio"
+  symbols: string[]
+  period: string
+  strategy: BacktestSummary
+  equity_curve: EquityCurvePoint[]
+  benchmark: BacktestBenchmark
+  disclaimer: string
+}
+
+export type NiftyListing = {
+  symbol: string
+  ticker: string
+  name: string
+  sector: string
+}
+
+export type RuntimeConfig = {
+  market_data_provider: "yahoo" | "nse_csv"
+  market_data_label: string
+  research_portfolio_max_symbols: number
+}

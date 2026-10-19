@@ -56,17 +56,14 @@ def directional_accuracy(actual: np.ndarray, predicted: np.ndarray) -> float:
     return float(np.mean(np.sign(actual[mask]) == np.sign(predicted[mask])))
 
 
-def main() -> None:
+def train_and_save(frames: dict, artifact_dir: str | os.PathLike | None = None) -> dict:
+    """Train on pre-fetched frames and write keras/scaler/metrics. Returns metrics dict."""
     import tensorflow as tf
     from tensorflow import keras
 
     tf.random.set_seed(7)
     np.random.seed(7)
 
-    symbols = [item.symbol for item in NIFTY_50]
-    print(f"Downloading 5y daily bars for {len(symbols)} symbols...")
-    frames = yfinance_fetcher(symbols, "5y")
-    print(f"Received history for {len(frames)} symbols")
     x_train, y_train, held = build_samples(frames)
     print(f"Training rows: {len(x_train)} across {len(held)} symbols")
 
@@ -88,13 +85,14 @@ def main() -> None:
     )
     model.compile(optimizer=keras.optimizers.Adam(1e-3), loss="mse")
     epochs = int(os.environ.get("LSTM_EPOCHS", "8"))
+    # Keep time order: last 10% of pooled rows is validation; no shuffle.
     model.fit(
         x_scaled,
         y_scaled,
         epochs=epochs,
         batch_size=512,
         validation_split=0.1,
-        shuffle=True,
+        shuffle=False,
         verbose=2,
         callbacks=[
             keras.callbacks.EarlyStopping(
@@ -124,6 +122,8 @@ def main() -> None:
     metrics = {
         "window": WINDOW,
         "holdout_fraction": 0.2,
+        "training_shuffle": False,
+        "fit_validation_split": 0.1,
         "mae_log_return": float(np.mean(np.abs(actual - predicted))),
         "naive_mae_log_return": float(np.mean(np.abs(actual))),
         "directional_accuracy": directional_accuracy(actual, predicted),
@@ -134,12 +134,21 @@ def main() -> None:
         "per_symbol": per_symbol,
     }
 
-    artifact_dir = os.path.join(os.path.dirname(__file__), "artifacts")
-    os.makedirs(artifact_dir, exist_ok=True)
-    model.save(os.path.join(artifact_dir, "model.keras"))
-    joblib.dump(scaler, os.path.join(artifact_dir, "scaler.joblib"))
-    with open(os.path.join(artifact_dir, "metrics.json"), "w", encoding="utf-8") as handle:
+    out_dir = artifact_dir or os.path.join(os.path.dirname(__file__), "artifacts")
+    os.makedirs(out_dir, exist_ok=True)
+    model.save(os.path.join(out_dir, "model.keras"))
+    joblib.dump(scaler, os.path.join(out_dir, "scaler.joblib"))
+    with open(os.path.join(out_dir, "metrics.json"), "w", encoding="utf-8") as handle:
         json.dump(metrics, handle, indent=2)
+    return metrics
+
+
+def main() -> None:
+    symbols = [item.symbol for item in NIFTY_50]
+    print(f"Downloading 5y daily bars for {len(symbols)} symbols...")
+    frames = yfinance_fetcher(symbols, "5y")
+    print(f"Received history for {len(frames)} symbols")
+    metrics = train_and_save(frames)
     print(
         "Saved model. Holdout directional accuracy "
         f"{metrics['directional_accuracy']:.3f}, MAE {metrics['mae_log_return']:.5f} "

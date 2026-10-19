@@ -15,10 +15,14 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from app_config import public_config
+from data_providers import provider_fetcher
+from market_data import HISTORY_PERIODS, PriceCache, bars_from_frame, sma_series
 from desk_predictor import DeskPredictor
 from market_data import HISTORY_PERIODS, PriceCache, bars_from_frame, quote_from_frame, sma_series
 from portfolio import PaperBook
 from predictor import Predictor
+from research import backtest_from_frame, portfolio_backtest
 from universe import GLOBALS, NIFTY_50, resolve
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -109,6 +113,10 @@ def _load_legacy_stack() -> None:
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     global market, book, predictor
+    market = PriceCache(ROOT / "cache", fetcher=provider_fetcher())
+    book = PaperBook(ROOT / "paper_trading.db")
+    predictor = Predictor(ROOT / "artifacts")
+    predictor.load()
     market = PriceCache(BASE_DIR / "cache")
     book = PaperBook(BASE_DIR / "paper_trading.db")
     lstm = Predictor(BASE_DIR / "artifacts")
@@ -160,6 +168,26 @@ def api_health():
     return {"ok": True, "model": predictor.ready, "disclaimer": DISCLAIMER}
 
 
+@app.get("/api/config")
+def runtime_config():
+    return public_config()
+
+
+@app.get("/api/universe/nifty50")
+def nifty50_universe():
+    return {
+        "names": [
+            {
+                "symbol": series.symbol,
+                "ticker": series.ticker,
+                "name": series.name,
+                "sector": series.sector,
+            }
+            for series in NIFTY_50
+        ]
+    }
+
+
 @app.get("/api/market/overview")
 def overview():
     symbols = [item.symbol for item in NIFTY_50]
@@ -206,6 +234,54 @@ def history(symbol: str, period: str = Query(default="2y")):
         "sma20": sma_series(frame, 20),
         "sma50": sma_series(frame, 50),
     }
+
+
+@app.get("/api/research/backtest/portfolio")
+def research_portfolio_backtest(
+    period: str = Query(default="2y"),
+    symbols: str = Query(default="RELIANCE,TCS,HDFCBANK,INFY,ITC"),
+):
+    if period not in HISTORY_PERIODS:
+        raise HTTPException(status_code=400, detail=f"period must be one of {', '.join(HISTORY_PERIODS)}")
+    if not predictor.ready:
+        raise HTTPException(status_code=503, detail="Model is not trained yet")
+    tickers = [part.strip() for part in symbols.split(",") if part.strip()]
+    resolved: list[str] = []
+    for raw in tickers:
+        series = resolve(raw)
+        if series is None or series.kind != "equity":
+            raise HTTPException(status_code=400, detail=f"Unknown or non-equity symbol: {raw}")
+        resolved.append(series.symbol)
+    if len(resolved) < 2:
+        raise HTTPException(status_code=400, detail="Provide at least two symbols")
+    frames = market.get_histories(resolved, period)
+    missing = [symbol for symbol in resolved if symbol not in frames]
+    if missing:
+        raise HTTPException(status_code=404, detail=f"No history for {', '.join(missing)}")
+    try:
+        return portfolio_backtest(frames, predictor, period, resolved)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/research/backtest/{symbol}")
+def research_backtest(symbol: str, period: str = Query(default="2y")):
+    if period not in HISTORY_PERIODS:
+        raise HTTPException(status_code=400, detail=f"period must be one of {', '.join(HISTORY_PERIODS)}")
+    series = resolve(symbol)
+    if series is None or series.kind != "equity":
+        raise HTTPException(status_code=404, detail="Unknown Nifty 50 symbol")
+    if not predictor.ready:
+        raise HTTPException(status_code=503, detail="Model is not trained yet")
+    frame = market.get_history(series.symbol, period)
+    if frame is None or frame.empty:
+        raise HTTPException(status_code=404, detail="No history for symbol")
+    try:
+        payload = backtest_from_frame(series.symbol, frame, predictor, period)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    payload.update({"ticker": series.ticker, "name": series.name})
+    return payload
 
 
 @app.get("/api/predict/{symbol}")

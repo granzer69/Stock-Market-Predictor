@@ -1,0 +1,25 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/artifacts:/app/backend/artifacts
+      - ./backend/data_cache:/app/backend/data_cache
+    environment:
+      YF_DISABLE_CURL_CFFI: "1"
+      # MARKET_DATA_PROVIDER: nse_csv
+      # NSE_CSV_DIR: /app/backend/data/nse_daily
+
+  web:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      API_ORIGIN: http://api:8000
+    depends_on:
+      - api
