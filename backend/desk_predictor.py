@@ -114,6 +114,10 @@ class DeskPredictor:
                 return out
         return self.lstm.summaries(frames)
 
+    def _predict_scaled(self, windows):
+        """Backtest path uses pooled LSTM windows (LightGBM is point-in-time only)."""
+        return self.lstm._predict_scaled(windows)
+
     def detail(self, symbol: str, frame: pd.DataFrame) -> dict | None:
         payload = None
         if frame is not None and not frame.empty:

@@ -7,8 +7,8 @@
   "paths": {
     "/api/health": {
       "get": {
-        "summary": "Health",
-        "operationId": "health_api_health_get",
+        "summary": "Api Health",
+        "operationId": "api_health_api_health_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -156,6 +156,15 @@
               "default": "RELIANCE,TCS,HDFCBANK,INFY,ITC",
               "title": "Symbols"
             }
+          },
+          {
+            "name": "fill",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Fill"
+            }
           }
         ],
         "responses": {
@@ -202,6 +211,15 @@
               "type": "string",
               "default": "2y",
               "title": "Period"
+            }
+          },
+          {
+            "name": "fill",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Fill"
             }
           }
         ],
@@ -308,6 +326,202 @@
           },
           "required": true
         },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/evaluation": {
+      "get": {
+        "summary": "Evaluation",
+        "operationId": "evaluation_evaluation_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/backtest": {
+      "get": {
+        "summary": "Backtest",
+        "operationId": "backtest_backtest_get",
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Symbol"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/symbols": {
+      "get": {
+        "summary": "List Symbols",
+        "operationId": "list_symbols_symbols_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chart": {
+      "get": {
+        "summary": "Get Chart Data",
+        "operationId": "get_chart_data_chart_get",
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Symbol"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predict": {
+      "get": {
+        "summary": "Predict Price",
+        "operationId": "predict_price_predict_get",
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Symbol"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/realtime": {
+      "get": {
+        "summary": "Get Realtime Data",
+        "operationId": "get_realtime_data_realtime_get",
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Symbol"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",

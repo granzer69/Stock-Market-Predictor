@@ -1,5 +1,7 @@
 # Codebase audit — Bharat Desk (Phase 0)
 
+> **Superseded API/ops detail (Phases 8–12):** see [ARCHITECTURE_DELTA.md](ARCHITECTURE_DELTA.md).
+
 **Audit date:** 2026-10-19 (UTC)  
 **Branch inspected:** `cursor/india-lstm-desk-1e7e` (commits `916819d`, `29cdc5e` ahead of `main`)  
 **Auditor:** Cursor agent (repository inspection + commands below; no application code changes in this phase)

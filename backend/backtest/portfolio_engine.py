@@ -23,12 +23,17 @@ def run_portfolio_backtest(
     wins = 0
     curve: list[dict] = []
 
-    for day in timeline:
+    for day_index, day in enumerate(timeline):
+        signal_day = timeline[day_index - cfg.fill_lag] if day_index >= cfg.fill_lag else None
         for symbol in symbols:
             price = prices.get(symbol, {}).get(day)
             if price is None or price <= 0:
                 continue
-            side = signals[symbol].get(day, "HOLD").upper()
+            side = (
+                signals[symbol].get(signal_day, "HOLD").upper()
+                if signal_day is not None
+                else "HOLD"
+            )
             qty = positions.get(symbol, 0)
             if side == "BUY" and qty == 0:
                 buy_qty = _max_buy_qty(cash, price, params)

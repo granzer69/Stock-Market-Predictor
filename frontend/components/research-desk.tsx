@@ -19,6 +19,7 @@ export function ResearchDesk() {
   const [portfolioPick, setPortfolioPick] = useState<string[]>(DEFAULT_PORTFOLIO)
   const [portfolioQuery, setPortfolioQuery] = useState("")
   const [period, setPeriod] = useState<(typeof PERIODS)[number]>("2y")
+  const [fill, setFill] = useState<"close" | "next_close">("close")
   const [report, setReport] = useState<BacktestReport | null>(null)
   const [portfolio, setPortfolio] = useState<PortfolioBacktestReport | null>(null)
   const [config, setConfig] = useState<RuntimeConfig | null>(null)
@@ -28,7 +29,12 @@ export function ResearchDesk() {
   const maxPortfolio = config?.research_portfolio_max_symbols ?? 10
 
   useEffect(() => {
-    apiGet<RuntimeConfig>("/api/config").then(setConfig).catch(() => setConfig(null))
+    apiGet<RuntimeConfig>("/api/config")
+      .then((cfg) => {
+        setConfig(cfg)
+        if (cfg.backtest_default_fill) setFill(cfg.backtest_default_fill)
+      })
+      .catch(() => setConfig(null))
     apiGet<{ names: NiftyListing[] }>("/api/universe/nifty50")
       .then((payload) => setUniverse(payload.names))
       .catch(() => setUniverse([]))
@@ -40,10 +46,11 @@ export function ResearchDesk() {
     if (mode === "portfolio" && portfolioPick.length < 2) return
     const controller = new AbortController()
     setLoading(true)
+    const fillQuery = `&fill=${encodeURIComponent(fill)}`
     const path =
       mode === "single"
-        ? `/api/research/backtest/${encodeURIComponent(ticker)}?period=${period}`
-        : `/api/research/backtest/portfolio?period=${period}&symbols=${encodeURIComponent(portfolioSymbolsParam)}`
+        ? `/api/research/backtest/${encodeURIComponent(ticker)}?period=${period}${fillQuery}`
+        : `/api/research/backtest/portfolio?period=${period}&symbols=${encodeURIComponent(portfolioSymbolsParam)}${fillQuery}`
 
     apiGet<BacktestReport | PortfolioBacktestReport>(path, controller.signal)
       .then((payload) => {
@@ -66,7 +73,7 @@ export function ResearchDesk() {
         if (!controller.signal.aborted) setLoading(false)
       })
     return () => controller.abort()
-  }, [ticker, period, mode, portfolioSymbolsParam])
+  }, [ticker, period, mode, portfolioSymbolsParam, fill])
 
   const tickers = universe.length > 0 ? universe.map((item) => item.ticker) : DEFAULT_PORTFOLIO
   const filteredUniverse = useMemo(() => {
@@ -102,11 +109,24 @@ export function ResearchDesk() {
             Long-only LSTM signals with India delivery costs on daily closes.
           </p>
         </div>
-        {config && (
-          <span className="rounded-md border border-white/10 bg-[#10151c] px-2 py-1 text-[11px] text-[#8b9bb0]">
-            Data: {config.market_data_label}
-          </span>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {config && (
+            <span className="rounded-md border border-white/10 bg-[#10151c] px-2 py-1 text-[11px] text-[#8b9bb0]">
+              Data: {config.market_data_label}
+              {config.paper_apply_india_costs ? " · paper costs on" : ""}
+            </span>
+          )}
+          {config?.model_card_url && (
+            <a
+              href={config.model_card_url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] text-[#e3b341] underline-offset-2 hover:underline"
+            >
+              Model card
+            </a>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
@@ -146,6 +166,17 @@ export function ResearchDesk() {
             {PERIODS.map((item) => (
               <option key={item} value={item}>{item}</option>
             ))}
+          </select>
+        </label>
+        <label className="text-sm text-[#8b9bb0]">
+          Fill
+          <select
+            value={fill}
+            onChange={(e) => setFill(e.target.value as "close" | "next_close")}
+            className="ml-2 rounded-md border border-white/10 bg-[#10151c] px-2 py-1.5 text-white"
+          >
+            <option value="close">Same close</option>
+            <option value="next_close">Next close</option>
           </select>
         </label>
       </div>

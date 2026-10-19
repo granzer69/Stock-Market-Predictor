@@ -39,6 +39,12 @@ Optional licensed data (see `.env.example`):
 -v /path/to/csvs:/data/nse_daily:ro
 ```
 
+Production browser origin (Vercel or custom domain) must be allowed on the API:
+
+```bash
+-e CORS_ORIGINS=https://desk.example.com,http://localhost:3000
+```
+
 The UI reads `GET /api/config` to show **Data: Yahoo Finance** vs **NSE CSV bundle**. No frontend env flag is required for provider selection.
 
 ## Single VM (demo)
@@ -47,12 +53,18 @@ The UI reads `GET /api/config` to show **Data: Yahoo Finance** vs **NSE CSV bund
 docker compose -f docker-compose.yml up --build -d
 ```
 
-Place TLS in front (Caddy/nginx) for public hosts — step-by-step in [TLS_RUNBOOK.md](TLS_RUNBOOK.md). Paper SQLite lives in the container unless you mount `backend/paper_trading.db`.
+Place TLS in front (Caddy/nginx) for public hosts — step-by-step in [TLS_RUNBOOK.md](TLS_RUNBOOK.md). Mount persistent volumes for `backend/cache`, `backend/artifacts`, and the paper book (see `docker-compose.yml` and [BACKUP.md](BACKUP.md)).
 
 ## Health checks
 
 - `GET /api/health` → `{"ok": true, "model": true}`
-- Monitor Yahoo failures via logs; switch to `nse_csv` when CSVs are available.
+- Structured request logs include `X-Request-Id`; research backtests are capped via `RESEARCH_MAX_CONCURRENT` (HTTP 429 when saturated).
+
+## When Yahoo is down
+
+1. Enable `MARKET_DATA_FAILOVER=true` (default) so the API retries missing symbols via the NSE CSV bundle when `NSE_CSV_DIR` is populated.
+2. Or set `MARKET_DATA_PROVIDER=nse_csv` and mount curated daily CSVs (see [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md)).
+3. Validate bundles with `python backend/scripts/validate_market_data.py --dir $NSE_CSV_DIR`.
 
 ## Not in scope
 

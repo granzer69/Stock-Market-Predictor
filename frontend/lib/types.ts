@@ -174,6 +174,7 @@ export type BacktestReport = {
   ticker: string
   name: string
   period: string
+  fill?: string
   strategy: BacktestSummary
   equity_curve: EquityCurvePoint[]
   benchmark: BacktestBenchmark
@@ -184,6 +185,7 @@ export type PortfolioBacktestReport = {
   kind: "portfolio"
   symbols: string[]
   period: string
+  fill?: string
   strategy: BacktestSummary
   equity_curve: EquityCurvePoint[]
   benchmark: BacktestBenchmark
@@ -200,5 +202,9 @@ export type NiftyListing = {
 export type RuntimeConfig = {
   market_data_provider: "yahoo" | "nse_csv"
   market_data_label: string
+  market_data_failover?: boolean
   research_portfolio_max_symbols: number
+  paper_apply_india_costs?: boolean
+  backtest_default_fill?: "close" | "next_close"
+  model_card_url?: string
 }

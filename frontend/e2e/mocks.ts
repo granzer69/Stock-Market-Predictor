@@ -35,6 +35,15 @@ export const mockOverview = {
     symbols: 50,
     window: 60,
     signal_threshold: 0.003,
+    production_model: "lightgbm",
+    champion_model: "ARIMA(1,1,1)",
+    champion_directional_accuracy: 0.507,
+    baselines: {
+      lightgbm_directional_accuracy: 0.471,
+      arima_directional_accuracy: 0.507,
+      persistence_mape_pct: 1.23,
+      legacy_lstm_mape_pct: 1.39,
+    },
   },
 }
 
@@ -64,6 +73,8 @@ export const mockConfig = {
   market_data_provider: "yahoo",
   market_data_label: "Yahoo Finance",
   research_portfolio_max_symbols: 10,
+  backtest_default_fill: "close",
+  model_card_url: "/MODEL_CARD.md",
 }
 
 const mockCurve = [

@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from app_config import RESEARCH_PORTFOLIO_MAX_SYMBOLS
+from app_config import RESEARCH_PORTFOLIO_MAX_SYMBOLS, default_backtest_fill
+from data_quality import validate_ohlcv_frame
 from backtest.engine import BacktestConfig, run_long_only_backtest
 from backtest.portfolio_engine import run_portfolio_backtest
 from backtest.report import buy_and_hold_benchmark, equal_weight_buy_hold, max_drawdown, summarize_result
@@ -28,24 +29,36 @@ def _curve_payload(curve: list[dict]) -> list[dict]:
     return [{"time": point["time"], "equity": point["equity"]} for point in downsample_curve(curve)]
 
 
+def _fill_lag(fill: str | None) -> int:
+    mode = (fill or default_backtest_fill()).strip().lower()
+    return 1 if mode == "next_close" else 0
+
+
 def backtest_from_frame(
     symbol: str,
     frame: pd.DataFrame,
     predictor: Predictor,
     period: str,
     config: BacktestConfig | None = None,
+    fill: str | None = None,
 ) -> dict:
+    issues = validate_ohlcv_frame(frame, symbol)
+    if issues:
+        raise ValueError("; ".join(issues[:3]))
     dates, closes = frame_to_closes(frame)
     if len(dates) < 65:
         raise ValueError("not enough history for backtest")
     signals, _ = predicted_returns_from_windows(predictor, closes)
-    result = run_long_only_backtest(dates, closes, signals, config or BacktestConfig())
+    cfg = config or BacktestConfig()
+    cfg.fill_lag = _fill_lag(fill)
+    result = run_long_only_backtest(dates, closes, signals, cfg)
     strategy = summarize_result(result)
     bench_curve = buy_and_hold_benchmark(dates, closes, result.starting_cash)
     bench_end = bench_curve[-1]["equity"] if bench_curve else result.starting_cash
     return {
         "symbol": symbol,
         "period": period,
+        "fill": "next_close" if cfg.fill_lag else "close",
         "strategy": strategy,
         "equity_curve": _curve_payload(result.equity_curve),
         "benchmark": {
@@ -86,6 +99,7 @@ def portfolio_backtest(
     period: str,
     symbols: list[str],
     config: BacktestConfig | None = None,
+    fill: str | None = None,
 ) -> dict:
     if len(symbols) > RESEARCH_PORTFOLIO_MAX_SYMBOLS:
         raise ValueError(f"at most {RESEARCH_PORTFOLIO_MAX_SYMBOLS} symbols")
@@ -105,6 +119,7 @@ def portfolio_backtest(
         signal_map[symbol] = dict(zip(dates, signals))
 
     cfg = config or BacktestConfig()
+    cfg.fill_lag = _fill_lag(fill)
     result = run_portfolio_backtest(timeline, prices, signal_map, cfg)
     strategy = summarize_result(result)
     bench_dates, bench_curve = equal_weight_buy_hold(aligned, cfg.starting_cash)
@@ -113,6 +128,7 @@ def portfolio_backtest(
         "kind": "portfolio",
         "symbols": list(aligned.keys()),
         "period": period,
+        "fill": "next_close" if cfg.fill_lag else "close",
         "strategy": strategy,
         "equity_curve": _curve_payload(result.equity_curve),
         "benchmark": {

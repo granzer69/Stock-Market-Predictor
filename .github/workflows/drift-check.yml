@@ -1,0 +1,30 @@
+name: Model drift check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  walk-forward-eval:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+      - name: Walk-forward evaluation report
+        env:
+          YF_DISABLE_CURL_CFFI: "1"
+          WF_FOLDS: "3"
+          WF_MIN_TRAIN: "120"
+        run: python backend/scripts/walk_forward_report.py | tee drift-report.json
+      - name: Upload drift report
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-report-${{ github.run_id }}
+          path: drift-report.json
+          retention-days: 14

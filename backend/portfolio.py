@@ -7,6 +7,9 @@ import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
+from app_config import paper_apply_india_costs
+from india_costs import delivery_turnover_cost_inr
+
 STARTING_CASH = 1_000_000.0
 
 
@@ -102,11 +105,14 @@ class PaperBook:
                 old_avg = float(position["avg_cost"]) if position else 0.0
 
                 if side == "BUY":
-                    if notional > cash + 1e-6:
+                    friction = (
+                        delivery_turnover_cost_inr("BUY", notional) if paper_apply_india_costs() else 0.0
+                    )
+                    if notional + friction > cash + 1e-6:
                         raise ValueError("Not enough cash for this order")
                     new_qty = old_qty + qty
                     new_avg = _money(((old_qty * old_avg) + notional) / new_qty)
-                    cash = _money(cash - notional)
+                    cash = _money(cash - notional - friction)
                     conn.execute(
                         """
                         INSERT INTO positions (symbol, qty, avg_cost) VALUES (?, ?, ?)
@@ -117,8 +123,11 @@ class PaperBook:
                 else:
                     if qty > old_qty:
                         raise ValueError("Not enough shares to sell")
-                    realized = _money(realized + (fill_price - old_avg) * qty)
-                    cash = _money(cash + notional)
+                    friction = (
+                        delivery_turnover_cost_inr("SELL", notional) if paper_apply_india_costs() else 0.0
+                    )
+                    realized = _money(realized + (fill_price - old_avg) * qty - friction)
+                    cash = _money(cash + notional - friction)
                     new_qty = old_qty - qty
                     if new_qty == 0:
                         conn.execute("DELETE FROM positions WHERE symbol = ?", (symbol,))

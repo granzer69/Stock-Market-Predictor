@@ -48,7 +48,7 @@ test("home shows Nifty table from mocked overview", async ({ page }) => {
   await page.goto("/")
   await expect(page.getByRole("heading", { name: "Nifty 50" })).toBeVisible()
   await expect(page.getByRole("link", { name: "RELIANCE" })).toBeVisible()
-  await expect(page.getByText("Holdout directional accuracy")).toBeVisible()
+  await expect(page.getByText(/Production:/i)).toBeVisible()
 })
 
 test("portfolio page loads paper book", async ({ page }) => {

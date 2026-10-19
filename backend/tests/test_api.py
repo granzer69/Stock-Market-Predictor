@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from tests.conftest import api_client
+from conftest import api_client
 
 
 def test_health(client):

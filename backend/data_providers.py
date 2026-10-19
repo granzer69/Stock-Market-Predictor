@@ -83,10 +83,36 @@ def get_history_provider() -> HistoryProvider:
     return YahooHistoryProvider()
 
 
+def failover_fetch(symbols: list[str], period: str) -> dict[str, pd.DataFrame]:
+    from app_config import market_data_failover_enabled, market_data_provider
+
+    primary = get_history_provider()
+    found = primary.fetch(symbols, period) or {}
+    if not market_data_failover_enabled():
+        return found
+    missing = [symbol for symbol in symbols if symbol not in found]
+    if not missing:
+        return found
+    # Yahoo primary → CSV fallback (or CSV primary → Yahoo fallback).
+    if market_data_provider() == "nse_csv":
+        secondary = YahooHistoryProvider()
+    else:
+        try:
+            secondary = LicensedIndiaDailyProvider()
+        except Exception:
+            return found
+    try:
+        extra = secondary.fetch(missing, period) or {}
+    except (FileNotFoundError, NotImplementedError):
+        extra = {}
+    found.update(extra)
+    return found
+
+
 def provider_fetcher():
     """Callable matching ``PriceCache`` fetcher signature."""
 
     def _fetch(symbols: list[str], period: str) -> dict[str, pd.DataFrame]:
-        return get_history_provider().fetch(symbols, period)
+        return failover_fetch(symbols, period)
 
     return _fetch
