@@ -1,37 +1,50 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { DisclaimerBanner } from "@/components/trading/disclaimer-banner";
-import { SiteNav } from "@/components/trading/site-nav";
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8000";
+import { useEffect, useState } from "react"
+import { DisclaimerBanner } from "@/components/trading/disclaimer-banner"
+import { SiteNav } from "@/components/trading/site-nav"
+import { apiGet, ApiError } from "@/lib/api"
 
 type Row = {
-  mape_pct?: number;
-  rmse?: number;
-  directional_accuracy?: number;
-  n_symbols?: number;
-};
+  mape_pct?: number
+  rmse?: number
+  directional_accuracy?: number
+  n_symbols?: number
+}
 
 export default function EvaluationPage() {
-  const [rows, setRows] = useState<Record<string, Row>>({});
-  const [note, setNote] = useState("");
-  const [champion, setChampion] = useState("");
-  const [err, setErr] = useState<string | null>(null);
+  const [rows, setRows] = useState<Record<string, Row>>({})
+  const [note, setNote] = useState("")
+  const [champion, setChampion] = useState("")
+  const [err, setErr] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch(`${API_BASE}/evaluation`)
-      .then((r) => r.json())
+    apiGet<{
+      pooled_model_comparison?: Record<string, Row>
+      methodology?: { honest_note?: string }
+      champion_model?: string
+      error?: string
+      hint?: string
+    }>("/evaluation")
       .then((d) => {
-        if (d.pooled_model_comparison) setRows(d.pooled_model_comparison);
-        setNote(d.methodology?.honest_note || "");
-        setChampion(d.champion_model || "");
+        if (d.error) {
+          setErr(d.hint || d.error)
+          return
+        }
+        if (d.pooled_model_comparison) setRows(d.pooled_model_comparison)
+        setNote(d.methodology?.honest_note || "")
+        setChampion(d.champion_model || "")
       })
-      .catch(() => setErr("Could not load evaluation. Run scripts/run_evaluation.py"));
-  }, []);
+      .catch((e: unknown) => {
+        setErr(
+          e instanceof ApiError
+            ? e.message
+            : "Could not load evaluation. Check API_ORIGIN and Render deploy.",
+        )
+      })
+  }, [])
 
-  const order = Object.keys(rows).sort();
+  const order = Object.keys(rows).sort()
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -77,5 +90,5 @@ export default function EvaluationPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
