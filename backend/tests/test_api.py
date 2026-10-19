@@ -49,6 +49,14 @@ def test_history_invalid_period(client):
     assert response.status_code == 400
 
 
+def test_nifty50_universe(client):
+    response = client.get("/api/universe/nifty50")
+    assert response.status_code == 200
+    names = response.json()["names"]
+    assert len(names) == 50
+    assert names[0]["ticker"] and names[0]["name"]
+
+
 def test_runtime_config(client):
     response = client.get("/api/config")
     assert response.status_code == 200

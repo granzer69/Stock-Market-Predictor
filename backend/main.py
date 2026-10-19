@@ -66,6 +66,21 @@ def runtime_config():
     return public_config()
 
 
+@app.get("/api/universe/nifty50")
+def nifty50_universe():
+    return {
+        "names": [
+            {
+                "symbol": series.symbol,
+                "ticker": series.ticker,
+                "name": series.name,
+                "sector": series.sector,
+            }
+            for series in NIFTY_50
+        ]
+    }
+
+
 @app.get("/api/market/overview")
 def overview():
     symbols = [item.symbol for item in NIFTY_50]

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { mockBacktest, mockConfig, mockGlobals, mockOrders, mockOverview, mockPortfolio, mockPortfolioBacktest } from "./mocks"
+import { mockBacktest, mockConfig, mockGlobals, mockOrders, mockOverview, mockPortfolio, mockPortfolioBacktest, mockUniverse } from "./mocks"
 
 async function mockApi(page: import("@playwright/test").Page) {
   await page.route("**/api/**", async (route) => {
@@ -32,6 +32,10 @@ async function mockApi(page: import("@playwright/test").Page) {
       await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockConfig) })
       return
     }
+    if (path.endsWith("/api/universe/nifty50")) {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockUniverse) })
+      return
+    }
     await route.fulfill({ status: 404, body: "not mocked" })
   })
 }
@@ -57,6 +61,7 @@ test("research page shows backtest metrics", async ({ page }) => {
   await page.goto("/research")
   await expect(page.getByRole("heading", { name: "Research backtest" })).toBeVisible()
   await expect(page.getByText("Strategy equity")).toBeVisible()
+  await expect(page.getByRole("button", { name: "Export JSON" })).toBeVisible()
 })
 
 test("header shows product name and disclaimer", async ({ page }) => {

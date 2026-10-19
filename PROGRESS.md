@@ -1,5 +1,22 @@
 # Progress log
 
+## 2026-10-19 — Phase 7 complete
+
+**Branch:** `cursor/india-lstm-desk-1e7e`
+
+### Delivered
+
+- `GET /api/universe/nifty50`; Research uses full Nifty 50 + portfolio chip picker
+- Export JSON/CSV for backtest results
+- [TLS_RUNBOOK.md](TLS_RUNBOOK.md)
+
+### Verification
+
+- `python3 -m pytest -q` → **43 passed**
+- `pnpm test:e2e` → **4** tests
+
+---
+
 ## 2026-10-19 — Phase 6 complete
 
 **Branch:** `cursor/india-lstm-desk-1e7e`

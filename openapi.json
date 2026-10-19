@@ -37,6 +37,22 @@
         }
       }
     },
+    "/api/universe/nifty50": {
+      "get": {
+        "summary": "Nifty50 Universe",
+        "operationId": "nifty50_universe_api_universe_nifty50_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/market/overview": {
       "get": {
         "summary": "Overview",

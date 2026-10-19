@@ -114,6 +114,14 @@ Macro and index tape (see [backend/universe.py](backend/universe.py) `GLOBALS`).
 
 ---
 
+## `GET /api/universe/nifty50`
+
+Static Nifty 50 listing (no quotes).
+
+**Response 200:** `{ "names": [ { "symbol", "ticker", "name", "sector" }, ... ] }` (50 rows).
+
+---
+
 ## `GET /api/config`
 
 Public runtime flags (no secrets).

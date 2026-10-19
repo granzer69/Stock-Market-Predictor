@@ -178,6 +178,13 @@ export type PortfolioBacktestReport = {
   disclaimer: string
 }
 
+export type NiftyListing = {
+  symbol: string
+  ticker: string
+  name: string
+  sector: string
+}
+
 export type RuntimeConfig = {
   market_data_provider: "yahoo" | "nse_csv"
   market_data_label: string

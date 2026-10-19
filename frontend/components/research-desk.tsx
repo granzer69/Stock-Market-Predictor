@@ -1,20 +1,23 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { BacktestEquityChart } from "@/components/backtest-equity-chart"
 import { apiGet, ApiError } from "@/lib/api"
+import { downloadBacktestCsv, downloadBacktestJson } from "@/lib/export-backtest"
 import { formatInr, formatPercent } from "@/lib/format"
-import type { BacktestReport, PortfolioBacktestReport, RuntimeConfig } from "@/lib/types"
+import type { BacktestReport, NiftyListing, PortfolioBacktestReport, RuntimeConfig } from "@/lib/types"
 
 const PERIODS = ["6mo", "1y", "2y", "5y"] as const
-const TICKERS = ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ITC"]
-const PORTFOLIO_TICKERS = TICKERS.join(",")
+const DEFAULT_PORTFOLIO = ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ITC"]
 
 type Mode = "single" | "portfolio"
 
 export function ResearchDesk() {
   const [mode, setMode] = useState<Mode>("single")
+  const [universe, setUniverse] = useState<NiftyListing[]>([])
   const [ticker, setTicker] = useState("RELIANCE")
+  const [portfolioPick, setPortfolioPick] = useState<string[]>(DEFAULT_PORTFOLIO)
+  const [portfolioQuery, setPortfolioQuery] = useState("")
   const [period, setPeriod] = useState<(typeof PERIODS)[number]>("2y")
   const [report, setReport] = useState<BacktestReport | null>(null)
   const [portfolio, setPortfolio] = useState<PortfolioBacktestReport | null>(null)
@@ -22,17 +25,25 @@ export function ResearchDesk() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    apiGet<RuntimeConfig>("/api/config").then(setConfig).catch(() => setConfig(null))
-  }, [])
+  const maxPortfolio = config?.research_portfolio_max_symbols ?? 10
 
   useEffect(() => {
+    apiGet<RuntimeConfig>("/api/config").then(setConfig).catch(() => setConfig(null))
+    apiGet<{ names: NiftyListing[] }>("/api/universe/nifty50")
+      .then((payload) => setUniverse(payload.names))
+      .catch(() => setUniverse([]))
+  }, [])
+
+  const portfolioSymbolsParam = useMemo(() => portfolioPick.join(","), [portfolioPick])
+
+  useEffect(() => {
+    if (mode === "portfolio" && portfolioPick.length < 2) return
     const controller = new AbortController()
     setLoading(true)
     const path =
       mode === "single"
         ? `/api/research/backtest/${encodeURIComponent(ticker)}?period=${period}`
-        : `/api/research/backtest/portfolio?period=${period}&symbols=${encodeURIComponent(PORTFOLIO_TICKERS)}`
+        : `/api/research/backtest/portfolio?period=${period}&symbols=${encodeURIComponent(portfolioSymbolsParam)}`
 
     apiGet<BacktestReport | PortfolioBacktestReport>(path, controller.signal)
       .then((payload) => {
@@ -55,10 +66,32 @@ export function ResearchDesk() {
         if (!controller.signal.aborted) setLoading(false)
       })
     return () => controller.abort()
-  }, [ticker, period, mode])
+  }, [ticker, period, mode, portfolioSymbolsParam])
+
+  const tickers = universe.length > 0 ? universe.map((item) => item.ticker) : DEFAULT_PORTFOLIO
+  const filteredUniverse = useMemo(() => {
+    const needle = portfolioQuery.trim().toLowerCase()
+    if (!needle) return universe
+    return universe.filter(
+      (item) =>
+        item.ticker.toLowerCase().includes(needle) ||
+        item.name.toLowerCase().includes(needle) ||
+        item.sector.toLowerCase().includes(needle),
+    )
+  }, [universe, portfolioQuery])
 
   const active = mode === "single" ? report : portfolio
   const benchLabel = mode === "single" ? "Buy & hold" : "Equal-weight B&H"
+
+  function togglePortfolioSymbol(symbolTicker: string) {
+    setPortfolioPick((current) => {
+      if (current.includes(symbolTicker)) {
+        return current.filter((item) => item !== symbolTicker)
+      }
+      if (current.length >= maxPortfolio) return current
+      return [...current, symbolTicker]
+    })
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
@@ -95,9 +128,9 @@ export function ResearchDesk() {
             <select
               value={ticker}
               onChange={(e) => setTicker(e.target.value)}
-              className="ml-2 rounded-md border border-white/10 bg-[#10151c] px-2 py-1.5 text-white"
+              className="ml-2 max-w-[12rem] rounded-md border border-white/10 bg-[#10151c] px-2 py-1.5 text-white"
             >
-              {TICKERS.map((item) => (
+              {tickers.map((item) => (
                 <option key={item} value={item}>{item}</option>
               ))}
             </select>
@@ -117,11 +150,65 @@ export function ResearchDesk() {
         </label>
       </div>
 
+      {mode === "portfolio" && (
+        <section className="mt-4 rounded-lg border border-white/10 bg-[#10151c] p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm text-[#8b9bb0]">
+              Portfolio names ({portfolioPick.length}/{maxPortfolio}, min 2)
+            </p>
+            <input
+              value={portfolioQuery}
+              onChange={(e) => setPortfolioQuery(e.target.value)}
+              placeholder="Search Nifty 50"
+              className="w-full max-w-xs rounded-md border border-white/10 bg-[#07090d] px-2 py-1 text-sm outline-none placeholder:text-[#5d6b7c] sm:w-56"
+            />
+          </div>
+          <div className="mt-2 max-h-40 overflow-y-auto scrollbar-tape">
+            <div className="flex flex-wrap gap-2">
+              {filteredUniverse.map((item) => {
+                const selected = portfolioPick.includes(item.ticker)
+                const disabled = !selected && portfolioPick.length >= maxPortfolio
+                return (
+                  <button
+                    key={item.ticker}
+                    type="button"
+                    disabled={disabled}
+                    onClick={() => togglePortfolioSymbol(item.ticker)}
+                    className={`rounded-md border px-2 py-1 text-xs ${selected ? "border-[#e3b341]/50 bg-[#e3b341]/10 text-white" : "border-white/10 text-[#8b9bb0] hover:text-white"} ${disabled ? "opacity-40" : ""}`}
+                  >
+                    {item.ticker}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+          {portfolioPick.length < 2 && (
+            <p className="mt-2 text-xs text-[#f0434c]">Select at least two symbols to run the portfolio backtest.</p>
+          )}
+        </section>
+      )}
+
       {loading && <p className="mt-6 text-sm text-[#8b9bb0]">Running backtest…</p>}
       {error && <p className="mt-6 text-sm text-[#f0434c]">{error}</p>}
 
       {active && !loading && (
         <div className="mt-6 space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => downloadBacktestJson(active, mode)}
+              className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-[#8b9bb0] hover:text-white"
+            >
+              Export JSON
+            </button>
+            <button
+              type="button"
+              onClick={() => downloadBacktestCsv(active, mode)}
+              className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-[#8b9bb0] hover:text-white"
+            >
+              Export CSV
+            </button>
+          </div>
           {mode === "single" && report && (
             <p className="text-sm text-[#8b9bb0]">
               {report.name} ({report.ticker}) · {report.period} · {report.disclaimer}

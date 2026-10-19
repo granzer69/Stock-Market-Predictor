@@ -53,6 +53,13 @@ export const mockPortfolio: Portfolio = {
 
 export const mockOrders: { orders: Order[] } = { orders: [] }
 
+export const mockUniverse = {
+  names: [
+    { symbol: "RELIANCE.NS", ticker: "RELIANCE", name: "Reliance Industries", sector: "Energy" },
+    { symbol: "TCS.NS", ticker: "TCS", name: "Tata Consultancy Services", sector: "IT" },
+  ],
+}
+
 export const mockConfig = {
   market_data_provider: "yahoo",
   market_data_label: "Yahoo Finance",

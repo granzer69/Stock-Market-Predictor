@@ -75,8 +75,15 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ---
 
-## Phase 7+ (backlog)
+## Phase 7 — Research polish + TLS runbook
 
-- [ ] More Nifty names in portfolio picker (not fixed quintet)
-- [ ] Export backtest JSON/CSV from UI
-- [ ] Production TLS + custom domain runbook
+- [x] **P7-1** `GET /api/universe/nifty50`; full Nifty dropdown + portfolio chip picker (max from config)
+- [x] **P7-2** Export JSON / CSV on Research page (`frontend/lib/export-backtest.ts`)
+- [x] **P7-3** [TLS_RUNBOOK.md](TLS_RUNBOOK.md) (Caddy / nginx + checklist)
+
+---
+
+## Phase 8+ (backlog)
+
+- [ ] Configurable production CORS origins via env
+- [ ] Merge PR to `main` and tag release

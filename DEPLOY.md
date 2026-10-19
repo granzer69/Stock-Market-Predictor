@@ -47,7 +47,7 @@ The UI reads `GET /api/config` to show **Data: Yahoo Finance** vs **NSE CSV bund
 docker compose -f docker-compose.yml up --build -d
 ```
 
-Place TLS in front (Caddy/nginx) for public hosts. Paper SQLite lives in the container unless you mount `backend/paper_trading.db`.
+Place TLS in front (Caddy/nginx) for public hosts — step-by-step in [TLS_RUNBOOK.md](TLS_RUNBOOK.md). Paper SQLite lives in the container unless you mount `backend/paper_trading.db`.
 
 ## Health checks
 
