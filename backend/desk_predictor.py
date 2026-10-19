@@ -101,17 +101,20 @@ class DeskPredictor:
         }
 
     def summaries(self, frames: dict[str, pd.DataFrame]) -> dict[str, dict]:
-        if self._inference().champion_available():
-            out: dict[str, dict] = {}
-            for symbol, frame in frames.items():
-                if frame is None or frame.empty:
-                    continue
-                last_close = float(frame.iloc[-1]["Close"])
-                payload = self._champion_payload(symbol, last_close)
-                if payload:
-                    out[symbol] = payload
-            if out:
-                return out
+        try:
+            if self._inference().champion_available():
+                out: dict[str, dict] = {}
+                for symbol, frame in frames.items():
+                    if frame is None or frame.empty:
+                        continue
+                    last_close = float(frame.iloc[-1]["Close"])
+                    payload = self._champion_payload(symbol, last_close)
+                    if payload:
+                        out[symbol] = payload
+                if out:
+                    return out
+        except Exception:  # noqa: BLE001 — fall back to LSTM if champion stack unavailable
+            pass
         return self.lstm.summaries(frames)
 
     def _predict_scaled(self, windows):
