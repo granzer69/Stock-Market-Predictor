@@ -3,7 +3,7 @@ import pandas as pd
 
 from backtest.portfolio_engine import run_portfolio_backtest
 from research import portfolio_backtest
-from tests.conftest import FakePredictor, _ohlc_frame
+from conftest import FakePredictor, _ohlc_frame
 
 
 def test_shared_cash_portfolio_runs():

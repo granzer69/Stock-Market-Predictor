@@ -7,11 +7,15 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/artifacts:/app/backend/artifacts
-      - ./backend/data_cache:/app/backend/data_cache
+      - ./backend/cache:/app/backend/cache
+      - ./data/paper:/app/backend/data/paper
     environment:
       YF_DISABLE_CURL_CFFI: "1"
+      CORS_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+      PAPER_DB_PATH: /app/backend/data/paper/paper_trading.db
       # MARKET_DATA_PROVIDER: nse_csv
       # NSE_CSV_DIR: /app/backend/data/nse_daily
+      # PAPER_APPLY_INDIA_COSTS: "0"
 
   web:
     build:

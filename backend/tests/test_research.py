@@ -1,7 +1,7 @@
 import pandas as pd
 
 from research import backtest_from_frame
-from tests.conftest import FakePredictor, _ohlc_frame
+from conftest import FakePredictor, _ohlc_frame
 
 
 def test_backtest_from_frame_returns_strategy_and_benchmark():

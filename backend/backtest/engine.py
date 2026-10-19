@@ -15,6 +15,7 @@ class BacktestConfig:
     starting_cash: float = 1_000_000.0
     signal_threshold: float = SIGNAL_THRESHOLD
     cost_params: IndiaEquityCostParams | None = None
+    fill_lag: int = 0  # 0 = fill at signal bar close; 1 = next bar close
 
 
 @dataclass
@@ -61,11 +62,14 @@ def run_long_only_backtest(
     wins = 0
     curve: list[dict] = []
 
-    for day, price, signal in zip(dates, closes, signals):
+    for index, (day, price) in enumerate(zip(dates, closes)):
         price = float(price)
         if price <= 0:
             raise ValueError("closes must be positive")
 
+        signal = "HOLD"
+        if index >= cfg.fill_lag:
+            signal = signals[index - cfg.fill_lag]
         side = signal.upper()
         if side == "BUY" and qty == 0:
             buy_qty = _max_buy_qty(cash, price, params)

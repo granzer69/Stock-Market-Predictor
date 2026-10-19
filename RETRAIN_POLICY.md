@@ -12,7 +12,7 @@ WF_AS_OF_DATE=2024-06-01 python backend/scripts/walk_forward_retrain.py
 
 Writes to `backend/artifacts/wf_<date>/` unless `--in-place` is passed.
 
-**Promotion checklist** (human gate — not automated in CI):
+**Promotion checklist** (human gate — not automated in CI). Use [RETRAIN_METRICS_DIFF.md](RETRAIN_METRICS_DIFF.md) as the review template.
 
 1. Holdout directional accuracy and MAE documented vs current `metrics.json`
 2. `python -m pytest -q` green

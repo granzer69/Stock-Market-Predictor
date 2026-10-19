@@ -83,7 +83,24 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ---
 
-## Phase 8+ (backlog)
+## Phase 8 — Release gate
 
-- [ ] Configurable production CORS origins via env
-- [ ] Merge PR to `main` and tag release
+- [x] **P8-1** `CORS_ORIGINS` + docs ([DEPLOY.md](DEPLOY.md), [TLS_RUNBOOK.md](TLS_RUNBOOK.md))
+- [x] **P8-2** [ARCHITECTURE_DELTA.md](ARCHITECTURE_DELTA.md); [CHANGELOG.md](CHANGELOG.md) / README v0.1.0
+- [x] **P8-3** Merge to `main`, tag `v0.1.0`; resolve alternate PR #2 (LSTM desk = primary)
+
+## Phase 9 — Ops
+
+- [x] Compose volumes, request logging, research concurrency cap, [BACKUP.md](BACKUP.md)
+
+## Phase 10 — Data credibility
+
+- [x] Failover fetch, validation CLI, governance / corp actions / universe docs
+
+## Phase 11 — ML governance
+
+- [x] Drift-check workflow, [RETRAIN_METRICS_DIFF.md](RETRAIN_METRICS_DIFF.md); LSTM research path + optional LightGBM live stack
+
+## Phase 12 — Product
+
+- [x] Backtest `next_close` fill, paper India costs env, MODEL_CARD link + fill UI on Research

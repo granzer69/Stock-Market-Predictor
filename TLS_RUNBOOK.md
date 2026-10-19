@@ -16,7 +16,7 @@ Use this when exposing Bharat Desk on the public internet with HTTPS. Assumes:
 
 1. Deploy frontend per [DEPLOY.md](DEPLOY.md); set `API_ORIGIN=https://api.desk.example.com`.
 2. On the API host, terminate TLS with Caddy (below) on ports 80/443, proxy to `127.0.0.1:8000`.
-3. Extend FastAPI CORS in `backend/main.py` to include `https://desk.example.com` (production origin).
+3. Set API env `CORS_ORIGINS=https://desk.example.com,http://localhost:3000` (comma-separated; see `.env.example`). No code change required.
 
 ## Option B — Single VM (Caddy + Docker Compose)
 

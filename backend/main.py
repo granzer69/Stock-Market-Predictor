@@ -1,8 +1,9 @@
-"""Bharat Desk API: Nifty 50, paper book, LightGBM + evaluation endpoints."""
+"""Bharat Desk API: Nifty 50, paper book, research backtests, optional LightGBM stack."""
 
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 from contextlib import asynccontextmanager
@@ -15,10 +16,10 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from app_config import public_config
+from app_config import cors_origins, default_backtest_fill, paper_db_path, public_config
 from data_providers import provider_fetcher
-from market_data import HISTORY_PERIODS, PriceCache, bars_from_frame, sma_series
 from desk_predictor import DeskPredictor
+from http_middleware import RequestContextMiddleware, ResearchRateLimitMiddleware
 from market_data import HISTORY_PERIODS, PriceCache, bars_from_frame, quote_from_frame, sma_series
 from portfolio import PaperBook
 from predictor import Predictor
@@ -112,13 +113,10 @@ def _load_legacy_stack() -> None:
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
     global market, book, predictor
-    market = PriceCache(ROOT / "cache", fetcher=provider_fetcher())
-    book = PaperBook(ROOT / "paper_trading.db")
-    predictor = Predictor(ROOT / "artifacts")
-    predictor.load()
-    market = PriceCache(BASE_DIR / "cache")
-    book = PaperBook(BASE_DIR / "paper_trading.db")
+    market = PriceCache(BASE_DIR / "cache", fetcher=provider_fetcher())
+    book = PaperBook(paper_db_path(BASE_DIR))
     lstm = Predictor(BASE_DIR / "artifacts")
     lstm.load()
     predictor = DeskPredictor(lstm)
@@ -127,11 +125,11 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Bharat Desk", lifespan=lifespan)
-allowed = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
-origins = [o.strip() for o in allowed.split(",") if o.strip()]
+app.add_middleware(RequestContextMiddleware)
+app.add_middleware(ResearchRateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=cors_origins(),
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -240,6 +238,7 @@ def history(symbol: str, period: str = Query(default="2y")):
 def research_portfolio_backtest(
     period: str = Query(default="2y"),
     symbols: str = Query(default="RELIANCE,TCS,HDFCBANK,INFY,ITC"),
+    fill: str = Query(default=None),
 ):
     if period not in HISTORY_PERIODS:
         raise HTTPException(status_code=400, detail=f"period must be one of {', '.join(HISTORY_PERIODS)}")
@@ -259,13 +258,17 @@ def research_portfolio_backtest(
     if missing:
         raise HTTPException(status_code=404, detail=f"No history for {', '.join(missing)}")
     try:
-        return portfolio_backtest(frames, predictor, period, resolved)
+        return portfolio_backtest(frames, predictor, period, resolved, fill=fill or default_backtest_fill())
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.get("/api/research/backtest/{symbol}")
-def research_backtest(symbol: str, period: str = Query(default="2y")):
+def research_backtest(
+    symbol: str,
+    period: str = Query(default="2y"),
+    fill: str = Query(default=None),
+):
     if period not in HISTORY_PERIODS:
         raise HTTPException(status_code=400, detail=f"period must be one of {', '.join(HISTORY_PERIODS)}")
     series = resolve(symbol)
@@ -277,7 +280,13 @@ def research_backtest(symbol: str, period: str = Query(default="2y")):
     if frame is None or frame.empty:
         raise HTTPException(status_code=404, detail="No history for symbol")
     try:
-        payload = backtest_from_frame(series.symbol, frame, predictor, period)
+        payload = backtest_from_frame(
+            series.symbol,
+            frame,
+            predictor,
+            period,
+            fill=fill or default_backtest_fill(),
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     payload.update({"ticker": series.ticker, "name": series.name})
