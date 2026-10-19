@@ -1,4 +1,5 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+// Same-origin by default so a forwarded UI port can reach the API through the Next proxy.
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ""
 
 export class ApiError extends Error {
   constructor(message: string) {
