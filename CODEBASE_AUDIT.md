@@ -101,7 +101,9 @@ CORS: `localhost:3000`, `127.0.0.1:3000` only.
 - Sell rejected when shares insufficient.
 - Average cost and unrealized PnL after two buys.
 
-**Gaps:** No FastAPI `TestClient` tests, no live `yfinance` contract tests, no frontend tests, no training reproducibility test, no API schema snapshots.
+**API tests (Phase 1):** `backend/tests/test_api.py` — 13 smoke tests with `FakeMarket` / `FakePredictor` (no live Yahoo, Keras `load` patched). See [API_SPEC.md](API_SPEC.md).
+
+**Remaining gaps:** No live `yfinance` contract tests, no frontend tests, no training reproducibility test, no OpenAPI export in CI.
 
 ## Data leakage and methodology risks (verified from code)
 
