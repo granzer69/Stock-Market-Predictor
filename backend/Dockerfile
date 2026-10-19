@@ -12,7 +12,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Champion LightGBM inference imports repo-root `ml/` (see backend/inference.py).
+COPY ml /app/ml
 COPY backend /app/backend
+ENV PYTHONPATH=/app:/app/backend
 WORKDIR /app/backend
 
 EXPOSE 8000
