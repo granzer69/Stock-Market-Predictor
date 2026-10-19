@@ -1,0 +1,11 @@
+{
+  "symbols_requested": 50,
+  "symbols_kept": 50,
+  "symbols_dropped": [],
+  "date_range": {
+    "min": "2021-10-18",
+    "max": "2026-10-16"
+  },
+  "output_csv": "backend/data/nifty50_closes.csv",
+  "min_rows_per_symbol": 200
+}
