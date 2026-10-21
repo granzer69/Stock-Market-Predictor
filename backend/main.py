@@ -200,7 +200,8 @@ def nifty50_universe():
 def overview():
     symbols = [item.symbol for item in NIFTY_50]
     quotes = market.get_quotes(symbols)
-    histories = market.get_histories(symbols, "2y")
+    # Shorter window is enough for signals (60-day LSTM window) and keeps cold-cache overview fast.
+    histories = market.get_histories(symbols, "6mo")
     predictions = predictor.summaries(histories)
     stocks = []
     for series in NIFTY_50:
@@ -365,6 +366,7 @@ def health():
     return {"status": "ok", "disclaimer": DISCLAIMER, "champion_model": use_champion}
 
 
+@app.get("/api/evaluation")
 @app.get("/evaluation")
 def evaluation():
     data = _inference_module().get_evaluation()
@@ -372,6 +374,7 @@ def evaluation():
     return data
 
 
+@app.get("/api/backtest")
 @app.get("/backtest")
 def backtest(symbol: str = Query(...)):
     yahoo_symbol, meta = canonicalize(symbol)
