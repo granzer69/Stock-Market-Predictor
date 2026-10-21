@@ -25,7 +25,7 @@ export default function EvaluationPage() {
       champion_model?: string
       error?: string
       hint?: string
-    }>("/evaluation")
+    }>("/api/evaluation")
       .then((d) => {
         if (d.error) {
           setErr(d.hint || d.error)

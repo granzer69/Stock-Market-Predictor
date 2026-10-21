@@ -14,27 +14,48 @@ export function Overview() {
 
   useEffect(() => {
     const controller = new AbortController()
-    setLoading(true)
-    apiGet<{ stocks: Quote[]; model: ModelSummary | null }>("/api/market/overview", controller.signal)
-      .then((overview) => {
+    let cancelled = false
+
+    async function loadOverview(attempt: number) {
+      setLoading(true)
+      if (attempt === 0) setError(null)
+      try {
+        const overview = await apiGet<{ stocks: Quote[]; model: ModelSummary | null }>(
+          "/api/market/overview",
+          controller.signal,
+        )
+        if (cancelled) return
         setStocks(overview.stocks)
         setModel(overview.model)
         setError(null)
-      })
-      .catch((err: unknown) => {
-        if (controller.signal.aborted) return
+      } catch (err: unknown) {
+        if (controller.signal.aborted || cancelled) return
+        if (attempt === 0) {
+          await new Promise((r) => setTimeout(r, 2500))
+          if (!cancelled) return loadOverview(1)
+          return
+        }
         setError(err instanceof ApiError ? err.message : "The market API is not reachable.")
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
-      })
-    return () => controller.abort()
+      } finally {
+        if (!cancelled && !controller.signal.aborted) setLoading(false)
+      }
+    }
+
+    void loadOverview(0)
+    return () => {
+      cancelled = true
+      controller.abort()
+    }
   }, [])
 
   return (
     <div>
       <div className="mx-auto max-w-7xl">
-        {loading && <p className="px-4 py-8 text-sm text-[#8b9bb0]">Loading Nifty 50 closes…</p>}
+        {loading && (
+          <p className="px-4 py-8 text-sm text-[#8b9bb0]">
+            Loading Nifty 50 quotes and forecasts… (first load after the API sleeps can take up to a minute)
+          </p>
+        )}
         {error && <p className="px-4 py-8 text-sm text-[#f0434c]">{error}</p>}
         {!loading && !error && (
           <>
