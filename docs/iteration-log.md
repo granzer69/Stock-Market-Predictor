@@ -156,7 +156,7 @@ No new holdout metric. `backend/models/evaluation_report.json` was not edited. C
 
 ### Risks
 
-The file's `methodology.honest_note` still contains the words "in-sample walk-forward". The page still prints that note under the subtitle. The Backtest subtitle still says "10bps cost · 5bps slippage" from the page, not from the payload. The disk file still has bare `NaN`.
+The file's `methodology.honest_note` still contains the words "in-sample walk-forward". The page quotes that sentence as the file's original wording and states that the report records one chronological split, not a walk-forward. The Backtest subtitle still says "10bps cost · 5bps slippage" from the page, not from the payload. The disk file still has bare `NaN`.
 
 ### Decision
 

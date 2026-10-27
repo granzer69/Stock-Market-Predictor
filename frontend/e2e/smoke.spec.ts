@@ -93,7 +93,10 @@ test("evaluation page loads its report from /api/evaluation", async ({ page }) =
       body: JSON.stringify({
         champion_model: "arima_111",
         production_model: "lightgbm",
-        methodology: { honest_note: "fixture note" },
+        methodology: {
+          honest_note:
+            "Metrics are in-sample walk-forward on Yahoo EOD data. They do NOT imply superiority over professional quant models.",
+        },
         pooled_model_comparison: {
           momentum: { directional_accuracy: 1, mape_pct: null, rmse: null, n_symbols: 50 },
           lightgbm: { directional_accuracy: 0.4707, mape_pct: 1.4153, rmse: 47.4909, n_symbols: 50 },
@@ -114,6 +117,15 @@ test("evaluation page loads its report from /api/evaluation", async ({ page }) =
   await expect(page.getByText("Pre-fix same-return score: the sign of the return being graded. Not a lagged baseline and not a champion.")).toBeVisible()
   await expect(page.getByText("Walk-forward holdout")).toHaveCount(0)
   await expect(page.getByText("same split for all baselines")).toHaveCount(0)
+  await expect(
+    page.getByText(
+      "File's original wording: Metrics are in-sample walk-forward on Yahoo EOD data. They do NOT imply superiority over professional quant models. The report records one chronological split, not a walk-forward.",
+    ),
+  ).toBeVisible()
+  const visible = await page.locator("body").innerText()
+  if (/walk-forward/i.test(visible)) {
+    expect(visible).toContain("The report records one chronological split, not a walk-forward.")
+  }
 })
 
 test("backtest page loads its report from /api/legacy/backtest", async ({ page }) => {

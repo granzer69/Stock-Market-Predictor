@@ -73,7 +73,11 @@ export default function EvaluationPage() {
         <DisclaimerBanner />
         {err && <p className="text-red-400 mt-4">{err}</p>}
         {pickLine && <p className="mt-4 text-gray-300">{pickLine}</p>}
-        {note && <p className="mt-4 text-gray-400 text-sm">{note}</p>}
+        {note && (
+          <p className="mt-4 text-gray-400 text-sm">
+            {`File's original wording: ${note} The report records one chronological split, not a walk-forward.`}
+          </p>
+        )}
         <div className="overflow-x-auto mt-6">
           <table className="w-full text-sm border border-gray-700">
             <thead className="bg-gray-800">
