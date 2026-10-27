@@ -189,21 +189,21 @@ Unchanged published numbers. This iteration does not refit them.
 ### Summary
 
 - `/lab` is linked from the desk header. `GET/POST /api/lab/jobs` starts, pauses, resumes, and cancels. A second start while a job is running or paused returns 409. The job log is polled.
-- The side directory is `backend/lab_runs/<id>/` (or next to the test database). The runner refuses `backend/artifacts` and `champion_lgbm.txt`. `train_lstm.train_and_save` is the entry point only when frames are already in memory, with `LSTM_EPOCHS` and `LAB_SYMBOL_CAP`. A desk start has no frames, so it does not download bars and does not refit. It writes the stored claim into the side directory.
+- The side directory is `backend/lab_runs/<id>/` (or next to the test database). The runner refuses `backend/artifacts` and `champion_lgbm.txt`. Start reads daily bars already on disk (price-cache history, the NSE CSV directory, then `ohlcv_panel.csv`) and does not contact Yahoo. When those files are missing, the job is rejected with `no local bars; train not started` and the committed `metrics.json` is not scored. When they are present, `train_lstm.train_and_save` runs with `LSTM_EPOCHS` and `LAB_SYMBOL_CAP` into that side directory. A trained job that loses to predict-zero is still rejected on naive MAE.
 - The gate reads that file and recomputes naive MAE with `naive_mae` and lagged momentum with `momentum_directional_accuracy`, both in `ml/metrics.py`. It does not refit. It rejects a missing file, a holdout that is not a tail split, momentum directional accuracy 1.0 on the same return, an LSTM MAE that does not beat predict-zero, and a directional accuracy that does not beat 0.5. Approve is manual. Rollback points the approved id at the previous job. Nothing is copied into the live hint path.
 - A paper session reuses `PaperBook.place_order`. Caps are max names, max notional, and max daily loss. The India fee schedule applies only when it is already on. One decision per session, symbol, and quote date. A stale or missing quote, an unapproved model, or a breached cap writes no order, halts the session, and stores the reason. Each fill stores `model`, `model_version` (job id), `forecast_as_of`, and `fill_date`. `GET /api/lab/portfolio` is the portfolio snapshot plus those fields.
 - One active job, `LAB_MAX_RUNTIME_SECONDS` (default 180), and no automatic promotion. No Redis, Celery, broker client, or live-trading toggle.
 
 ### Tests
 
-- `backend/tests/test_lab.py` — second start returns 409; the published LSTM claim is rejected and cannot be approved; the published LightGBM claim and a same-return momentum score of 1.0 are rejected; a stale quote writes no order; two ticks on one quote date produce one fill; rollback restores the previous job; the side directory does not change live artifacts; lab source does not name a broker SDK, a broker secret, Redis, or Celery.
+- `backend/tests/test_lab.py` — second start returns 409; the published LSTM claim is rejected and cannot be approved; the published LightGBM claim and a same-return momentum score of 1.0 are rejected; a stale quote writes no order; two ticks on one quote date produce one fill; rollback restores the previous job; Start refuses with `no local bars; train not started` when the disk sources are empty and does not call the trainer; Start calls `train_and_save` into the side directory when local bars exist, with the symbol cap, and a losing fit is still rejected on naive MAE; the side directory does not change live artifacts; lab source does not name a broker SDK, a broker secret, Redis, or Celery.
 - `frontend/e2e/smoke.spec.ts` — `/lab` renders a mocked rejected job and the Start control.
 
 ### Measurements
 
 No new holdout metric. `backend/artifacts` and `backend/models/evaluation_report.json` were not edited. Commands on this branch, not pushed:
 
-- `python3 -m pytest -q` → **65 passed**, 1 warning (`StarletteDeprecationWarning` from `fastapi.testclient`), 5.25s.
+- `python3 -m pytest -q` → **67 passed**, 1 warning (`StarletteDeprecationWarning` from `fastapi.testclient`), 5.39s.
 - `cd frontend && pnpm test:e2e` → **8 passed** (9.9s). The new case is `lab page shows a mocked rejected job`.
 
 The gate rejects:
@@ -216,7 +216,7 @@ The gate rejects:
 
 ### Risks
 
-Desk Start does not call `train_and_save` unless frames are already in the process. That avoids a Yahoo download and a refit of the published holdout. A passing synthetic series can be approved by hand; the published claims cannot. The Markets strip still shows the file's raw `honest_note`. The Backtest subtitle still says "10bps". The lab database is the paper-book SQLite file. This checkout was not deployed: no host here keeps that file outside the machine.
+Desk Start calls `train_and_save` only when daily bars are already on disk, and it does not download. A missing-bars job is not scored against the committed metrics file. A passing synthetic series can be approved by hand; the published claims cannot. The Markets strip still shows the file's raw `honest_note`. The Backtest subtitle still says "10bps". The lab database is the paper-book SQLite file. This checkout was not deployed: no host here keeps that file outside the machine.
 
 ### Decision
 

@@ -13,7 +13,7 @@
 
 ### Verification
 
-- `python3 -m pytest -q` → **65 passed**
+- `python3 -m pytest -q` → **67 passed**
 - `pnpm test:e2e` → **8 passed**
 
 ---

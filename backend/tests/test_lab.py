@@ -5,6 +5,7 @@ No Yahoo, no Keras, no broker. The published LSTM and LightGBM claims fail the g
 
 from __future__ import annotations
 
+import os
 import threading
 import time
 from pathlib import Path
@@ -195,20 +196,111 @@ def test_rollback_restores_the_previous_approved_job(client, monkeypatch):
     assert protected_snapshot() == before
 
 
-def test_side_directory_does_not_touch_live_artifacts(tmp_path):
+def _empty_sources(tmp_path: Path) -> tuple[Path, Path, Path]:
+    return (tmp_path / "cache", tmp_path / "nse", tmp_path / "panel.csv")
+
+
+def _write_bars(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "Date,Open,High,Low,Close,Volume\n2024-01-02,10,11,9,10,100\n2024-01-03,10,11,9,11,100\n",
+        encoding="utf-8",
+    )
+
+
+def _forbid_yahoo(monkeypatch) -> dict:
+    called = {"yahoo": 0, "train": 0}
+
+    def yahoo(*_args, **_kwargs):
+        called["yahoo"] += 1
+        raise AssertionError("yahoo contacted")
+
+    monkeypatch.setattr("market_data.yfinance_fetcher", yahoo)
+    return called
+
+
+def test_start_refuses_when_local_bars_are_missing(client, monkeypatch, tmp_path):
+    monkeypatch.setattr(lab_jobs, "disk_bar_sources", lambda: _empty_sources(tmp_path))
+    called = _forbid_yahoo(monkeypatch)
+
+    def train_and_save(*_args, **_kwargs):
+        called["train"] += 1
+        raise AssertionError("train_and_save")
+
+    monkeypatch.setattr("train_lstm.train_and_save", train_and_save)
+    before = protected_snapshot()
+    started = client.post("/api/lab/jobs", json={"action": "start", "candidate_id": "lstm_returns"})
+    assert started.status_code == 200, started.text
+    job = _wait_job(client, started.json()["id"])
+    assert job["status"] == "rejected"
+    assert job["rejection_reason"] == "no local bars; train not started"
+    assert job["metrics"] is None
+    assert "0.012052" not in (job["log_tail"] or "")
+    assert called == {"yahoo": 0, "train": 0}
+    assert protected_snapshot() == before
+
+
+def test_start_trains_side_directory_when_local_bars_exist(client, monkeypatch, tmp_path):
+    nse = tmp_path / "nse"
+    _write_bars(nse / "ADANIENT.NS.csv")
+    _write_bars(nse / "ADANIPORTS.NS.csv")
+    _write_bars(nse / "APOLLOHOSP.NS.csv")
+    monkeypatch.setattr(lab_jobs, "disk_bar_sources", lambda: (tmp_path / "cache", nse, tmp_path / "panel.csv"))
+    monkeypatch.setenv("LAB_SYMBOL_CAP", "2")
+    monkeypatch.setenv("LSTM_EPOCHS", "3")
+    called = _forbid_yahoo(monkeypatch)
+    seen: dict = {}
+
+    def train_and_save(frames, artifact_dir=None):
+        called["train"] += 1
+        seen["symbols"] = list(frames)
+        seen["artifact_dir"] = str(artifact_dir)
+        seen["epochs"] = os.environ.get("LSTM_EPOCHS")
+        write_metrics_file(
+            Path(artifact_dir),
+            {
+                "holdout_fraction": 0.2,
+                "training_shuffle": False,
+                "mae_log_return": 0.02,
+                "naive_mae_log_return": 0.01,
+            },
+        )
+        return {}
+
+    monkeypatch.setattr("train_lstm.train_and_save", train_and_save)
+    before = protected_snapshot()
+    started = client.post("/api/lab/jobs", json={"action": "start", "candidate_id": "lstm_returns"})
+    assert started.status_code == 200, started.text
+    job = _wait_job(client, started.json()["id"])
+    assert called["yahoo"] == 0
+    assert called["train"] == 1
+    assert seen["symbols"] == ["ADANIENT.NS", "ADANIPORTS.NS"]
+    assert seen["epochs"] == "3"
+    artifact_dir = Path(seen["artifact_dir"]).resolve()
+    assert artifact_dir.name == job["id"]
+    assert artifact_dir != (REPO / "backend" / "artifacts").resolve()
+    assert (REPO / "backend" / "artifacts").resolve() not in artifact_dir.parents
+    assert not (artifact_dir / "champion_lgbm.txt").exists()
+    assert job["status"] == "rejected"
+    assert job["rejection_reason"] == "mae_log_return 0.020000 does not beat naive MAE 0.010000"
+    assert "symbol_cap=2" in job["log_tail"]
+    assert "LSTM_EPOCHS=3" in job["log_tail"]
+    assert protected_snapshot() == before
+
+
+def test_side_directory_does_not_touch_live_artifacts(tmp_path, monkeypatch):
     with pytest.raises(RuntimeError, match="backend/artifacts"):
         assert_side_directory(REPO / "backend" / "artifacts")
     with pytest.raises(RuntimeError, match="champion_lgbm.txt"):
         assert_side_directory(REPO / "backend" / "models")
+    monkeypatch.setattr(lab_jobs, "disk_bar_sources", lambda: _empty_sources(tmp_path))
     before = protected_snapshot()
     side = tmp_path / "run"
-    default_trainer("lstm_returns", side, {}, lambda _message: None, JobControl(30))
-    assert (side / "metrics.json").exists()
+    with pytest.raises(lab_jobs.TrainNotStarted, match="no local bars; train not started"):
+        default_trainer("lstm_returns", side, {}, lambda _message: None, JobControl(30))
+    assert not (side / "metrics.json").exists()
     assert list(side.glob("champion_lgbm.txt")) == []
     assert protected_snapshot() == before
-    status, reason, _recomputed = verify_metrics(__import__("json").loads((side / "metrics.json").read_text()))
-    assert status == "rejected"
-    assert reason == "mae_log_return 0.012052 does not beat naive MAE 0.011988"
 
 
 def test_lab_modules_do_not_import_a_broker_or_a_queue():

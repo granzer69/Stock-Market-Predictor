@@ -329,7 +329,7 @@ Paper-lab job history. One SQLite database, the same file as the paper book.
 | `409` | `start` while a job is `running` or `paused` (`a lab job is already running`) |
 | `400` | Unknown action, missing id, or the job is not in the state that action expects |
 
-A started job writes `backend/lab_runs/<id>/`. It does not write `backend/artifacts` or `champion_lgbm.txt`. With no in-process frames it records the stored claim and does not download bars. The gate then runs. It does not approve the job.
+A started job looks for daily bars already on disk (price-cache history, the NSE CSV directory, then `ohlcv_panel.csv`). It does not contact Yahoo. When none are there, the job is `rejected` with `no local bars; train not started` and the committed `metrics.json` is not scored. When bars are there, `train_lstm.train_and_save` runs with `LSTM_EPOCHS` and `LAB_SYMBOL_CAP` and writes only under `backend/lab_runs/<id>/`. It does not write `backend/artifacts` or `champion_lgbm.txt`. The gate then runs on that side file. It does not approve the job.
 
 ## `POST /api/lab/jobs/{job_id}/approve`
 

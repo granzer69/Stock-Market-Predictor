@@ -18,6 +18,7 @@ import uuid
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 from app_config import paper_apply_india_costs
 from portfolio import STARTING_CASH
@@ -56,6 +57,13 @@ class LabConflict(Exception):
 
 class LabBadRequest(Exception):
     """The command does not apply to this job."""
+
+
+class TrainNotStarted(Exception):
+    """Start found no daily bars on disk, so the trainer was not called."""
+
+
+NO_LOCAL_BARS = "no local bars; train not started"
 
 
 class JobControl:
@@ -208,6 +216,20 @@ def _as_float_array(values) -> np.ndarray | None:
     return array
 
 
+def _summary_mae(metrics: dict) -> tuple[float, float] | None:
+    """MAE pair written by ``train_and_save`` when the side file has no return series."""
+    if "mae_log_return" not in metrics or "naive_mae_log_return" not in metrics:
+        return None
+    try:
+        model_mae = float(metrics["mae_log_return"])
+        baseline = float(metrics["naive_mae_log_return"])
+    except (TypeError, ValueError):
+        return None
+    if not np.isfinite(model_mae) or not np.isfinite(baseline):
+        return None
+    return model_mae, baseline
+
+
 def verify_metrics(metrics: dict | None) -> tuple[str, str | None, dict]:
     """Recompute naive MAE and lagged momentum. Does not refit."""
     if not metrics:
@@ -243,9 +265,8 @@ def verify_metrics(metrics: dict | None) -> tuple[str, str | None, dict]:
 
     actual = _as_float_array(metrics.get("actual_log_returns"))
     predicted = _as_float_array(metrics.get("predicted_log_returns"))
-    if actual is None or predicted is None or len(actual) != len(predicted):
-        reasons.append("cannot recompute naive MAE")
-    elif claimed == "directional_accuracy":
+    summary_mae = _summary_mae(metrics)
+    if actual is not None and predicted is not None and len(actual) == len(predicted) and claimed == "directional_accuracy":
         score = float(directional_accuracy(actual, predicted))
         recomputed["directional_accuracy"] = score
         claimed_value = metrics.get("claimed_value")
@@ -259,54 +280,153 @@ def verify_metrics(metrics: dict | None) -> tuple[str, str | None, dict]:
             )
         elif not score > 0.5:
             reasons.append(f"directional_accuracy {score:.4f} does not beat the naive baseline 0.5")
-    else:
+    elif actual is not None and predicted is not None and len(actual) == len(predicted):
         model_mae = float(np.mean(np.abs(actual - predicted)))
         baseline = float(naive_mae(actual))
         recomputed["mae_log_return"] = model_mae
         recomputed["naive_mae"] = baseline
         if not model_mae < baseline:
             reasons.append(f"mae_log_return {model_mae:.6f} does not beat naive MAE {baseline:.6f}")
+    elif summary_mae is not None:
+        model_mae, baseline = summary_mae
+        recomputed["mae_log_return"] = model_mae
+        recomputed["naive_mae"] = baseline
+        if not model_mae < baseline:
+            reasons.append(f"mae_log_return {model_mae:.6f} does not beat naive MAE {baseline:.6f}")
+    else:
+        reasons.append("cannot recompute naive MAE")
 
     if reasons:
         return "rejected", "; ".join(reasons), recomputed
     return "verified", None, recomputed
 
 
-def default_trainer(candidate_id: str, side_dir: Path, config: dict, log, control: JobControl) -> None:
-    """Record a side-directory claim. Call ``train_and_save`` only with in-process frames.
+_PERIOD_RANK = {"5y": 0, "2y": 1, "1y": 2, "6mo": 3}
 
-    The default desk start has no frames. It does not download bars and it does
-    not refit the published holdout. ``train_and_save`` is still the entry point
-    when a caller supplies frames, and its ``artifact_dir`` is the side directory.
+
+def disk_bar_sources() -> tuple[Path, Path, Path]:
+    """Cache history, NSE CSV directory, and the local OHLCV panel. No network."""
+    from app_config import nse_csv_dir
+
+    configured = nse_csv_dir().strip()
+    nse_dir = Path(configured) if configured else _BACKEND / "data" / "nse_daily"
+    return (
+        _BACKEND / "cache" / "history",
+        nse_dir,
+        _BACKEND / "data" / "ohlcv_panel.csv",
+    )
+
+
+def _usable_frame(frame: pd.DataFrame | None) -> bool:
+    if frame is None or frame.empty or "Close" not in frame.columns:
+        return False
+    closes = pd.to_numeric(frame["Close"], errors="coerce")
+    return bool(closes.notna().any())
+
+
+def _cache_history_frames(history_dir: Path) -> dict[str, pd.DataFrame]:
+    if not history_dir.is_dir():
+        return {}
+    best: dict[str, tuple[int, Path]] = {}
+    for path in history_dir.glob("*.csv"):
+        if "__" not in path.stem:
+            continue
+        symbol, period = path.stem.rsplit("__", 1)
+        rank = _PERIOD_RANK.get(period, 9)
+        current = best.get(symbol)
+        if current is None or rank < current[0]:
+            best[symbol] = (rank, path)
+    frames: dict[str, pd.DataFrame] = {}
+    for symbol, (_rank, path) in best.items():
+        frame = pd.read_csv(path)
+        if _usable_frame(frame):
+            frames[symbol] = frame
+    return frames
+
+
+def _nse_csv_frames(root: Path) -> dict[str, pd.DataFrame]:
+    if not root.is_dir():
+        return {}
+    from data_providers import LicensedIndiaDailyProvider
+    from universe import NIFTY_50
+
+    symbols = [item.symbol for item in NIFTY_50 if item.kind == "equity"]
+    try:
+        found = LicensedIndiaDailyProvider(root).fetch(symbols, "5y") or {}
+    except FileNotFoundError:
+        return {}
+    return {symbol: frame for symbol, frame in found.items() if _usable_frame(frame)}
+
+
+def _panel_frames(path: Path) -> dict[str, pd.DataFrame]:
+    if not path.is_file():
+        return {}
+    frame = pd.read_csv(path)
+    if "Symbol" not in frame.columns or "Close" not in frame.columns:
+        return {}
+    frames: dict[str, pd.DataFrame] = {}
+    for symbol, group in frame.groupby("Symbol", sort=False):
+        bars = group.reset_index(drop=True)
+        if _usable_frame(bars):
+            frames[str(symbol)] = bars
+    return frames
+
+
+def local_bar_frames(symbol_cap: int) -> dict[str, pd.DataFrame]:
+    """Daily bars already stored on disk, capped. Does not call Yahoo."""
+    if symbol_cap < 1:
+        return {}
+    history_dir, nse_dir, panel_path = disk_bar_sources()
+    found: dict[str, pd.DataFrame] = {}
+    for batch in (
+        _cache_history_frames(history_dir),
+        _nse_csv_frames(nse_dir),
+        _panel_frames(panel_path),
+    ):
+        for symbol, frame in batch.items():
+            if symbol not in found:
+                found[symbol] = frame
+    if not found:
+        return {}
+    from universe import NIFTY_50
+
+    ordered = [item.symbol for item in NIFTY_50 if item.kind == "equity" and item.symbol in found]
+    for symbol in found:
+        if symbol not in ordered:
+            ordered.append(symbol)
+    return {symbol: found[symbol] for symbol in ordered[:symbol_cap]}
+
+
+def default_trainer(candidate_id: str, side_dir: Path, config: dict, log, control: JobControl) -> None:
+    """Train with ``train_and_save`` when disk bars exist. Otherwise refuse.
+
+    ``artifact_dir`` is the job side directory. The committed artifact folder
+    and ``champion_lgbm.txt`` are not written. Yahoo is not contacted.
     """
+    del candidate_id
     assert_side_directory(side_dir)
     if not control.wait_if_paused():
         log("stopped before training")
         return
-    from train_lstm import train_and_save
-
     epochs = int(os.environ.get("LSTM_EPOCHS", "8"))
     try:
-        symbol_cap = max(1, int(os.environ.get("LAB_SYMBOL_CAP", str(config.get("symbol_cap", 2)))))
+        symbol_cap = max(1, int(os.environ.get("LAB_SYMBOL_CAP", str((config or {}).get("symbol_cap", 2)))))
     except (TypeError, ValueError):
         symbol_cap = 2
+    frames = local_bar_frames(symbol_cap)
+    if not frames:
+        raise TrainNotStarted(NO_LOCAL_BARS)
     log(
         f"entry point train_lstm.train_and_save; fixed budget LSTM_EPOCHS={epochs} "
         f"symbol_cap={symbol_cap}; writing {side_dir.name} only"
     )
-    frames = config.get("frames") if isinstance(config, dict) else None
+    from train_lstm import train_and_save
+
     before = protected_snapshot()
-    if frames:
-        capped = dict(list(frames.items())[:symbol_cap])
-        train_and_save(capped, artifact_dir=side_dir)
-        log("train_and_save finished in the side directory")
-    else:
-        log("no in-process frames; train_and_save was not called; Yahoo was not contacted")
-        log("writing the stored claim for an independent check; promotion stays manual")
-        write_metrics_file(side_dir, stored_claim_metrics(candidate_id))
+    train_and_save(frames, artifact_dir=side_dir)
     if protected_snapshot() != before:
         raise RuntimeError("protected artifacts changed")
-    del train_and_save
+    log("train_and_save finished in the side directory")
 
 
 def service_for(db_path: str | Path, runs_dir: str | Path) -> "LabService":
@@ -556,13 +676,19 @@ class LabService:
                     conn.close()
             if row is None or row["status"] == "canceled":
                 return
-            trainer(
-                row["candidate_id"],
-                Path(row["side_dir"]),
-                config,
-                lambda message: self.append_log(job_id, message),
-                control,
-            )
+            try:
+                trainer(
+                    row["candidate_id"],
+                    Path(row["side_dir"]),
+                    config,
+                    lambda message: self.append_log(job_id, message),
+                    control,
+                )
+            except TrainNotStarted as exc:
+                reason = str(exc) or NO_LOCAL_BARS
+                self.append_log(job_id, reason)
+                self._set_status(job_id, "rejected", reason=reason)
+                return
             if self._status(job_id) == "canceled" or control.canceled():
                 self._stop(job_id, control)
                 return
