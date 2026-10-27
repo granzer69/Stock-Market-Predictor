@@ -139,6 +139,29 @@ def build_sequences(feats: np.ndarray, targets: np.ndarray, window: int):
     return np.array(xs), np.array(ys)
 
 
+def momentum_directional_accuracy(closes: np.ndarray, split: int) -> dict:
+    """Directional accuracy of the sign of the previous return.
+
+    The return being graded runs from ``closes[split - 1 + j]`` to
+    ``closes[split + j]``. Momentum is the sign of the return that ended on
+    the prior bar, not the sign of that same move.
+    """
+    closes = np.asarray(closes, dtype=np.float64)
+    actual_next = closes[split:]
+    prev_close = closes[split - 1 : -1]
+    actual_ret = (actual_next - prev_close) / np.where(prev_close == 0, np.nan, prev_close)
+    mom = np.diff(closes)[split - 2 : split - 2 + len(actual_ret)]
+    mask = np.isfinite(mom) & (actual_ret != 0)
+    if np.any(mask):
+        accuracy = float(np.mean(np.sign(mom[mask]) == np.sign(actual_ret[mask])))
+    else:
+        accuracy = 0.5
+    return {
+        "directional_accuracy": round(accuracy, 4),
+        "n_samples": int(len(actual_ret)),
+    }
+
+
 def evaluate_symbol(symbol: str, ohlcv: pd.DataFrame, macro: pd.DataFrame) -> dict:
     feat_df = build_symbol_features(ohlcv, macro)
     feat_df = feat_df.dropna(subset=["target_return", "Close"] + FEATURE_COLUMNS)
@@ -172,21 +195,7 @@ def evaluate_symbol(symbol: str, ohlcv: pd.DataFrame, macro: pd.DataFrame) -> di
     pers_summary["directional_note"] = "Zero-return forecast; ~50% is random-walk expectation."
     results["persistence"] = pers_summary
 
-    mom = np.diff(closes)[split - 1 : split - 1 + len(actual_ret)]
-    results["momentum"] = {
-        "directional_accuracy": round(
-            float(
-                np.mean(
-                    np.sign(mom[np.isfinite(mom) & (actual_ret != 0)])
-                    == np.sign(actual_ret[np.isfinite(mom) & (actual_ret != 0)])
-                )
-            )
-            if np.any(np.isfinite(mom))
-            else 0.5,
-            4,
-        ),
-        "n_samples": int(len(actual_ret)),
-    }
+    results["momentum"] = momentum_directional_accuracy(closes, split)
 
     # MA20
     ma_preds = ma20_pred(closes, slice(split, len(closes)))

@@ -79,7 +79,8 @@ class DeskPredictor:
             "honest_note": ev.get("methodology", {}).get("honest_note"),
         }
 
-    def _champion_payload(self, symbol: str, last_close: float) -> dict | None:
+    def _champion_payload(self, symbol: str, _live_close: float) -> dict | None:
+        """Forecast fields come from predict_symbol. The live quote close is not copied onto them."""
         try:
             inf = self._inference()
             if not inf.champion_available():
@@ -89,15 +90,19 @@ class DeskPredictor:
             return None
         move = float(out["predicted_return"])
         q = out.get("quantiles", {})
+        confidence = out.get("confidence")
         return {
             "predicted_close": float(out["predicted_price"]),
             "predicted_return": move,
             "direction": out.get("direction", "flat"),
             "signal": signal_from_move(move),
-            "confidence": float(out.get("confidence", 0.5)),
+            "confidence": None if confidence is None else float(confidence),
+            "confidence_source": out.get("confidence_source"),
             "interval_p10": (q.get("0.1") or {}).get("price"),
             "interval_p90": (q.get("0.9") or {}).get("price"),
-            "model": out.get("model", "lightgbm"),
+            "as_of": out.get("as_of"),
+            "last_close": out.get("last_close"),
+            "model": out.get("model") or "lightgbm",
         }
 
     def summaries(self, frames: dict[str, pd.DataFrame]) -> dict[str, dict]:
@@ -107,12 +112,11 @@ class DeskPredictor:
                 for symbol, frame in frames.items():
                     if frame is None or frame.empty:
                         continue
-                    last_close = float(frame.iloc[-1]["Close"])
-                    payload = self._champion_payload(symbol, last_close)
+                    payload = self._champion_payload(symbol, float(frame.iloc[-1]["Close"]))
                     if payload:
                         out[symbol] = payload
-                if out:
-                    return out
+                # Champion files exist: a miss stays empty. Do not fill only the misses from the LSTM.
+                return out
         except Exception:  # noqa: BLE001 — fall back to LSTM if champion stack unavailable
             pass
         return self.lstm.summaries(frames)
@@ -122,22 +126,27 @@ class DeskPredictor:
         return self.lstm._predict_scaled(windows)
 
     def detail(self, symbol: str, frame: pd.DataFrame) -> dict | None:
-        payload = None
-        if frame is not None and not frame.empty:
-            payload = self._champion_payload(symbol, float(frame.iloc[-1]["Close"]))
-        if payload:
-            dates = [str(v) for v in frame["Date"].tolist()]
-            return {
-                "symbol": symbol,
-                "as_of": dates[-1],
-                "last_close": float(frame.iloc[-1]["Close"]),
-                "predicted_close": payload["predicted_close"],
-                "predicted_return": payload["predicted_return"],
-                "direction": payload["direction"],
-                "signal": payload["signal"],
-                "confidence": payload["confidence"],
-                "signal_threshold": SIGNAL_THRESHOLD,
-                "comparison": [],
-                "model": self.summary(),
-            }
+        try:
+            if self._inference().champion_available():
+                if frame is None or frame.empty:
+                    return None
+                payload = self._champion_payload(symbol, float(frame.iloc[-1]["Close"]))
+                if not payload:
+                    return None
+                return {
+                    "symbol": symbol,
+                    "as_of": payload["as_of"],
+                    "last_close": payload["last_close"],
+                    "predicted_close": payload["predicted_close"],
+                    "predicted_return": payload["predicted_return"],
+                    "direction": payload["direction"],
+                    "signal": payload["signal"],
+                    "confidence": payload["confidence"],
+                    "confidence_source": payload.get("confidence_source"),
+                    "signal_threshold": SIGNAL_THRESHOLD,
+                    "comparison": [],
+                    "model": payload["model"],
+                }
+        except Exception:  # noqa: BLE001 — champion stack unavailable
+            pass
         return self.lstm.detail(symbol, frame)

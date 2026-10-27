@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { mockBacktest, mockConfig, mockGlobals, mockOrders, mockOverview, mockPortfolio, mockPortfolioBacktest, mockUniverse } from "./mocks"
+import { mockBacktest, mockConfig, mockGlobals, mockHistory, mockOrders, mockOverview, mockPortfolio, mockPortfolioBacktest, mockPredict, mockUniverse } from "./mocks"
 
 async function mockApi(page: import("@playwright/test").Page) {
   await page.route("**/api/**", async (route) => {
@@ -36,6 +36,14 @@ async function mockApi(page: import("@playwright/test").Page) {
       await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockUniverse) })
       return
     }
+    if (path.includes("/api/market/history/")) {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockHistory) })
+      return
+    }
+    if (path.includes("/api/predict/")) {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify(mockPredict) })
+      return
+    }
     await route.fulfill({ status: 404, body: "not mocked" })
   })
 }
@@ -49,6 +57,20 @@ test("home shows Nifty table from mocked overview", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Nifty 50" })).toBeVisible()
   await expect(page.getByRole("link", { name: "RELIANCE" })).toBeVisible()
   await expect(page.getByText(/Production:/i)).toBeVisible()
+  await expect(page.getByRole("button", { name: "LSTM next" })).toHaveCount(0)
+  await expect(page.getByRole("button", { name: "lightgbm next" })).toBeVisible()
+  await expect(page.getByText(/lightgbm forecast bar 2026-10-16/)).toBeVisible()
+  await expect(page.getByText(/Quote session 2026-10-27/)).toBeVisible()
+})
+
+test("symbol page names the lightgbm forecast bar", async ({ page }) => {
+  await page.goto("/stock/RELIANCE")
+  await expect(page.getByRole("heading", { name: "RELIANCE" })).toBeVisible()
+  await expect(page.getByText("one-step LSTM close")).toHaveCount(0)
+  await expect(page.getByText("LSTM next")).toHaveCount(0)
+  await expect(page.getByRole("heading", { name: "Next-session lightgbm forecast" })).toBeVisible()
+  await expect(page.getByText(/Forecast as of 2026-10-16/).first()).toBeVisible()
+  await expect(page.getByText(/Close on 2026-10-27/)).toBeVisible()
 })
 
 test("portfolio page loads paper book", async ({ page }) => {

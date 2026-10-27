@@ -47,6 +47,8 @@ export function StockDesk({ ticker }: { ticker: string }) {
   }, [ticker, period])
 
   const quote = history?.quote
+  const servedModel = typeof prediction?.model === "string" && prediction.model ? prediction.model : null
+  const modelId = servedModel ?? (prediction ? "LSTM" : "Model")
 
   return (
     <div>
@@ -98,13 +100,14 @@ export function StockDesk({ ticker }: { ticker: string }) {
                 <div className="mb-2 flex flex-wrap gap-3 text-[11px] uppercase tracking-wide text-[#8b9bb0]">
                   <span>Candles</span>
                   <span className="text-[#7aa2f7]">SMA 20</span>
-                  <span className="text-[#e3b341]">SMA 50 · LSTM next</span>
+                  <span className="text-[#e3b341]">SMA 50 · {modelId} next</span>
                 </div>
                 <StockChart
                   bars={history.bars}
                   sma20={history.sma20}
                   sma50={history.sma50}
                   predicted={prediction?.predicted_close ?? null}
+                  forecastLabel={modelId}
                 />
               </div>
               <TradeTicket
@@ -116,21 +119,29 @@ export function StockDesk({ ticker }: { ticker: string }) {
             </div>
 
             <section className="mt-4 rounded-lg border border-white/10 bg-[#10151c] p-4">
-              <h2 className="text-sm font-medium">Recent actual close vs one-step LSTM close</h2>
+              <h2 className="text-sm font-medium">
+                {servedModel
+                  ? `Next-session ${servedModel} forecast`
+                  : "Recent actual close vs one-step LSTM close"}
+              </h2>
               <p className="mb-3 text-xs text-[#8b9bb0]">
-                Each gold point is the close the model expected from the prior 60 sessions. It is a check on the fit, not a promise about the next session.
+                {servedModel
+                  ? `${servedModel} scored the panel bar dated ${prediction?.as_of ?? "—"}. The forecast base close is that bar. The quote above is the live session.`
+                  : "Each gold point is the close the model expected from the prior 60 sessions. It is a check on the fit, not a promise about the next session."}
                 {prediction?.confidence != null
-                  ? ` This name's holdout directional hit rate is ${(prediction.confidence * 100).toFixed(0)}%.`
+                  ? prediction.confidence_source
+                    ? ` Pooled holdout directional accuracy is ${(prediction.confidence * 100).toFixed(1)}% (${prediction.confidence_source}).`
+                    : ` This name's holdout directional hit rate is ${(prediction.confidence * 100).toFixed(0)}%.`
                   : ""}
               </p>
               {prediction ? (
-                <ComparisonChart points={prediction.comparison} />
+                <ComparisonChart points={prediction.comparison} seriesName={servedModel ? `${servedModel} close` : "LSTM close"} />
               ) : (
                 <p className="text-sm text-[#8b9bb0]">Prediction series is not available.</p>
               )}
               {prediction && (
                 <p className="mt-2 text-xs text-[#8b9bb0]">
-                  Next session model close {formatInr(prediction.predicted_close)} ({formatPercent(prediction.predicted_return * 100)}), direction {prediction.direction}. Last close {formatNumber(prediction.last_close)}.
+                  Next session {modelId} close {formatInr(prediction.predicted_close)} ({formatPercent(prediction.predicted_return * 100)}), direction {prediction.direction}. Forecast as of {prediction.as_of}, base close {formatNumber(prediction.last_close)}. Quote close on {quote.as_of} is the paper fill.
                 </p>
               )}
             </section>

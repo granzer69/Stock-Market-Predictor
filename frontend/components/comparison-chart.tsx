@@ -3,7 +3,7 @@
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import type { ComparisonPoint } from "@/lib/types"
 
-export function ComparisonChart({ points }: { points: ComparisonPoint[] }) {
+export function ComparisonChart({ points, seriesName = "LSTM close" }: { points: ComparisonPoint[]; seriesName?: string }) {
   if (points.length === 0) return null
   return (
     <div className="h-64">
@@ -18,7 +18,7 @@ export function ComparisonChart({ points }: { points: ComparisonPoint[] }) {
           />
           <Legend />
           <Line type="monotone" dataKey="actual" name="Actual close" stroke="#e7eef7" dot={false} strokeWidth={2} />
-          <Line type="monotone" dataKey="predicted" name="LSTM close" stroke="#e3b341" dot={false} strokeWidth={2} />
+          <Line type="monotone" dataKey="predicted" name={seriesName} stroke="#e3b341" dot={false} strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
     </div>

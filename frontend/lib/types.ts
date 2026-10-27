@@ -4,6 +4,14 @@ export type PredictionSummary = {
   direction: "up" | "down" | "flat"
   signal: "BUY" | "HOLD" | "SELL"
   confidence: number | null
+  /** Id of the model that produced this forecast, when the payload names one. */
+  model?: string
+  /** Panel or history date the forecast was scored on. Not the live quote date. */
+  as_of?: string
+  /** Close of the bar the forecast was scored on. Not the live quote. */
+  last_close?: number
+  /** Where `confidence` was copied from, when it is a published hit rate. */
+  confidence_source?: string | null
 }
 
 export type ModelSummary = {
@@ -91,7 +99,7 @@ export type ComparisonPoint = {
   predicted: number
 }
 
-export type PredictionDetail = PredictionSummary & {
+export type PredictionDetail = Omit<PredictionSummary, "model" | "as_of" | "last_close"> & {
   symbol: string
   ticker: string
   name: string
@@ -99,7 +107,9 @@ export type PredictionDetail = PredictionSummary & {
   last_close: number
   signal_threshold: number
   comparison: ComparisonPoint[]
-  model: ModelSummary | null
+  /** Served model id, or the LSTM summary object on the artifact path. */
+  model: string | ModelSummary | null
+  confidence_source?: string | null
 }
 
 export type Position = {
