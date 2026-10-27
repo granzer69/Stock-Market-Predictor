@@ -52,6 +52,20 @@ test.beforeEach(async ({ page }) => {
   await mockApi(page)
 })
 
+const QUALIFIED_FILE_NOTE =
+  "File's original wording: Metrics are in-sample walk-forward on Yahoo EOD data. They do NOT imply superiority over professional quant models. The report records one chronological split, not a walk-forward."
+
+/** walk-forward may appear only inside the quoted file note. The banner does not get that pass. */
+async function assertNoUnqualifiedWalkForward(page: import("@playwright/test").Page, allowQualifiedNote: boolean) {
+  const visible = await page.locator("body").innerText()
+  let rest = visible
+  if (allowQualifiedNote) {
+    expect(rest).toContain(QUALIFIED_FILE_NOTE)
+    rest = rest.split(QUALIFIED_FILE_NOTE).join("")
+  }
+  expect(rest).not.toMatch(/walk-forward/i)
+}
+
 test("home shows Nifty table from mocked overview", async ({ page }) => {
   await page.goto("/")
   await expect(page.getByRole("heading", { name: "Nifty 50" })).toBeVisible()
@@ -117,15 +131,9 @@ test("evaluation page loads its report from /api/evaluation", async ({ page }) =
   await expect(page.getByText("Pre-fix same-return score: the sign of the return being graded. Not a lagged baseline and not a champion.")).toBeVisible()
   await expect(page.getByText("Walk-forward holdout")).toHaveCount(0)
   await expect(page.getByText("same split for all baselines")).toHaveCount(0)
-  await expect(
-    page.getByText(
-      "File's original wording: Metrics are in-sample walk-forward on Yahoo EOD data. They do NOT imply superiority over professional quant models. The report records one chronological split, not a walk-forward.",
-    ),
-  ).toBeVisible()
-  const visible = await page.locator("body").innerText()
-  if (/walk-forward/i.test(visible)) {
-    expect(visible).toContain("The report records one chronological split, not a walk-forward.")
-  }
+  await expect(page.getByText(QUALIFIED_FILE_NOTE)).toBeVisible()
+  await expect(page.getByText("Metrics come from one chronological split on Yahoo EOD data — not proof of edge vs professional models.")).toBeVisible()
+  await assertNoUnqualifiedWalkForward(page, true)
 })
 
 test("backtest page loads its report from /api/legacy/backtest", async ({ page }) => {
@@ -150,6 +158,8 @@ test("backtest page loads its report from /api/legacy/backtest", async ({ page }
   await page.goto("/backtest")
   expect(new URL((await reportRequest).url()).pathname).toBe("/api/legacy/backtest")
   await expect(page.getByRole("heading", { name: "Paper backtest" })).toBeVisible()
+  await expect(page.getByText("Metrics come from one chronological split on Yahoo EOD data — not proof of edge vs professional models.")).toBeVisible()
+  await assertNoUnqualifiedWalkForward(page, false)
 })
 
 test("header shows product name and disclaimer", async ({ page }) => {
