@@ -49,12 +49,29 @@ export function NiftyTable({ stocks }: { stocks: Quote[] }) {
     setAscending(key === "ticker")
   }
 
+  const modelIds = Array.from(
+    new Set(
+      stocks
+        .map((stock) => stock.prediction?.model)
+        .filter((model): model is string => typeof model === "string" && model.length > 0),
+    ),
+  )
+  const forecastHeader = modelIds.length === 1 ? `${modelIds[0]} next` : "Model next"
+  const forecastDates = Array.from(
+    new Set(stocks.map((stock) => stock.prediction?.as_of).filter((value): value is string => Boolean(value))),
+  )
+  const quoteDates = Array.from(new Set(stocks.map((stock) => stock.as_of).filter(Boolean)))
+
   return (
     <section className="px-4 py-6">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold">Nifty 50</h1>
-          <p className="text-sm text-[#8b9bb0]">{rows.length} names. Last daily close, with the next-session model close.</p>
+          <p className="text-sm text-[#8b9bb0]">
+            {rows.length} names. Last daily close, with the next-session model close.
+            {modelIds.length === 1 ? ` ${modelIds[0]} forecast bar ${forecastDates.length === 1 ? forecastDates[0] : "varies"}.` : ""}
+            {quoteDates.length === 1 ? ` Quote session ${quoteDates[0]}.` : ""}
+          </p>
         </div>
         <input
           value={query}
@@ -72,7 +89,7 @@ export function NiftyTable({ stocks }: { stocks: Quote[] }) {
               <Header label="Last" onClick={() => toggle("price")} align="right" />
               <Header label="Change" onClick={() => toggle("change_percent")} align="right" />
               <th className="px-3 py-2 text-right font-medium">Volume</th>
-              <Header label="LSTM next" onClick={() => toggle("predicted")} align="right" />
+              <Header label={forecastHeader} onClick={() => toggle("predicted")} align="right" />
               <th className="px-3 py-2 text-right font-medium">Move</th>
               <th className="px-3 py-2 text-right font-medium">Signal</th>
             </tr>

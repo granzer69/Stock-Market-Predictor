@@ -59,7 +59,11 @@ Nifty 50 listings with latest quote and batch LSTM summary per symbol.
 | `predicted_return` | number | Fractional move (not percent) |
 | `direction` | string | `up` \| `down` \| `flat` |
 | `signal` | string | `BUY` \| `HOLD` \| `SELL` |
-| `confidence` | number \| null | Holdout directional hit rate |
+| `confidence` | number \| null | When present on a LightGBM hint, the evaluation report's pooled directional accuracy across per-symbol LightGBM fits. Not the saved booster's own holdout and not a per-name rate |
+| `confidence_source` | string \| null | Where `confidence` was copied from. LightGBM desk hints use `evaluation_report.pooled_model_comparison.lightgbm.directional_accuracy` |
+| `model` | string | Id of the model that produced the hint (`lightgbm` when the champion booster ran, `lstm` when that stack cannot run) |
+| `as_of` | string | Date of the bar the forecast was scored on. Not the live quote date |
+| `last_close` | number | Close of that forecast bar. Not the live quote |
 
 **Model summary object** (when present)
 
@@ -173,18 +177,19 @@ Nifty 50 **equity** only.
 
 | Field | Type |
 |-------|------|
-| `as_of` | string |
-| `last_close` | number |
+| `as_of` | string | Forecast bar date from `predict_symbol` when the LightGBM booster ran. Live quote date on the LSTM artifact path |
+| `last_close` | number | Close of that forecast bar. Not overwritten with the live quote when the booster ran |
 | `predicted_close` | number |
 | `predicted_return` | number |
 | `direction` | string |
 | `signal` | string |
-| `confidence` | number \| null |
+| `confidence` | number \| null | Evaluation report's pooled directional accuracy across per-symbol LightGBM fits, when the champion booster ran. Not that booster's own holdout |
+| `confidence_source` | string \| null | Names the report field above when `confidence` is that pooled figure |
 | `signal_threshold` | number |
-| `comparison` | array | `{ date, actual, predicted }` |
-| `model` | object | Model summary (same as overview) |
+| `comparison` | array | `{ date, actual, predicted }`. Empty when the hint is the panel booster |
+| `model` | string | `lightgbm` when the booster ran. `lstm` when that stack cannot run. A name with no panel forecast is a 404, not an LSTM label |
 
-**Errors:** `404` unknown or non-equity; `503` model not trained; `400` insufficient history.
+**Errors:** `404` unknown or non-equity, or `No champion forecast for this symbol` when the booster is up and this name has no panel forecast; `503` model not trained; `400` insufficient history on the LSTM path.
 
 ---
 
@@ -263,3 +268,118 @@ Nifty 50 **equity** only.
 | `503` | No quote for symbol |
 
 Fill price is the latest cached quote `price` (last close), not a live exchange order.
+
+---
+
+## `GET /api/evaluation`
+
+Alias of `GET /evaluation`. The Evaluation page requests this path. The Next document stays at `/evaluation`.
+
+**Response 200:** The committed `evaluation_report.json` plus `disclaimer`. Non-finite numbers in that file are JSON `null`. Metrics are not recomputed. `pooled_model_comparison.momentum.directional_accuracy` stays **1.0** (the pre-fix same-return score). `mape_pct` and `rmse` on that row are `null`. `champion_model` stays the file's value (`arima_111` in this checkout).
+
+`GET /evaluation` returns the same body. `tests/test_api.py` calls that path.
+
+---
+
+## `GET /api/legacy/backtest`
+
+Alias of `GET /backtest`. The Backtest page requests this path. The Next document stays at `/backtest`.
+
+**Query:** `symbol` (required).
+
+**Response 200:** `symbol`, `yahoo_symbol`, `strategy` `long_flat_lightgbm_signal`, `paper_trading_only`, `disclaimer`, `metrics` (the stored per-symbol block), `nifty_buy_hold_benchmark`. Non-finite numbers are JSON `null`. The stored block is not recomputed.
+
+`GET /backtest` returns the same body.
+
+---
+
+## `GET /api/lab/jobs`
+
+Paper-lab job history. One SQLite database, the same file as the paper book.
+
+**Response 200**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `jobs` | array | Newest first. Each job has `id`, `status`, `candidate_id`, `config_hash`, `metrics`, `rejection_reason`, `created_at`, `log_tail` |
+| `approved_job_id` | string or null | Job a person approved. Not set by the gate |
+| `previous_approved_job_id` | string or null | Job `rollback` returns to |
+| `session` | object or null | Latest paper session |
+| `disclaimer` | string | Same paper-trading disclaimer as the other routes |
+
+`status` is `running`, `paused`, `canceled`, `verified`, `rejected`, or `approved`.
+
+## `POST /api/lab/jobs`
+
+**Request body (JSON)**
+
+| Field | Type | Required |
+|-------|------|----------|
+| `action` | string | Yes — `start`, `pause`, `resume`, or `cancel` |
+| `candidate_id` | string | For `start` — `lstm_returns` or `lightgbm` |
+| `job_id` | string | For `pause`, `resume`, and `cancel` |
+| `config` | object | No. `frames` is ignored |
+
+**Response 200:** The job object.
+
+**Errors**
+
+| Status | Condition |
+|--------|-----------|
+| `409` | `start` while a job is `running` or `paused` (`a lab job is already running`) |
+| `400` | Unknown action, missing id, or the job is not in the state that action expects |
+
+A started job looks for daily bars already on disk (price-cache history, the NSE CSV directory, then `ohlcv_panel.csv`). It does not contact Yahoo. When none are there, the job is `rejected` with `no local bars; train not started` and the committed `metrics.json` is not scored. When bars are there, `train_lstm.train_and_save` runs with `LSTM_EPOCHS` and `LAB_SYMBOL_CAP` and writes only under `backend/lab_runs/<id>/`. It does not write `backend/artifacts` or `champion_lgbm.txt`. The gate then runs on that side file. It does not approve the job.
+
+## `POST /api/lab/jobs/{job_id}/approve`
+
+Manual. The job must be `verified`. A `rejected` job returns `409`. Live artifact files are not copied.
+
+**Response 200:** The job object, `status` `approved`.
+
+## `POST /api/lab/jobs/{job_id}/rollback`
+
+Sets the approved id back to `previous_approved_job_id`.
+
+**Response 200:** The `GET /api/lab/jobs` body.
+
+**Errors:** `409` when there is no previous approved job. `400` when `{job_id}` is not the approved job.
+
+## `POST /api/lab/session`
+
+**Request body (JSON)**
+
+| Field | Type | Required |
+|-------|------|----------|
+| `max_names` | integer | No, default 5 |
+| `max_notional` | number | No, default 100000 |
+| `max_daily_loss` | number | No, default 50000 |
+| `apply_india_costs` | boolean | No. Fees apply only when this is true and `PAPER_APPLY_INDIA_COSTS` is already on |
+
+**Response 200:** The session row (`id`, `approved_job_id`, `status`, `halt_reason`, caps, `apply_india_costs`, `created_at`).
+
+**Errors:** `409` when no job is approved, or a session is already `running`.
+
+## `POST /api/lab/session/tick`
+
+One decision per session, symbol, and quote date. Uses `PaperBook.place_order`.
+
+**Request body (JSON)**
+
+| Field | Type | Required |
+|-------|------|----------|
+| `symbol` | string | Yes |
+| `side` | string | Yes — `BUY` or `SELL` |
+| `qty` | integer | Yes |
+| `quote` | object | Yes — `price`, `as_of`, optional `stale` |
+| `forecast_as_of` | string | Yes |
+| `model` | string | No. If set, it must match the approved candidate |
+
+**Response 200:** `order` (the paper fill) and `fill` (`model`, `model_version` job id, `forecast_as_of`, `fill_date`, `quote_date`, `symbol`, `session_id`, `order_id`).
+
+**Errors:** `409` for a stale or missing quote, an unapproved model, a breached cap, a halted session, or a duplicate `(session, symbol, quote_date)`. Those halts store a reason and do not call `place_order`. A duplicate does not halt the session and does not add a second order.
+
+## `GET /api/lab/portfolio`
+
+The same book snapshot as `GET /api/portfolio`, plus `fills` and `session`.
+

@@ -73,8 +73,14 @@ function ModelStrip({ model, count }: { model: ModelSummary | null; count: numbe
           : arimaDir != null
             ? `${(arimaDir * 100).toFixed(1)}% (ARIMA)`
             : "—"}
-        . Legacy LSTM close MAPE ~{baselines?.legacy_lstm_mape_pct ?? "1.39"}% vs persistence{" "}
-        {baselines?.persistence_mape_pct ?? "1.23"}%.
+        {baselines?.legacy_lstm_mape_pct != null || baselines?.persistence_mape_pct != null ? (
+          <>
+            . Legacy LSTM close MAPE
+            {baselines?.legacy_lstm_mape_pct != null ? ` ${baselines.legacy_lstm_mape_pct}%` : ""}
+            {baselines?.persistence_mape_pct != null ? ` vs persistence ${baselines.persistence_mape_pct}%` : ""}
+          </>
+        ) : null}
+        .
         {model.honest_note ? ` ${model.honest_note}` : ""}
       </p>
       <p className="text-xs">

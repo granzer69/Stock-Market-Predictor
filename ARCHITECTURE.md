@@ -1,6 +1,6 @@
 # Architecture — Bharat Desk (as-built)
 
-**Status:** As implemented on branch `cursor/india-lstm-desk-1e7e` (Phase 0 documentation; see [CODEBASE_AUDIT.md](CODEBASE_AUDIT.md)).
+**Status:** Phase 0 as-built. Iteration 1 (forecast provenance) is in [docs/architecture.md](docs/architecture.md). See [CODEBASE_AUDIT.md](CODEBASE_AUDIT.md) for the 2026-10-19 inspection.
 
 ## System context
 
@@ -53,8 +53,8 @@
 1. Client `GET /api/market/overview`.
 2. `get_quotes(Nifty 50)` — memory/disk/ Yahoo `5d`.
 3. `get_histories(Nifty 50, 2y)` — memory/disk/ Yahoo.
-4. `predictor.summaries(histories)` — one LSTM forward per symbol (last window).
-5. Merge quote + metadata + prediction; attach `predictor.summary()` from `metrics.json`.
+4. `predictor.summaries(histories)` — when `champion_lgbm.txt` is present, each hint is `inference.predict_symbol` (LightGBM on the frozen panel). The payload keeps that forecast's `as_of`, base close, and model id `lightgbm`. It does not copy the live bar onto the forecast. If the champion stack is not available, this step is one LSTM forward per symbol on the last window.
+5. Merge quote + metadata + prediction. The quote keeps the live session. `predictor.summary()` is the separate model-summary object (LSTM card metrics plus the evaluation report). Research backtests do not use this hint; they call `DeskPredictor._predict_scaled`.
 
 ### Order flow
 

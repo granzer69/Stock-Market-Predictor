@@ -47,8 +47,50 @@ def load_panel() -> tuple[pd.DataFrame, pd.DataFrame]:
     return _panel, _macro
 
 
+# The booster loaded from champion_lgbm.txt. Not evaluation_report champion_model.
+SERVED_MODEL = "lightgbm"
+CONFIDENCE_SOURCE = "evaluation_report.pooled_model_comparison.lightgbm.directional_accuracy"
+
+
 def champion_available() -> bool:
-    return CHAMPION_LGBM.exists() and ARTIFACTS.exists()
+    """True only when the saved booster can load. A missing import is not a per-symbol miss."""
+    if not CHAMPION_LGBM.exists() or not ARTIFACTS.exists():
+        return False
+    try:
+        import lightgbm  # noqa: F401
+        _load_lgbm()
+    except Exception:  # noqa: BLE001 — stack cannot run; caller uses the LSTM
+        return False
+    return _lgbm is not None
+
+
+def forecast_feature_row(feat: pd.DataFrame) -> pd.Series:
+    """Last bar that has features. The newest close has no realized target_return yet."""
+    usable = feat.dropna(subset=list(FEATURE_COLUMNS) + ["Close"])
+    if len(usable) < 65:
+        raise ValueError("not enough history")
+    return usable.iloc[-1]
+
+
+def _finite_float(value: object) -> float | None:
+    try:
+        number = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    if number != number or number in (float("inf"), float("-inf")):
+        return None
+    return number
+
+
+def served_confidence(report: dict | None) -> tuple[float | None, str | None]:
+    """Pooled LightGBM directional accuracy. Never the momentum or champion_model row."""
+    if not report:
+        return None, None
+    block = (report.get("pooled_model_comparison") or {}).get(SERVED_MODEL) or {}
+    value = _finite_float(block.get("directional_accuracy"))
+    if value is None:
+        return None, None
+    return value, CONFIDENCE_SOURCE
 
 
 def predict_symbol(yahoo_symbol: str) -> dict:
@@ -59,11 +101,7 @@ def predict_symbol(yahoo_symbol: str) -> dict:
         raise ValueError("symbol not in panel")
 
     feat = build_symbol_features(sym, macro.copy())
-    feat = feat.dropna(subset=FEATURE_COLUMNS + ["Close", "target_return"])
-    if len(feat) < 65:
-        raise ValueError("not enough history")
-
-    row = feat.iloc[-1]
+    row = forecast_feature_row(feat)
     close = float(row["Close"])
     X = row[FEATURE_COLUMNS].values.reshape(1, -1)
     scaler = _artifacts["scaler"]
@@ -73,22 +111,19 @@ def predict_symbol(yahoo_symbol: str) -> dict:
     pred_close = close * (1 + pred_ret)
 
     q_models = _artifacts.get("quantile_models", {})
-    import lightgbm as lgb
-
     quantiles = {}
-    for q, model_str in q_models.items():
-        booster = lgb.Booster(model_str=model_str)
-        q_ret = float(booster.predict(Xs)[0])
-        quantiles[q] = {
-            "return": q_ret,
-            "price": close * (1 + q_ret),
-        }
+    if q_models:
+        import lightgbm as lgb
 
-    conf = 0.5
-    if _report and "pooled_model_comparison" in _report:
-        champ = _report.get("champion_model", "lightgbm")
-        comp = _report["pooled_model_comparison"].get(champ, {})
-        conf = float(comp.get("directional_accuracy", 0.5))
+        for q, model_str in q_models.items():
+            booster = lgb.Booster(model_str=model_str)
+            q_ret = float(booster.predict(Xs)[0])
+            quantiles[q] = {
+                "return": q_ret,
+                "price": close * (1 + q_ret),
+            }
+
+    conf, confidence_source = served_confidence(_report)
 
     return {
         "predicted_return": pred_ret,
@@ -96,9 +131,10 @@ def predict_symbol(yahoo_symbol: str) -> dict:
         "direction": "up" if pred_ret > 0 else "down",
         "quantiles": quantiles,
         "confidence": conf,
+        "confidence_source": confidence_source,
         "as_of": str(row["Date"])[:10],
         "last_close": close,
-        "model": _report.get("champion_model", "lightgbm") if _report else "lightgbm",
+        "model": SERVED_MODEL,
     }
 
 

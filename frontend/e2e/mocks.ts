@@ -15,13 +15,17 @@ export const mockStock: Quote = {
   high: 2510,
   low: 2485,
   volume: 1_000_000,
-  as_of: "2026-01-15T00:00:00Z",
+  as_of: "2026-10-27",
   prediction: {
-    predicted_close: 2510,
-    predicted_return: 0.004,
+    predicted_close: 2410,
+    predicted_return: 2410 / 2400 - 1,
     direction: "up",
     signal: "BUY",
-    confidence: 0.487,
+    confidence: 0.4707,
+    confidence_source: "evaluation_report.pooled_model_comparison.lightgbm.directional_accuracy",
+    model: "lightgbm",
+    as_of: "2026-10-16",
+    last_close: 2400,
   },
 }
 
@@ -45,6 +49,50 @@ export const mockOverview = {
       legacy_lstm_mape_pct: 1.39,
     },
   },
+}
+
+export const mockHistory = {
+  symbol: "RELIANCE.NS",
+  ticker: "RELIANCE",
+  name: "Reliance Industries",
+  sector: "Energy",
+  unit: "INR",
+  kind: "equity",
+  period: "1y",
+  quote: {
+    price: 2500,
+    previous_close: 2480,
+    change: 20,
+    change_percent: 0.8,
+    open: 2490,
+    high: 2510,
+    low: 2485,
+    volume: 1_000_000,
+    as_of: "2026-10-27",
+  },
+  bars: [] as { time: string; open: number; high: number; low: number; close: number; volume: number }[],
+  sma20: [] as { time: string; value: number }[],
+  sma50: [] as { time: string; value: number }[],
+}
+
+export const mockPredict = {
+  symbol: "RELIANCE.NS",
+  ticker: "RELIANCE",
+  name: "Reliance Industries",
+  sector: "Energy",
+  unit: "INR",
+  kind: "equity",
+  as_of: "2026-10-16",
+  last_close: 2400,
+  predicted_close: 2410,
+  predicted_return: 2410 / 2400 - 1,
+  direction: "up",
+  signal: "BUY",
+  confidence: 0.4707,
+  confidence_source: "evaluation_report.pooled_model_comparison.lightgbm.directional_accuracy",
+  signal_threshold: 0.003,
+  comparison: [] as { date: string; actual: number; predicted: number }[],
+  model: "lightgbm",
 }
 
 export const mockGlobals = { series: [] as Quote[] }

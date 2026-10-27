@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT))
 
 from ml.backtest import run_long_flat_backtest  # noqa: E402
 from ml.features import FEATURE_COLUMNS, build_symbol_features  # noqa: E402
-from ml.metrics import summarize  # noqa: E402
+from ml.metrics import momentum_directional_accuracy, summarize  # noqa: E402
 
 PANEL_CSV = ROOT / "backend" / "data" / "ohlcv_panel.csv"
 MACRO_CSV = ROOT / "backend" / "data" / "macro_series.csv"
@@ -172,21 +172,7 @@ def evaluate_symbol(symbol: str, ohlcv: pd.DataFrame, macro: pd.DataFrame) -> di
     pers_summary["directional_note"] = "Zero-return forecast; ~50% is random-walk expectation."
     results["persistence"] = pers_summary
 
-    mom = np.diff(closes)[split - 1 : split - 1 + len(actual_ret)]
-    results["momentum"] = {
-        "directional_accuracy": round(
-            float(
-                np.mean(
-                    np.sign(mom[np.isfinite(mom) & (actual_ret != 0)])
-                    == np.sign(actual_ret[np.isfinite(mom) & (actual_ret != 0)])
-                )
-            )
-            if np.any(np.isfinite(mom))
-            else 0.5,
-            4,
-        ),
-        "n_samples": int(len(actual_ret)),
-    }
+    results["momentum"] = momentum_directional_accuracy(closes, split)
 
     # MA20
     ma_preds = ma20_pred(closes, slice(split, len(closes)))

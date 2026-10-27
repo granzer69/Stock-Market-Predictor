@@ -5,6 +5,22 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "summary": "Api Health",
@@ -380,10 +396,65 @@
         }
       }
     },
+    "/api/evaluation": {
+      "get": {
+        "summary": "Evaluation Alias",
+        "description": "Same body as GET /evaluation. The Next page calls this path.",
+        "operationId": "evaluation_alias_api_evaluation_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/backtest": {
       "get": {
         "summary": "Backtest",
         "operationId": "backtest_backtest_get",
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Symbol"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/legacy/backtest": {
+      "get": {
+        "summary": "Legacy Backtest",
+        "description": "Same body as GET /backtest. The Next page calls this path.",
+        "operationId": "legacy_backtest_api_legacy_backtest_get",
         "parameters": [
           {
             "name": "symbol",
@@ -543,6 +614,218 @@
           }
         }
       }
+    },
+    "/api/lab/jobs": {
+      "get": {
+        "summary": "Lab Job List",
+        "operationId": "lab_job_list_api_lab_jobs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Lab Job Command",
+        "operationId": "lab_job_command_api_lab_jobs_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LabCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/jobs/{job_id}/approve": {
+      "post": {
+        "summary": "Lab Job Approve",
+        "operationId": "lab_job_approve_api_lab_jobs__job_id__approve_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/jobs/{job_id}/rollback": {
+      "post": {
+        "summary": "Lab Job Rollback",
+        "operationId": "lab_job_rollback_api_lab_jobs__job_id__rollback_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/session": {
+      "post": {
+        "summary": "Lab Open Session",
+        "operationId": "lab_open_session_api_lab_session_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LabSessionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/session/tick": {
+      "post": {
+        "summary": "Lab Session Tick",
+        "operationId": "lab_session_tick_api_lab_session_tick_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LabTickIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/portfolio": {
+      "get": {
+        "summary": "Lab Portfolio",
+        "operationId": "lab_portfolio_api_lab_portfolio_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -559,6 +842,141 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "LabCommand": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "candidate_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Id"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "title": "LabCommand"
+      },
+      "LabSessionIn": {
+        "properties": {
+          "max_names": {
+            "type": "integer",
+            "maximum": 50.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Max Names",
+            "default": 5
+          },
+          "max_notional": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Notional",
+            "default": 100000
+          },
+          "max_daily_loss": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Daily Loss",
+            "default": 50000
+          },
+          "apply_india_costs": {
+            "type": "boolean",
+            "title": "Apply India Costs",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "LabSessionIn"
+      },
+      "LabTickIn": {
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "title": "Symbol"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          },
+          "qty": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Qty"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
+          "forecast_as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast As Of"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "symbol",
+          "side",
+          "qty"
+        ],
+        "title": "LabTickIn"
       },
       "OrderIn": {
         "properties": {

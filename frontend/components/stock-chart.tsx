@@ -8,9 +8,10 @@ type StockChartProps = {
   sma20: LinePoint[]
   sma50: LinePoint[]
   predicted: number | null
+  forecastLabel?: string
 }
 
-export function StockChart({ bars, sma20, sma50, predicted }: StockChartProps) {
+export function StockChart({ bars, sma20, sma50, predicted, forecastLabel = "LSTM" }: StockChartProps) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -95,7 +96,7 @@ export function StockChart({ bars, sma20, sma50, predicted }: StockChartProps) {
           lineWidth: 2,
           lineStyle: lc.LineStyle.Dashed,
           axisLabelVisible: true,
-          title: "LSTM",
+          title: forecastLabel,
         })
       }
       created.timeScale().fitContent()
@@ -105,7 +106,7 @@ export function StockChart({ bars, sma20, sma50, predicted }: StockChartProps) {
       alive = false
       chart?.remove()
     }
-  }, [bars, sma20, sma50, predicted])
+  }, [bars, sma20, sma50, predicted, forecastLabel])
 
   if (bars.length === 0) {
     return <div className="flex h-[460px] items-center justify-center text-sm text-[#8b9bb0]">No candles for this range.</div>

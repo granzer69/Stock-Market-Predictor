@@ -12,7 +12,7 @@ export default function BacktestPage() {
 
   useEffect(() => {
     setErr(null);
-    apiGet<Record<string, unknown>>(`/backtest?symbol=${encodeURIComponent(symbol)}`)
+    apiGet<Record<string, unknown>>(`/api/legacy/backtest?symbol=${encodeURIComponent(symbol)}`)
       .then(setData)
       .catch((e: unknown) => {
         setErr(
