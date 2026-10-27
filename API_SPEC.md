@@ -59,9 +59,9 @@ Nifty 50 listings with latest quote and batch LSTM summary per symbol.
 | `predicted_return` | number | Fractional move (not percent) |
 | `direction` | string | `up` \| `down` \| `flat` |
 | `signal` | string | `BUY` \| `HOLD` \| `SELL` |
-| `confidence` | number \| null | Holdout directional hit rate of the model that ran, when one is published |
+| `confidence` | number \| null | When present on a LightGBM hint, the evaluation report's pooled directional accuracy across per-symbol LightGBM fits. Not the saved booster's own holdout and not a per-name rate |
 | `confidence_source` | string \| null | Where `confidence` was copied from. LightGBM desk hints use `evaluation_report.pooled_model_comparison.lightgbm.directional_accuracy` |
-| `model` | string | Id of the model that produced the hint (`lightgbm` when the champion booster ran). Absent on the LSTM artifact path |
+| `model` | string | Id of the model that produced the hint (`lightgbm` when the champion booster ran, `lstm` when that stack cannot run) |
 | `as_of` | string | Date of the bar the forecast was scored on. Not the live quote date |
 | `last_close` | number | Close of that forecast bar. Not the live quote |
 
@@ -183,13 +183,13 @@ Nifty 50 **equity** only.
 | `predicted_return` | number |
 | `direction` | string |
 | `signal` | string |
-| `confidence` | number \| null |
-| `confidence_source` | string \| null | Present when `confidence` is the pooled LightGBM hit rate |
+| `confidence` | number \| null | Evaluation report's pooled directional accuracy across per-symbol LightGBM fits, when the champion booster ran. Not that booster's own holdout |
+| `confidence_source` | string \| null | Names the report field above when `confidence` is that pooled figure |
 | `signal_threshold` | number |
 | `comparison` | array | `{ date, actual, predicted }`. Empty when the hint is the panel booster |
-| `model` | string \| object | Served model id (`lightgbm`) when the booster ran. LSTM artifact path still returns the model summary object |
+| `model` | string | `lightgbm` when the booster ran. `lstm` when that stack cannot run. A name with no panel forecast is a 404, not an LSTM label |
 
-**Errors:** `404` unknown or non-equity; `503` model not trained; `400` insufficient history.
+**Errors:** `404` unknown or non-equity, or `No champion forecast for this symbol` when the booster is up and this name has no panel forecast; `503` model not trained; `400` insufficient history on the LSTM path.
 
 ---
 

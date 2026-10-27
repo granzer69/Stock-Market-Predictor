@@ -5,7 +5,6 @@ No Yahoo and no Keras. These checks do not claim that any model beats 0.5.
 
 from __future__ import annotations
 
-import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -21,22 +20,16 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
 from ml.features import FEATURE_COLUMNS  # noqa: E402
+from ml.metrics import momentum_directional_accuracy  # noqa: E402
 
-
-def _run_evaluation():
-    path = ROOT / "scripts" / "run_evaluation.py"
-    spec = importlib.util.spec_from_file_location("run_evaluation_script", path)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+# Same cut evaluate_symbol uses (TRAIN_RATIO in scripts/run_evaluation.py).
+_TRAIN_RATIO = 0.8
 
 
 def test_momentum_baseline_uses_previous_return_sign():
-    evaluation = _run_evaluation()
     closes = np.array([100, 110, 100, 110, 100, 110], dtype=np.float64)
-    split = int(len(closes) * evaluation.TRAIN_RATIO)
-    scored = evaluation.momentum_directional_accuracy(closes, split)
+    split = int(len(closes) * _TRAIN_RATIO)
+    scored = momentum_directional_accuracy(closes, split)
     # Alternating closes: the lagged sign never matches the next return.
     assert scored["directional_accuracy"] == 0
     assert scored["n_samples"] == len(closes) - split
@@ -44,8 +37,8 @@ def test_momentum_baseline_uses_previous_return_sign():
     # A second series where the lagged sign matches once. A constant 0 or the
     # same-bar sign (accuracy 1 on this cut) would not produce 0.5.
     mixed = np.array([100, 110, 100, 110, 120, 110], dtype=np.float64)
-    mixed_split = int(len(mixed) * evaluation.TRAIN_RATIO)
-    mixed_score = evaluation.momentum_directional_accuracy(mixed, mixed_split)
+    mixed_split = int(len(mixed) * _TRAIN_RATIO)
+    mixed_score = momentum_directional_accuracy(mixed, mixed_split)
     assert mixed_score["directional_accuracy"] == 0.5
 
 

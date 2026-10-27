@@ -24,7 +24,7 @@ Status of iteration 1: **in review** until QA. Entries here are the choices in t
 
 ## 2026-10-27 — Momentum baseline is the previous return
 
-**Decision.** `momentum_directional_accuracy` in `scripts/run_evaluation.py` uses the sign of the previous return. The rest of that script is unchanged. The committed report is not regenerated.
+**Decision.** `momentum_directional_accuracy` in `ml/metrics.py` uses the sign of the previous return. `scripts/run_evaluation.py` calls that helper. The rest of that script is unchanged. The committed report is not regenerated.
 
 **Why.** The stored 1.0 is not a usable ranking. Rewriting the report would be a new measurement. This iteration only stops the next run from grading a return against itself.
 

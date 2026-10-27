@@ -44,11 +44,24 @@ No new holdout metric. The tests lock labels, not skill. Commands from this iter
 
 ### Reviewer
 
-Pending QA.
+Pending QA. Independent review verdict: revise. The revise below is in this same iteration.
+
+### Revise
+
+- Momentum scoring lives in `ml/metrics.py`. The unit test imports that module and does not import `scripts/run_evaluation.py`, so CI can run pytest without `statsmodels`.
+- Copy for 0.4707 says it is the evaluation report's pooled directional accuracy across per-symbol LightGBM fits. It is not this saved booster's holdout and not a per-name rate.
+- A universe name with no panel forecast returns 404 `No champion forecast for this symbol`. A single miss stays empty and is not labeled `lstm`. If the champion stack cannot load, hints use the LSTM and `model` is `lstm`.
+- `GET /evaluation` fails on bare `NaN` in `evaluation_report.json`. It does not serve the momentum 1.0 row. That route is still not fixed.
+- An empty champion hint table uses the column header `Model next`, not `LSTM next`.
+
+Commands for this revise, on the same branch, not pushed:
+
+- `python3 -m pytest -q` → **54 passed**, 1 warning (`StarletteDeprecationWarning` from `fastapi.testclient`), 5.17s.
+- Fresh interpreter with `sys.modules["statsmodels"]`, `statsmodels.tsa`, `statsmodels.tsa.arima`, and `statsmodels.tsa.arima.model` set to `None`, then `pytest.main(["-q"])` → **54 passed**, 1 warning, 4.24s. The suite does not import `scripts/run_evaluation.py`. `statsmodels` was not added to `backend/requirements.txt`.
 
 ### Risks
 
-The hint is still the panel bar (last date in this checkout 2026-10-16), not the live close. Confidence is a pooled rate, not a probability for that name. The stored evaluation file still advertises momentum 1.0 until someone re-runs the script, and that re-run is not part of this iteration. `/evaluation` routing is still broken. Empty hints remain for symbols missing from the panel.
+The hint is still the panel bar (last date in this checkout 2026-10-16), not the live close. The 0.4707 figure is the report's pooled per-symbol LightGBM directional accuracy, not a probability for that name and not a score of `champion_lgbm.txt`. The stored evaluation file still contains momentum 1.0 and bare `NaN`; `GET /evaluation` errors on that `NaN` and does not return the row. Empty hints remain for symbols missing from the panel, with an explicit no-forecast error.
 
 ### Decision
 

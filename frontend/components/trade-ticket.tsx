@@ -68,7 +68,7 @@ export function TradeTicket({ ticker, price, asOf, prediction }: TradeTicketProp
             {formatPercent(prediction.predicted_return * 100)}
             {prediction.confidence != null
               ? prediction.confidence_source
-                ? ` · ${modelId ?? "model"} holdout ${(prediction.confidence * 100).toFixed(1)}%`
+                ? ` · evaluation-report pooled directional accuracy ${(prediction.confidence * 100).toFixed(1)}% across per-symbol LightGBM fits`
                 : ` · holdout hit rate ${(prediction.confidence * 100).toFixed(0)}%`
               : ""}
           </div>

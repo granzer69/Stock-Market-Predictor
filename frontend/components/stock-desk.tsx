@@ -130,7 +130,7 @@ export function StockDesk({ ticker }: { ticker: string }) {
                   : "Each gold point is the close the model expected from the prior 60 sessions. It is a check on the fit, not a promise about the next session."}
                 {prediction?.confidence != null
                   ? prediction.confidence_source
-                    ? ` Pooled holdout directional accuracy is ${(prediction.confidence * 100).toFixed(1)}% (${prediction.confidence_source}).`
+                    ? ` Evaluation-report pooled directional accuracy across per-symbol LightGBM fits is ${(prediction.confidence * 100).toFixed(1)}% (${prediction.confidence_source}).`
                     : ` This name's holdout directional hit rate is ${(prediction.confidence * 100).toFixed(0)}%.`
                   : ""}
               </p>

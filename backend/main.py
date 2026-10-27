@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 
 from app_config import cors_origins, default_backtest_fill, paper_db_path, public_config
 from data_providers import provider_fetcher
-from desk_predictor import DeskPredictor
+from desk_predictor import DeskPredictor, ForecastUnavailable
 from http_middleware import RequestContextMiddleware, ResearchRateLimitMiddleware
 from market_data import HISTORY_PERIODS, PriceCache, bars_from_frame, quote_from_frame, sma_series
 from portfolio import PaperBook
@@ -313,7 +313,10 @@ def predict(symbol: str):
     frame = market.get_history(series.symbol, "2y")
     if frame is None:
         raise HTTPException(status_code=404, detail="No history for symbol")
-    detail = predictor.detail(series.symbol, frame)
+    try:
+        detail = predictor.detail(series.symbol, frame)
+    except ForecastUnavailable as exc:
+        raise HTTPException(status_code=404, detail="No champion forecast for this symbol") from exc
     if detail is None:
         raise HTTPException(status_code=400, detail="Not enough history to predict")
     detail.update(series.as_dict())

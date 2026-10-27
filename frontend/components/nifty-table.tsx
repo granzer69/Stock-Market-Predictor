@@ -56,7 +56,7 @@ export function NiftyTable({ stocks }: { stocks: Quote[] }) {
         .filter((model): model is string => typeof model === "string" && model.length > 0),
     ),
   )
-  const forecastHeader = modelIds.length === 1 ? `${modelIds[0]} next` : modelIds.length > 1 ? "Model next" : "LSTM next"
+  const forecastHeader = modelIds.length === 1 ? `${modelIds[0]} next` : "Model next"
   const forecastDates = Array.from(
     new Set(stocks.map((stock) => stock.prediction?.as_of).filter((value): value is string => Boolean(value))),
   )

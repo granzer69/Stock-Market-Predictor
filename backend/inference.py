@@ -53,7 +53,15 @@ CONFIDENCE_SOURCE = "evaluation_report.pooled_model_comparison.lightgbm.directio
 
 
 def champion_available() -> bool:
-    return CHAMPION_LGBM.exists() and ARTIFACTS.exists()
+    """True only when the saved booster can load. A missing import is not a per-symbol miss."""
+    if not CHAMPION_LGBM.exists() or not ARTIFACTS.exists():
+        return False
+    try:
+        import lightgbm  # noqa: F401
+        _load_lgbm()
+    except Exception:  # noqa: BLE001 — stack cannot run; caller uses the LSTM
+        return False
+    return _lgbm is not None
 
 
 def forecast_feature_row(feat: pd.DataFrame) -> pd.Series:

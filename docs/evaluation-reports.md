@@ -39,10 +39,10 @@ Nifty buy-and-hold block in that file: CAGR -0.0876, Sharpe -0.6008, max drawdow
 
 ## Momentum label
 
-`scripts/run_evaluation.py` now scores momentum as the sign of the **previous** return. On an alternating close series that lagged sign does not match the next return (directional accuracy 0). The committed report still says pooled momentum directional accuracy **1.0**, because this iteration does not re-run the script or replace the JSON. A later run would write a different momentum row. Until then, `/evaluation` still serves the file with 1.0.
+`momentum_directional_accuracy` in `ml/metrics.py` (called from `scripts/run_evaluation.py`) scores momentum as the sign of the **previous** return. On an alternating close series that lagged sign does not match the next return (directional accuracy 0). The committed report still says pooled momentum directional accuracy **1.0**, because this iteration does not re-run the script or replace the JSON. A later run would write a different momentum row. `GET /evaluation` does not serve that 1.0 row today: bare `NaN` in the same file makes the handler fail with `ValueError: Out of range float values are not JSON compliant: nan`. This iteration does not fix that route.
 
 ## What a desk hint copies
 
-`inference.predict_symbol` sets `confidence` from the lightgbm row (0.4707 in this file) and sets `confidence_source` to `evaluation_report.pooled_model_comparison.lightgbm.directional_accuracy`. It does not copy 1.0 or 0.5066. `model` on that payload is `lightgbm`.
+`inference.predict_symbol` sets `confidence` from the report's lightgbm row (0.4707 in this file). That figure is the evaluation report's pooled directional accuracy across per-symbol LightGBM fits. It is not the saved `champion_lgbm.txt` booster's own holdout and not a per-name rate. `confidence_source` is `evaluation_report.pooled_model_comparison.lightgbm.directional_accuracy`. The payload does not copy 1.0 or 0.5066. `model` on that payload is `lightgbm`.
 
 Retrain and promotion rules for the LSTM bundle are [RETRAIN_POLICY.md](../RETRAIN_POLICY.md). Response fields are [API_SPEC.md](../API_SPEC.md).
