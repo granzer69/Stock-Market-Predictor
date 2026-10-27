@@ -2,7 +2,7 @@
 
 ## Iteration 1 — forecast identity and the momentum label
 
-**Status:** in review
+**Status:** accepted
 
 ### Problem
 
@@ -44,7 +44,7 @@ No new holdout metric. The tests lock labels, not skill. Commands from this iter
 
 ### Reviewer
 
-Pending QA. Independent review verdict: revise. The revise below is in this same iteration.
+Pending QA. Independent review verdict: revise. The revise below is in this same iteration. Re-review accepted the revise: [hint-provenance-rereview.md](/cursor/stores/bc-255b3324-964c-4a90-bd85-a3cd276fdc5f/internal/hint-provenance-rereview.md).
 
 ### Revise
 
@@ -65,8 +65,55 @@ The hint is still the panel bar (last date in this checkout 2026-10-16), not the
 
 ### Decision
 
-In review. Do not treat this as a model promotion. See [decision-log.md](decision-log.md).
+Accept. The re-review at [hint-provenance-rereview.md](/cursor/stores/bc-255b3324-964c-4a90-bd85-a3cd276fdc5f/internal/hint-provenance-rereview.md) accepted the revise. Do not treat this as a model promotion. See [decision-log.md](decision-log.md).
 
 ### Next
 
 Iteration 2: split the `/evaluation` and `/backtest` documents from the FastAPI routes, without changing this forecast contract. See [engineering-roadmap.md](engineering-roadmap.md) and [known-issues.md](known-issues.md).
+
+## Iteration 2 — Evaluation and Backtest documents
+
+**Status:** in review
+
+### Problem
+
+`/evaluation` and `/backtest` were both Next pages and FastAPI routes. With `API_ORIGIN` set, middleware rewrote the documents to the API. Without it, the pages fetched those same paths and received HTML. `GET /evaluation` also failed strict JSON because `evaluation_report.json` contains bare `NaN`.
+
+### Why
+
+The header links are the screen that shows the stored baselines, including the momentum row iteration 1 left at 1.0. A reader could not open that screen under the documented deploy, and a strict client could not parse the report.
+
+### Baseline
+
+Unchanged files and figures from iteration 1. The evaluation file still has momentum directional accuracy 1.0, `NaN` MAPE and RMSE, and `champion_model` arima_111. Model weights, inference labels, the paper book, and `momentum_directional_accuracy` are not part of this change.
+
+### Summary
+
+- Middleware matches `/api/:path*` only. `/evaluation` and `/backtest` stay on Next when `API_ORIGIN` is set.
+- The Evaluation page fetches `GET /api/evaluation`. The Backtest page fetches `GET /api/legacy/backtest`. FastAPI `GET /evaluation` and `GET /backtest` remain and return the same bodies.
+- The HTTP payloads replace non-finite floats with JSON `null`. The file on disk is not regenerated. Momentum directional accuracy stays 1.0. The page says that row is the pre-fix same-return score, not a lagged baseline and not a champion. `champion_model` stays arima_111.
+
+### Tests
+
+- `backend/tests/test_evaluation_json.py` — `/evaluation` and `/api/evaluation` are equal, contain no `NaN`, keep momentum directional accuracy 1.0 with null MAPE and RMSE, and keep `champion_model` arima_111. The file on disk still contains `NaN`. `/backtest` and `/api/legacy/backtest` match for RELIANCE.
+- `frontend/e2e/smoke.spec.ts` — mocks `GET /api/evaluation` and asserts the heading `Model evaluation`, the momentum annotation, and that the request path is `/api/evaluation`. Existing smoke tests stay.
+
+### Measurements
+
+No new holdout metric. The file on disk was not rewritten. Commands on this branch, not pushed:
+
+- `python3 -m pytest -q` → **56 passed**, 1 warning (`StarletteDeprecationWarning` from `fastapi.testclient`), 4.47s. That run includes `backend/tests/test_evaluation_json.py` and `backend/scripts/export_openapi.py`, which added `GET /api/evaluation` and `GET /api/legacy/backtest` to `openapi.json`.
+- `cd frontend && pnpm test:e2e` → **6 passed** (4.7s). The new case asserts the heading `Model evaluation` and a request to `/api/evaluation`. The five earlier smoke tests passed in the same run.
+- With `API_ORIGIN=http://127.0.0.1:9`, `GET /evaluation` and `GET /backtest` on the Next server returned `text/html` containing `Model evaluation` and `Paper backtest`. `GET /api/market/overview` on that server returned 500, so `/api/*` was still proxied.
+
+### Risks
+
+The disk file still has bare `NaN`. A reader of the raw JSON, outside these routes, still sees it. The 1.0 row is still in the table, with the annotation beside it. The Backtest page still says "10bps cost · 5bps slippage" from the page copy, not from the payload.
+
+### Decision
+
+In review.
+
+### Next
+
+Not scheduled in this iteration. See [engineering-roadmap.md](engineering-roadmap.md).

@@ -25,7 +25,7 @@ export default function EvaluationPage() {
       champion_model?: string
       error?: string
       hint?: string
-    }>("/evaluation")
+    }>("/api/evaluation")
       .then((d) => {
         if (d.error) {
           setErr(d.hint || d.error)
@@ -56,7 +56,7 @@ export default function EvaluationPage() {
         <SiteNav />
         <DisclaimerBanner />
         {err && <p className="text-red-400 mt-4">{err}</p>}
-        {champion && (
+        {champion && champion !== "momentum" && (
           <p className="mt-4 text-green-400">
             Champion (by directional accuracy, then RMSE): <strong>{champion}</strong>
           </p>
@@ -76,7 +76,14 @@ export default function EvaluationPage() {
             <tbody>
               {order.map((name) => (
                 <tr key={name} className="border-t border-gray-800">
-                  <td className="p-2 font-mono">{name}</td>
+                  <td className="p-2 font-mono">
+                    {name}
+                    {name === "momentum" && (
+                      <p className="mt-1 font-sans text-xs text-amber-300">
+                        Pre-fix same-return score: the sign of the return being graded. Not a lagged baseline and not a champion.
+                      </p>
+                    )}
+                  </td>
                   <td className="p-2 text-right">
                     {rows[name].directional_accuracy?.toFixed(4) ?? "—"}
                   </td>

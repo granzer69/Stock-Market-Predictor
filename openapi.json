@@ -396,10 +396,65 @@
         }
       }
     },
+    "/api/evaluation": {
+      "get": {
+        "summary": "Evaluation Alias",
+        "description": "Same body as GET /evaluation. The Next page calls this path.",
+        "operationId": "evaluation_alias_api_evaluation_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/backtest": {
       "get": {
         "summary": "Backtest",
         "operationId": "backtest_backtest_get",
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Symbol"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/legacy/backtest": {
+      "get": {
+        "summary": "Legacy Backtest",
+        "description": "Same body as GET /backtest. The Next page calls this path.",
+        "operationId": "legacy_backtest_api_legacy_backtest_get",
         "parameters": [
           {
             "name": "symbol",

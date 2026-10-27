@@ -39,7 +39,7 @@ Nifty buy-and-hold block in that file: CAGR -0.0876, Sharpe -0.6008, max drawdow
 
 ## Momentum label
 
-`momentum_directional_accuracy` in `ml/metrics.py` (called from `scripts/run_evaluation.py`) scores momentum as the sign of the **previous** return. On an alternating close series that lagged sign does not match the next return (directional accuracy 0). The committed report still says pooled momentum directional accuracy **1.0**, because this iteration does not re-run the script or replace the JSON. A later run would write a different momentum row. `GET /evaluation` does not serve that 1.0 row today: bare `NaN` in the same file makes the handler fail with `ValueError: Out of range float values are not JSON compliant: nan`. This iteration does not fix that route.
+`momentum_directional_accuracy` in `ml/metrics.py` (called from `scripts/run_evaluation.py`) scores momentum as the sign of the **previous** return. On an alternating close series that lagged sign does not match the next return (directional accuracy 0). The committed report still says pooled momentum directional accuracy **1.0**, because this iteration does not re-run the script or replace the JSON. A later run would write a different momentum row. Iteration 2 serves that 1.0 row as strict JSON: bare `NaN` MAPE and RMSE become `null`. The Evaluation page labels the row as the pre-fix same-return score, not a lagged baseline and not a champion. The file on disk still contains `NaN`.
 
 ## What a desk hint copies
 

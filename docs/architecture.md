@@ -34,4 +34,4 @@ Field list: [API_SPEC.md](../API_SPEC.md) (`prediction` summary and `GET /api/pr
 
 ## What this split does not do
 
-A champion miss for one symbol leaves that hint empty. It does not fill the miss from the LSTM. Scoring the live Yahoo bar, lagging US macro features, and aliasing `/evaluation` are later work ([known-issues.md](known-issues.md), [engineering-roadmap.md](engineering-roadmap.md)).
+A champion miss for one symbol leaves that hint empty. It does not fill the miss from the LSTM. Scoring the live Yahoo bar and lagging US macro features are later work. Iteration 2 points the Evaluation and Backtest pages at `/api/evaluation` and `/api/legacy/backtest` ([known-issues.md](known-issues.md), [engineering-roadmap.md](engineering-roadmap.md)).

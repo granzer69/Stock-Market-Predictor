@@ -1,6 +1,6 @@
 # Engineering roadmap
 
-Iteration 1 is the only slice in this change. Later items are recorded so they are not folded into it. Status of iteration 1: **in review**.
+Iteration 1 is accepted. Iteration 2 is in review. Later items stay out of both.
 
 ## Iteration 1 — one named forecast (this change)
 
@@ -13,9 +13,9 @@ Iteration 1 is the only slice in this change. Later items are recorded so they a
 
 Details: [architecture.md](architecture.md), [decision-log.md](decision-log.md), [iteration-log.md](iteration-log.md).
 
-## Next — page versus API for Evaluation and Backtest
+## Iteration 2 — page versus API for Evaluation and Backtest
 
-Keep the FastAPI paths. Serve the Next pages at `/evaluation` and `/backtest`, and point their data fetches at `/api/...` aliases. One Playwright case for the Evaluation heading. Do not start that in the provenance change. See [known-issues.md](known-issues.md).
+In review. FastAPI `GET /evaluation` and `GET /backtest` stay. The Next documents stay on those paths. The pages fetch `GET /api/evaluation` and `GET /api/legacy/backtest`. The evaluation response is strict JSON. See [iteration-log.md](iteration-log.md) and [known-issues.md](known-issues.md).
 
 ## Later, not scheduled here
 

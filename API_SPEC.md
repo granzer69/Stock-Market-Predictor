@@ -268,3 +268,25 @@ Nifty 50 **equity** only.
 | `503` | No quote for symbol |
 
 Fill price is the latest cached quote `price` (last close), not a live exchange order.
+
+---
+
+## `GET /api/evaluation`
+
+Alias of `GET /evaluation`. The Evaluation page requests this path. The Next document stays at `/evaluation`.
+
+**Response 200:** The committed `evaluation_report.json` plus `disclaimer`. Non-finite numbers in that file are JSON `null`. Metrics are not recomputed. `pooled_model_comparison.momentum.directional_accuracy` stays **1.0** (the pre-fix same-return score). `mape_pct` and `rmse` on that row are `null`. `champion_model` stays the file's value (`arima_111` in this checkout).
+
+`GET /evaluation` returns the same body. `tests/test_api.py` calls that path.
+
+---
+
+## `GET /api/legacy/backtest`
+
+Alias of `GET /backtest`. The Backtest page requests this path. The Next document stays at `/backtest`.
+
+**Query:** `symbol` (required).
+
+**Response 200:** `symbol`, `yahoo_symbol`, `strategy` `long_flat_lightgbm_signal`, `paper_trading_only`, `disclaimer`, `metrics` (the stored per-symbol block), `nifty_buy_hold_benchmark`. Non-finite numbers are JSON `null`. The stored block is not recomputed.
+
+`GET /backtest` returns the same body.

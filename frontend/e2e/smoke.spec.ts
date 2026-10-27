@@ -86,6 +86,28 @@ test("research page shows backtest metrics", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Export JSON" })).toBeVisible()
 })
 
+test("evaluation page loads its report from /api/evaluation", async ({ page }) => {
+  await page.route("**/api/evaluation", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        champion_model: "arima_111",
+        methodology: { honest_note: "fixture note" },
+        pooled_model_comparison: {
+          momentum: { directional_accuracy: 1, mape_pct: null, rmse: null, n_symbols: 50 },
+          lightgbm: { directional_accuracy: 0.4707, mape_pct: 1.4153, rmse: 47.4909, n_symbols: 50 },
+        },
+      }),
+    })
+  })
+  const reportRequest = page.waitForRequest((request) => new URL(request.url()).pathname === "/api/evaluation")
+  await page.goto("/evaluation")
+  expect(new URL((await reportRequest).url()).pathname).toBe("/api/evaluation")
+  await expect(page.getByRole("heading", { name: "Model evaluation" })).toBeVisible()
+  await expect(page.getByText("Pre-fix same-return score: the sign of the return being graded. Not a lagged baseline and not a champion.")).toBeVisible()
+  await expect(page.getByText("arima_111")).toBeVisible()
+})
+
 test("header shows product name and disclaimer", async ({ page }) => {
   await page.goto("/")
   await expect(page.getByRole("link", { name: "Bharat Desk" })).toBeVisible()

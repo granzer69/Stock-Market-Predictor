@@ -2,17 +2,15 @@
 
 Left open on purpose in iteration 1. Historical figures cited here are the committed ones in [evaluation-reports.md](evaluation-reports.md).
 
-## Next iteration — `/evaluation` and `/backtest` collide with the pages
+## Evaluation and Backtest documents
 
-`frontend/middleware.ts` rewrites `/evaluation` and `/backtest` to the API when `API_ORIGIN` is set, so the Next pages do not render under the documented Docker and Vercel setup. Locally, without that variable, the page loads and then fetches the same path, which is HTML. Playwright does not open those routes.
+Fixed in iteration 2. `frontend/middleware.ts` proxies `/api/*` only. `/evaluation` and `/backtest` stay on Next when `API_ORIGIN` is set. The pages fetch `GET /api/evaluation` and `GET /api/legacy/backtest`. FastAPI `GET /evaluation` and `GET /backtest` still return the same JSON.
 
-`GET /evaluation` currently fails. `backend/models/evaluation_report.json` contains bare `NaN` for momentum MAPE and RMSE, and FastAPI raises `ValueError: Out of range float values are not JSON compliant: nan` (HTTP 500). The route does not serve the momentum 1.0 row. This iteration does not fix that route. When a later iteration makes the response strict JSON, drop or annotate that momentum row instead of ranking on it.
-
-This iteration does not change that routing.
+`GET /evaluation` and `GET /api/evaluation` replace bare `NaN` with JSON `null`. The file on disk is unchanged. The Evaluation page prints that the momentum row is the pre-fix same-return score, not a lagged baseline and not a champion.
 
 ## The stored momentum row is still 1.0
 
-`scripts/run_evaluation.py` now lags the momentum sign via `momentum_directional_accuracy` in `ml/metrics.py`. `backend/models/evaluation_report.json` still records pooled momentum `directional_accuracy` **1.0** and non-strict `NaN` MAPE, and `champion_model` **arima_111**. The file was not regenerated. `GET /evaluation` does not return that row: the bare `NaN` makes the response fail before any model table is sent.
+`scripts/run_evaluation.py` now lags the momentum sign via `momentum_directional_accuracy` in `ml/metrics.py`. `backend/models/evaluation_report.json` still records pooled momentum `directional_accuracy` **1.0** and non-strict `NaN` MAPE, and `champion_model` **arima_111**. The file was not regenerated. The HTTP response keeps directional accuracy 1.0 and sends `null` for that row's MAPE and RMSE.
 
 ## The hint bar is not the live bar
 

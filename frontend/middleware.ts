@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 
 export const config = {
-  // Desk routes use /api/*; Evaluation/Backtest pages call legacy FastAPI paths.
-  matcher: ["/api/:path*", "/evaluation", "/backtest"],
+  // Documents at /evaluation and /backtest stay on Next.
+  // Those pages fetch /api/evaluation and /api/legacy/backtest, which this matcher proxies.
+  matcher: ["/api/:path*"],
 }
 
 export function middleware(request: NextRequest) {

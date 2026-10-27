@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
 import sys
 from contextlib import asynccontextmanager
@@ -368,15 +369,24 @@ def health():
     return {"status": "ok", "disclaimer": DISCLAIMER, "champion_model": use_champion}
 
 
-@app.get("/evaluation")
-def evaluation():
-    data = _inference_module().get_evaluation()
+def _json_safe(value):
+    """Replace non-finite floats with null. Does not recompute or drop metrics."""
+    if isinstance(value, dict):
+        return {key: _json_safe(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    return value
+
+
+def _evaluation_payload() -> dict:
+    data = _json_safe(_inference_module().get_evaluation())
     data["disclaimer"] = DISCLAIMER
     return data
 
 
-@app.get("/backtest")
-def backtest(symbol: str = Query(...)):
+def _legacy_backtest_payload(symbol: str) -> dict:
     yahoo_symbol, meta = canonicalize(symbol)
     if not EVAL_REPORT.exists():
         raise HTTPException(status_code=503, detail="Evaluation not available.")
@@ -384,15 +394,39 @@ def backtest(symbol: str = Query(...)):
     bt = report.get("per_symbol_backtests", {}).get(yahoo_symbol)
     if not bt:
         raise HTTPException(status_code=404, detail="Backtest not found for symbol.")
-    return {
-        "symbol": meta["symbol"],
-        "yahoo_symbol": yahoo_symbol,
-        "strategy": "long_flat_lightgbm_signal",
-        "paper_trading_only": True,
-        "disclaimer": DISCLAIMER,
-        "metrics": bt,
-        "nifty_buy_hold_benchmark": report.get("nifty_buy_hold_benchmark"),
-    }
+    return _json_safe(
+        {
+            "symbol": meta["symbol"],
+            "yahoo_symbol": yahoo_symbol,
+            "strategy": "long_flat_lightgbm_signal",
+            "paper_trading_only": True,
+            "disclaimer": DISCLAIMER,
+            "metrics": bt,
+            "nifty_buy_hold_benchmark": report.get("nifty_buy_hold_benchmark"),
+        }
+    )
+
+
+@app.get("/evaluation")
+def evaluation():
+    return _evaluation_payload()
+
+
+@app.get("/api/evaluation")
+def evaluation_alias():
+    """Same body as GET /evaluation. The Next page calls this path."""
+    return _evaluation_payload()
+
+
+@app.get("/backtest")
+def backtest(symbol: str = Query(...)):
+    return _legacy_backtest_payload(symbol)
+
+
+@app.get("/api/legacy/backtest")
+def legacy_backtest(symbol: str = Query(...)):
+    """Same body as GET /backtest. The Next page calls this path."""
+    return _legacy_backtest_payload(symbol)
 
 
 @app.get("/symbols")
