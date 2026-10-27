@@ -152,7 +152,7 @@ A matcher change would send the documents back to the API under Docker and Verce
 No new holdout metric. `backend/models/evaluation_report.json` was not edited. Commands on this branch, not pushed:
 
 - `python3 -m pytest -q` → **57 passed**, 1 warning (`StarletteDeprecationWarning` from `fastapi.testclient`), 4.98s. That includes `backend/tests/test_middleware_matcher.py`.
-- `cd frontend && pnpm test:e2e` → **7 passed** (2.5s) after a fresh `pnpm dev` on port 3010. The new case asserts the heading `Paper backtest` and a request to `/api/legacy/backtest`. The Evaluation case asserts the subtitle, the `arima_111` sentence, the single-symbol label, and the momentum annotation. The five earlier smoke tests passed in the same run.
+- `cd frontend && pnpm test:e2e` → **7 passed** (2.5s) after a fresh `pnpm dev` on port 3010. The Backtest case asserts the heading `Paper backtest`. The Evaluation case asserts the subtitle, the `arima_111` sentence, the single-symbol label, the momentum annotation, and the qualified file note. A later run of the same command after quoting `honest_note` was **7 passed** (2.5s). `python3 -m pytest -q` on that pass was **57 passed**, 1 warning, 4.20s.
 
 ### Risks
 
