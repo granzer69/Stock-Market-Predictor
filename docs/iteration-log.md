@@ -73,7 +73,7 @@ Iteration 2: split the `/evaluation` and `/backtest` documents from the FastAPI 
 
 ## Iteration 2 — Evaluation and Backtest documents
 
-**Status:** in review
+**Status:** accepted
 
 ### Problem
 
@@ -109,6 +109,54 @@ No new holdout metric. The file on disk was not rewritten. Commands on this bran
 ### Risks
 
 The disk file still has bare `NaN`. A reader of the raw JSON, outside these routes, still sees it. The 1.0 row is still in the table, with the annotation beside it. The Backtest page still says "10bps cost · 5bps slippage" from the page copy, not from the payload.
+
+### Decision
+
+Accept. Re-review: [route-split-review.md](/cursor/stores/bc-255b3324-964c-4a90-bd85-a3cd276fdc5f/internal/route-split-review.md). That review records two low gaps: no automated middleware-matcher test, and no Playwright coverage of the Backtest page.
+
+### Next
+
+Iteration 3 closes those two gaps and corrects the Evaluation page copy. See [engineering-roadmap.md](engineering-roadmap.md).
+
+## Iteration 3 — matcher guard and evaluation copy
+
+**Status:** in review
+
+### Problem
+
+The route split had no test that fails when `/evaluation` or `/backtest` return to the middleware matcher. Playwright starts without `API_ORIGIN` and mocks `/api/**` in the browser, so that regression would stay green. The Backtest page had no Playwright case. The Evaluation subtitle said "Walk-forward holdout — same split for all baselines", and the champion line treated `arima_111` as the winner while `gru_reliance_sample` has a higher directional accuracy on a single name.
+
+### Why
+
+A matcher change would send the documents back to the API under Docker and Vercel, and the suite would not notice. The subtitle described a procedure the stored rows do not share. `arima_111` is the file's directional-accuracy pick, and its MAPE is 11.8258 against persistence at 1.225. The desk hint is `lightgbm`.
+
+### Baseline
+
+`backend/models/evaluation_report.json` is not edited. Momentum directional accuracy stays 1.0. `champion_model` stays `arima_111`. `production_model` stays `lightgbm`. Inference, model weights, and the paper book stay as they were.
+
+### Summary
+
+- `backend/tests/test_middleware_matcher.py` reads `frontend/middleware.ts` and fails if the matcher array contains `/evaluation` or `/backtest`.
+- Playwright opens `/backtest`, mocks `GET /api/legacy/backtest`, and asserts the heading `Paper backtest`.
+- The Evaluation subtitle is "Stored comparison from the evaluation report. The rows were not all produced by one split."
+- The pick line is "`arima_111` is the stored directional-accuracy pick. The desk hint is `lightgbm`. This row's MAPE is 11.8258, much worse than persistence at 1.225." Those MAPE figures are read from the payload.
+- `gru_reliance_sample` is labeled "Single-symbol sample, not a Nifty-wide champion." The momentum pre-fix annotation stays.
+
+### Tests
+
+- `backend/tests/test_middleware_matcher.py`
+- `frontend/e2e/smoke.spec.ts` — Backtest heading, and the Evaluation sentences above.
+
+### Measurements
+
+No new holdout metric. `backend/models/evaluation_report.json` was not edited. Commands on this branch, not pushed:
+
+- `python3 -m pytest -q` → **57 passed**, 1 warning (`StarletteDeprecationWarning` from `fastapi.testclient`), 4.98s. That includes `backend/tests/test_middleware_matcher.py`.
+- `cd frontend && pnpm test:e2e` → **7 passed** (2.5s) after a fresh `pnpm dev` on port 3010. The new case asserts the heading `Paper backtest` and a request to `/api/legacy/backtest`. The Evaluation case asserts the subtitle, the `arima_111` sentence, the single-symbol label, and the momentum annotation. The five earlier smoke tests passed in the same run.
+
+### Risks
+
+The file's `methodology.honest_note` still contains the words "in-sample walk-forward". The page still prints that note under the subtitle. The Backtest subtitle still says "10bps cost · 5bps slippage" from the page, not from the payload. The disk file still has bare `NaN`.
 
 ### Decision
 

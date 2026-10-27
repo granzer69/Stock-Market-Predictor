@@ -1,6 +1,6 @@
 # Known issues
 
-Left open on purpose in iteration 1. Historical figures cited here are the committed ones in [evaluation-reports.md](evaluation-reports.md).
+The Evaluation and Backtest route split is fixed. Items below are still open. Historical figures cited here are the committed ones in [evaluation-reports.md](evaluation-reports.md).
 
 ## Evaluation and Backtest documents
 

@@ -6,16 +6,22 @@ import { SiteNav } from "@/components/trading/site-nav"
 import { apiGet, ApiError } from "@/lib/api"
 
 type Row = {
-  mape_pct?: number
-  rmse?: number
-  directional_accuracy?: number
-  n_symbols?: number
+  mape_pct?: number | null
+  rmse?: number | null
+  directional_accuracy?: number | null
+  n_symbols?: number | null
+}
+
+function shownMape(value: number | null | undefined): string | null {
+  if (value == null || Number.isNaN(value)) return null
+  return String(value)
 }
 
 export default function EvaluationPage() {
   const [rows, setRows] = useState<Record<string, Row>>({})
   const [note, setNote] = useState("")
   const [champion, setChampion] = useState("")
+  const [deskModel, setDeskModel] = useState("")
   const [err, setErr] = useState<string | null>(null)
 
   useEffect(() => {
@@ -23,6 +29,7 @@ export default function EvaluationPage() {
       pooled_model_comparison?: Record<string, Row>
       methodology?: { honest_note?: string }
       champion_model?: string
+      production_model?: string
       error?: string
       hint?: string
     }>("/api/evaluation")
@@ -34,6 +41,7 @@ export default function EvaluationPage() {
         if (d.pooled_model_comparison) setRows(d.pooled_model_comparison)
         setNote(d.methodology?.honest_note || "")
         setChampion(d.champion_model || "")
+        setDeskModel(d.production_model || "lightgbm")
       })
       .catch((e: unknown) => {
         setErr(
@@ -45,22 +53,26 @@ export default function EvaluationPage() {
   }, [])
 
   const order = Object.keys(rows).sort()
+  const arimaMape = shownMape(rows.arima_111?.mape_pct)
+  const persistenceMape = shownMape(rows.persistence?.mape_pct)
+  const pickLine =
+    champion && champion !== "momentum" && arimaMape && persistenceMape
+      ? `${champion} is the stored directional-accuracy pick. The desk hint is ${deskModel || "lightgbm"}. This row's MAPE is ${arimaMape}, much worse than persistence at ${persistenceMape}.`
+      : ""
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <header className="text-center mb-6">
           <h1 className="text-3xl font-bold text-blue-400">Model evaluation</h1>
-          <p className="text-gray-400 mt-2">Walk-forward holdout — same split for all baselines</p>
+          <p className="text-gray-400 mt-2">
+            Stored comparison from the evaluation report. The rows were not all produced by one split.
+          </p>
         </header>
         <SiteNav />
         <DisclaimerBanner />
         {err && <p className="text-red-400 mt-4">{err}</p>}
-        {champion && champion !== "momentum" && (
-          <p className="mt-4 text-green-400">
-            Champion (by directional accuracy, then RMSE): <strong>{champion}</strong>
-          </p>
-        )}
+        {pickLine && <p className="mt-4 text-gray-300">{pickLine}</p>}
         {note && <p className="mt-4 text-gray-400 text-sm">{note}</p>}
         <div className="overflow-x-auto mt-6">
           <table className="w-full text-sm border border-gray-700">
@@ -81,6 +93,11 @@ export default function EvaluationPage() {
                     {name === "momentum" && (
                       <p className="mt-1 font-sans text-xs text-amber-300">
                         Pre-fix same-return score: the sign of the return being graded. Not a lagged baseline and not a champion.
+                      </p>
+                    )}
+                    {name === "gru_reliance_sample" && (
+                      <p className="mt-1 font-sans text-xs text-amber-300">
+                        Single-symbol sample, not a Nifty-wide champion.
                       </p>
                     )}
                   </td>

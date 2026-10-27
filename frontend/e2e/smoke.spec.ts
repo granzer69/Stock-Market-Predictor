@@ -92,10 +92,14 @@ test("evaluation page loads its report from /api/evaluation", async ({ page }) =
       contentType: "application/json",
       body: JSON.stringify({
         champion_model: "arima_111",
+        production_model: "lightgbm",
         methodology: { honest_note: "fixture note" },
         pooled_model_comparison: {
           momentum: { directional_accuracy: 1, mape_pct: null, rmse: null, n_symbols: 50 },
           lightgbm: { directional_accuracy: 0.4707, mape_pct: 1.4153, rmse: 47.4909, n_symbols: 50 },
+          arima_111: { directional_accuracy: 0.5066, mape_pct: 11.8258, rmse: 332.2357, n_symbols: 50 },
+          persistence: { directional_accuracy: 0, mape_pct: 1.225, rmse: 42.6031, n_symbols: 50 },
+          gru_reliance_sample: { directional_accuracy: 0.5251, mape_pct: 1018.7255, rmse: 0.0531, n_samples: 221 },
         },
       }),
     })
@@ -104,8 +108,36 @@ test("evaluation page loads its report from /api/evaluation", async ({ page }) =
   await page.goto("/evaluation")
   expect(new URL((await reportRequest).url()).pathname).toBe("/api/evaluation")
   await expect(page.getByRole("heading", { name: "Model evaluation" })).toBeVisible()
+  await expect(page.getByText("Stored comparison from the evaluation report. The rows were not all produced by one split.")).toBeVisible()
+  await expect(page.getByText("arima_111 is the stored directional-accuracy pick. The desk hint is lightgbm. This row's MAPE is 11.8258, much worse than persistence at 1.225.")).toBeVisible()
+  await expect(page.getByText("Single-symbol sample, not a Nifty-wide champion.")).toBeVisible()
   await expect(page.getByText("Pre-fix same-return score: the sign of the return being graded. Not a lagged baseline and not a champion.")).toBeVisible()
-  await expect(page.getByText("arima_111")).toBeVisible()
+  await expect(page.getByText("Walk-forward holdout")).toHaveCount(0)
+  await expect(page.getByText("same split for all baselines")).toHaveCount(0)
+})
+
+test("backtest page loads its report from /api/legacy/backtest", async ({ page }) => {
+  await page.route("**/api/legacy/backtest**", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        symbol: "RELIANCE",
+        paper_trading_only: true,
+        metrics: {
+          cagr: -0.1164,
+          buy_hold_cagr: 0.01,
+          sharpe: -0.65,
+          buy_hold_sharpe: 0.2,
+          max_drawdown: -0.2,
+          win_rate: 0.4,
+        },
+      }),
+    })
+  })
+  const reportRequest = page.waitForRequest((request) => new URL(request.url()).pathname === "/api/legacy/backtest")
+  await page.goto("/backtest")
+  expect(new URL((await reportRequest).url()).pathname).toBe("/api/legacy/backtest")
+  await expect(page.getByRole("heading", { name: "Paper backtest" })).toBeVisible()
 })
 
 test("header shows product name and disclaimer", async ({ page }) => {

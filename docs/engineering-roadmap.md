@@ -1,6 +1,6 @@
 # Engineering roadmap
 
-Iteration 1 is accepted. Iteration 2 is in review. Later items stay out of both.
+Iterations 1 and 2 are accepted. Iteration 3 is in review. Later items stay out of these slices.
 
 ## Iteration 1 — one named forecast (this change)
 
@@ -15,7 +15,11 @@ Details: [architecture.md](architecture.md), [decision-log.md](decision-log.md),
 
 ## Iteration 2 — page versus API for Evaluation and Backtest
 
-In review. FastAPI `GET /evaluation` and `GET /backtest` stay. The Next documents stay on those paths. The pages fetch `GET /api/evaluation` and `GET /api/legacy/backtest`. The evaluation response is strict JSON. See [iteration-log.md](iteration-log.md) and [known-issues.md](known-issues.md).
+Accepted. FastAPI `GET /evaluation` and `GET /backtest` stay. The Next documents stay on those paths. The pages fetch `GET /api/evaluation` and `GET /api/legacy/backtest`. The evaluation response is strict JSON. See [iteration-log.md](iteration-log.md).
+
+## Iteration 3 — matcher guard and evaluation copy
+
+In review. A pytest reads the middleware matcher. Playwright opens `/backtest`. The Evaluation subtitle and the `arima_111` line follow the stored report. See [iteration-log.md](iteration-log.md).
 
 ## Later, not scheduled here
 
