@@ -17,6 +17,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+import lab as lab_jobs
 from app_config import cors_origins, default_backtest_fill, paper_db_path, public_config
 from data_providers import provider_fetcher
 from desk_predictor import DeskPredictor, ForecastUnavailable
@@ -538,5 +539,120 @@ def get_realtime_data(symbol: str = Query(...)):
         "previous_close": previous_close,
         "currency": "INR",
         "as_of": str(latest_row["Date"]),
+        "disclaimer": DISCLAIMER,
+    }
+
+
+class LabCommand(BaseModel):
+    action: str
+    candidate_id: str | None = None
+    job_id: str | None = None
+    config: dict | None = None
+
+
+class LabSessionIn(BaseModel):
+    max_names: int = Field(5, gt=0, le=50)
+    max_notional: float = Field(100_000, gt=0)
+    max_daily_loss: float = Field(50_000, gt=0)
+    apply_india_costs: bool = False
+
+
+class LabTickIn(BaseModel):
+    symbol: str
+    side: str
+    qty: int = Field(..., gt=0)
+    quote: dict | None = None
+    forecast_as_of: str | None = None
+    model: str | None = None
+
+
+def desk_lab() -> lab_jobs.LabService:
+    runs = Path(book.path).parent / "lab_runs"
+    return lab_jobs.service_for(book.path, runs)
+
+
+def _lab_call(fn):
+    try:
+        return fn()
+    except lab_jobs.LabConflict as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except lab_jobs.LabBadRequest as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/lab/jobs")
+def lab_job_list():
+    payload = desk_lab().list_jobs()
+    payload["disclaimer"] = DISCLAIMER
+    return payload
+
+
+@app.post("/api/lab/jobs")
+def lab_job_command(body: LabCommand):
+    action = body.action.strip().lower()
+    service = desk_lab()
+
+    def run():
+        if action == "start":
+            if not body.candidate_id:
+                raise lab_jobs.LabBadRequest("candidate_id is required")
+            config = dict(body.config or {})
+            config.pop("frames", None)
+            return service.start(body.candidate_id, config)
+        if not body.job_id:
+            raise lab_jobs.LabBadRequest("job_id is required")
+        if action == "pause":
+            return service.pause(body.job_id)
+        if action == "resume":
+            return service.resume(body.job_id)
+        if action == "cancel":
+            return service.cancel(body.job_id)
+        raise lab_jobs.LabBadRequest("action must be start, pause, resume, or cancel")
+
+    return _lab_call(run)
+
+
+@app.post("/api/lab/jobs/{job_id}/approve")
+def lab_job_approve(job_id: str):
+    return _lab_call(lambda: desk_lab().approve(job_id))
+
+
+@app.post("/api/lab/jobs/{job_id}/rollback")
+def lab_job_rollback(job_id: str):
+    payload = _lab_call(lambda: desk_lab().rollback(job_id))
+    payload["disclaimer"] = DISCLAIMER
+    return payload
+
+
+@app.post("/api/lab/session")
+def lab_open_session(body: LabSessionIn):
+    return _lab_call(
+        lambda: desk_lab().open_session(
+            body.max_names,
+            body.max_notional,
+            body.max_daily_loss,
+            body.apply_india_costs,
+        )
+    )
+
+
+@app.post("/api/lab/session/tick")
+def lab_session_tick(body: LabTickIn):
+    return _lab_call(lambda: desk_lab().tick(body.model_dump(), book))
+
+
+@app.get("/api/lab/portfolio")
+def lab_portfolio():
+    positions = book.positions()
+    quotes = market.get_quotes([row["symbol"] for row in positions]) if positions else {}
+    prices = {symbol: quote["price"] for symbol, quote in quotes.items()}
+    snapshot = book.snapshot(prices)
+    snapshot["positions"] = [_enrich(row) for row in snapshot["positions"]]
+    snapshot["disclaimer"] = DISCLAIMER
+    service = desk_lab()
+    return {
+        "snapshot": snapshot,
+        "fills": service.fills(),
+        "session": service.list_jobs()["session"],
         "disclaimer": DISCLAIMER,
     }

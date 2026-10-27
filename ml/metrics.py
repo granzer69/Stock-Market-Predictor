@@ -60,6 +60,18 @@ def momentum_directional_accuracy(closes: np.ndarray, split: int) -> dict:
     }
 
 
+def naive_mae(actual: np.ndarray) -> float:
+    """MAE of predicting zero.
+
+    This is the same quantity ``train_lstm`` stores as ``naive_mae_log_return``:
+    the mean absolute value of the holdout log returns.
+    """
+    actual = np.asarray(actual, dtype=np.float64)
+    if actual.size == 0:
+        return float("nan")
+    return float(np.mean(np.abs(actual)))
+
+
 def summarize(
     actual: np.ndarray,
     pred: np.ndarray,

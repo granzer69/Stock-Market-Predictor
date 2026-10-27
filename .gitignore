@@ -12,3 +12,4 @@ frontend/.next/
 frontend/.env.local
 backend/cache/
 backend/paper_trading.db
+backend/lab_runs/

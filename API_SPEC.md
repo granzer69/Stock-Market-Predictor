@@ -290,3 +290,96 @@ Alias of `GET /backtest`. The Backtest page requests this path. The Next documen
 **Response 200:** `symbol`, `yahoo_symbol`, `strategy` `long_flat_lightgbm_signal`, `paper_trading_only`, `disclaimer`, `metrics` (the stored per-symbol block), `nifty_buy_hold_benchmark`. Non-finite numbers are JSON `null`. The stored block is not recomputed.
 
 `GET /backtest` returns the same body.
+
+---
+
+## `GET /api/lab/jobs`
+
+Paper-lab job history. One SQLite database, the same file as the paper book.
+
+**Response 200**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `jobs` | array | Newest first. Each job has `id`, `status`, `candidate_id`, `config_hash`, `metrics`, `rejection_reason`, `created_at`, `log_tail` |
+| `approved_job_id` | string or null | Job a person approved. Not set by the gate |
+| `previous_approved_job_id` | string or null | Job `rollback` returns to |
+| `session` | object or null | Latest paper session |
+| `disclaimer` | string | Same paper-trading disclaimer as the other routes |
+
+`status` is `running`, `paused`, `canceled`, `verified`, `rejected`, or `approved`.
+
+## `POST /api/lab/jobs`
+
+**Request body (JSON)**
+
+| Field | Type | Required |
+|-------|------|----------|
+| `action` | string | Yes — `start`, `pause`, `resume`, or `cancel` |
+| `candidate_id` | string | For `start` — `lstm_returns` or `lightgbm` |
+| `job_id` | string | For `pause`, `resume`, and `cancel` |
+| `config` | object | No. `frames` is ignored |
+
+**Response 200:** The job object.
+
+**Errors**
+
+| Status | Condition |
+|--------|-----------|
+| `409` | `start` while a job is `running` or `paused` (`a lab job is already running`) |
+| `400` | Unknown action, missing id, or the job is not in the state that action expects |
+
+A started job writes `backend/lab_runs/<id>/`. It does not write `backend/artifacts` or `champion_lgbm.txt`. With no in-process frames it records the stored claim and does not download bars. The gate then runs. It does not approve the job.
+
+## `POST /api/lab/jobs/{job_id}/approve`
+
+Manual. The job must be `verified`. A `rejected` job returns `409`. Live artifact files are not copied.
+
+**Response 200:** The job object, `status` `approved`.
+
+## `POST /api/lab/jobs/{job_id}/rollback`
+
+Sets the approved id back to `previous_approved_job_id`.
+
+**Response 200:** The `GET /api/lab/jobs` body.
+
+**Errors:** `409` when there is no previous approved job. `400` when `{job_id}` is not the approved job.
+
+## `POST /api/lab/session`
+
+**Request body (JSON)**
+
+| Field | Type | Required |
+|-------|------|----------|
+| `max_names` | integer | No, default 5 |
+| `max_notional` | number | No, default 100000 |
+| `max_daily_loss` | number | No, default 50000 |
+| `apply_india_costs` | boolean | No. Fees apply only when this is true and `PAPER_APPLY_INDIA_COSTS` is already on |
+
+**Response 200:** The session row (`id`, `approved_job_id`, `status`, `halt_reason`, caps, `apply_india_costs`, `created_at`).
+
+**Errors:** `409` when no job is approved, or a session is already `running`.
+
+## `POST /api/lab/session/tick`
+
+One decision per session, symbol, and quote date. Uses `PaperBook.place_order`.
+
+**Request body (JSON)**
+
+| Field | Type | Required |
+|-------|------|----------|
+| `symbol` | string | Yes |
+| `side` | string | Yes — `BUY` or `SELL` |
+| `qty` | integer | Yes |
+| `quote` | object | Yes — `price`, `as_of`, optional `stale` |
+| `forecast_as_of` | string | Yes |
+| `model` | string | No. If set, it must match the approved candidate |
+
+**Response 200:** `order` (the paper fill) and `fill` (`model`, `model_version` job id, `forecast_as_of`, `fill_date`, `quote_date`, `symbol`, `session_id`, `order_id`).
+
+**Errors:** `409` for a stale or missing quote, an unapproved model, a breached cap, a halted session, or a duplicate `(session, symbol, quote_date)`. Those halts store a reason and do not call `place_order`. A duplicate does not halt the session and does not add a second order.
+
+## `GET /api/lab/portfolio`
+
+The same book snapshot as `GET /api/portfolio`, plus `fills` and `session`.
+

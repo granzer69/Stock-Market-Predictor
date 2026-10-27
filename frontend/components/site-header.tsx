@@ -10,6 +10,7 @@ import { MarketTape } from "@/components/market-tape"
 const links = [
   { href: "/", label: "Markets" },
   { href: "/portfolio", label: "Portfolio" },
+  { href: "/lab", label: "Lab" },
   { href: "/research", label: "Research" },
   { href: "/evaluation", label: "Evaluation" },
   { href: "/backtest", label: "Backtest" },

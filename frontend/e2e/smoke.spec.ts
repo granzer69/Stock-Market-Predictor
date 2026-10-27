@@ -162,6 +162,57 @@ test("backtest page loads its report from /api/legacy/backtest", async ({ page }
   await assertNoUnqualifiedWalkForward(page, false)
 })
 
+test("lab page shows a mocked rejected job", async ({ page }) => {
+  await page.route("**/api/lab/**", async (route) => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith("/api/lab/portfolio")) {
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          snapshot: {
+            equity: 1000000,
+            cash: 1000000,
+            starting_cash: 1000000,
+            realized_pnl: 0,
+            unrealized_pnl: 0,
+            market_value: 0,
+            positions: [],
+            equity_curve: [],
+          },
+          fills: [],
+          session: null,
+        }),
+      })
+      return
+    }
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        jobs: [
+          {
+            id: "job-1",
+            status: "rejected",
+            candidate_id: "lstm_returns",
+            config_hash: "abc",
+            metrics: null,
+            rejection_reason: "mae_log_return 0.012052 does not beat naive MAE 0.011988",
+            created_at: "2026-10-27T00:00:00+00:00",
+            log_tail: "gate rejected: mae_log_return 0.012052 does not beat naive MAE 0.011988",
+          },
+        ],
+        approved_job_id: null,
+        previous_approved_job_id: null,
+        session: null,
+      }),
+    })
+  })
+  await page.goto("/lab")
+  await expect(page.getByRole("heading", { name: "Paper lab" })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Lab" })).toBeVisible()
+  await expect(page.getByText("mae_log_return 0.012052 does not beat naive MAE 0.011988", { exact: true })).toBeVisible()
+  await expect(page.getByRole("button", { name: "Start" })).toBeVisible()
+})
+
 test("header shows product name and disclaimer", async ({ page }) => {
   await page.goto("/")
   await expect(page.getByRole("link", { name: "Bharat Desk" })).toBeVisible()

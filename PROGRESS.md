@@ -1,5 +1,23 @@
 # Progress log
 
+## 2026-10-27 — Paper lab
+
+**Branch:** `cursor/forecast-provenance-3fcb`
+
+### Delivered
+
+- `/lab` and `GET/POST /api/lab/jobs` with start, pause, resume, cancel, and a 409 when a job is already active
+- Independent gate (naive MAE, lagged momentum) with manual approve and rollback
+- Paper session on `PaperBook.place_order` with caps, dedupe, and fill attribution
+- Lab stays local. No deploy.
+
+### Verification
+
+- `python3 -m pytest -q` → **65 passed**
+- `pnpm test:e2e` → **8 passed**
+
+---
+
 ## 2026-10-19 — Phase 7 complete
 
 **Branch:** `cursor/india-lstm-desk-1e7e`

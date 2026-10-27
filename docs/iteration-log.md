@@ -166,3 +166,62 @@ Accept. Scoreboard review: [scoreboard-copy-review.md](/cursor/stores/bc-255b332
 ### Next
 
 Not scheduled in this iteration. See [engineering-roadmap.md](engineering-roadmap.md).
+
+## Iteration 4 — Paper lab
+
+**Status:** in review
+
+### Problem
+
+The desk can show a forecast and fill a paper order, but it cannot run a candidate beside the live artifacts, reject a weak one, and record which model a paper fill used. The stored returns LSTM loses to predict-zero (MAE 0.012052 vs naive 0.011988). The stored LightGBM directional accuracy is 0.4707. The stored momentum row is 1.0 because it scores the same return. None of those should be promoted.
+
+### Why
+
+A training button that overwrites `backend/artifacts` or `champion_lgbm.txt` would mix a new fit into the hint the desk already serves. An automatic promote would put a model that loses to a naive baseline onto the paper book. The fill and the forecast bar are different dates, so the blotter has to keep both.
+
+### Baseline
+
+Unchanged published numbers. This iteration does not refit them.
+
+- Returns LSTM (`backend/artifacts/metrics.json`, 2026-10-19T06:34:07.092506+00:00): MAE 0.012051809898621074, naive MAE 0.011987893123182505.
+- Evaluation report (2026-10-18T19:29:57.174939+00:00): lightgbm directional accuracy 0.4707. Momentum directional accuracy 1.0 is the pre-fix same-return score.
+
+### Summary
+
+- `/lab` is linked from the desk header. `GET/POST /api/lab/jobs` starts, pauses, resumes, and cancels. A second start while a job is running or paused returns 409. The job log is polled.
+- The side directory is `backend/lab_runs/<id>/` (or next to the test database). The runner refuses `backend/artifacts` and `champion_lgbm.txt`. `train_lstm.train_and_save` is the entry point only when frames are already in memory, with `LSTM_EPOCHS` and `LAB_SYMBOL_CAP`. A desk start has no frames, so it does not download bars and does not refit. It writes the stored claim into the side directory.
+- The gate reads that file and recomputes naive MAE with `naive_mae` and lagged momentum with `momentum_directional_accuracy`, both in `ml/metrics.py`. It does not refit. It rejects a missing file, a holdout that is not a tail split, momentum directional accuracy 1.0 on the same return, an LSTM MAE that does not beat predict-zero, and a directional accuracy that does not beat 0.5. Approve is manual. Rollback points the approved id at the previous job. Nothing is copied into the live hint path.
+- A paper session reuses `PaperBook.place_order`. Caps are max names, max notional, and max daily loss. The India fee schedule applies only when it is already on. One decision per session, symbol, and quote date. A stale or missing quote, an unapproved model, or a breached cap writes no order, halts the session, and stores the reason. Each fill stores `model`, `model_version` (job id), `forecast_as_of`, and `fill_date`. `GET /api/lab/portfolio` is the portfolio snapshot plus those fields.
+- One active job, `LAB_MAX_RUNTIME_SECONDS` (default 180), and no automatic promotion. No Redis, Celery, broker client, or live-trading toggle.
+
+### Tests
+
+- `backend/tests/test_lab.py` — second start returns 409; the published LSTM claim is rejected and cannot be approved; the published LightGBM claim and a same-return momentum score of 1.0 are rejected; a stale quote writes no order; two ticks on one quote date produce one fill; rollback restores the previous job; the side directory does not change live artifacts; lab source does not name a broker SDK, a broker secret, Redis, or Celery.
+- `frontend/e2e/smoke.spec.ts` — `/lab` renders a mocked rejected job and the Start control.
+
+### Measurements
+
+No new holdout metric. `backend/artifacts` and `backend/models/evaluation_report.json` were not edited. Commands on this branch, not pushed:
+
+- `python3 -m pytest -q` → **65 passed**, 1 warning (`StarletteDeprecationWarning` from `fastapi.testclient`), 5.25s.
+- `cd frontend && pnpm test:e2e` → **8 passed** (9.9s). The new case is `lab page shows a mocked rejected job`.
+
+The gate rejects:
+
+- `mae_log_return 0.012052 does not beat naive MAE 0.011988`
+- `directional_accuracy 0.4707 does not beat the naive baseline 0.5`
+- `momentum directional accuracy is 1.0 on the same return`
+- `metrics file missing`
+- `holdout is not a tail split`
+
+### Risks
+
+Desk Start does not call `train_and_save` unless frames are already in the process. That avoids a Yahoo download and a refit of the published holdout. A passing synthetic series can be approved by hand; the published claims cannot. The Markets strip still shows the file's raw `honest_note`. The Backtest subtitle still says "10bps". The lab database is the paper-book SQLite file. This checkout was not deployed: no host here keeps that file outside the machine.
+
+### Decision
+
+In review.
+
+### Next
+
+Leave the lab local until `GET /api/health` and `GET /api/lab/jobs` both succeed on a host that persists the SQLite file.
