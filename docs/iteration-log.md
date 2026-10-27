@@ -120,7 +120,7 @@ Iteration 3 closes those two gaps and corrects the Evaluation page copy. See [en
 
 ## Iteration 3 — matcher guard and evaluation copy
 
-**Status:** in review
+**Status:** accepted
 
 ### Problem
 
@@ -161,7 +161,7 @@ The file's `methodology.honest_note` still contains the words "in-sample walk-fo
 
 ### Decision
 
-In review.
+Accept. Scoreboard review: [scoreboard-copy-review.md](/cursor/stores/bc-255b3324-964c-4a90-bd85-a3cd276fdc5f/internal/scoreboard-copy-review.md). Banner re-check: [banner-wording-review.md](/cursor/stores/bc-255b3324-964c-4a90-bd85-a3cd276fdc5f/internal/banner-wording-review.md).
 
 ### Next
 
