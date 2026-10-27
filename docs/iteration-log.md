@@ -153,6 +153,7 @@ No new holdout metric. `backend/models/evaluation_report.json` was not edited. C
 
 - `python3 -m pytest -q` → **57 passed**, 1 warning (`StarletteDeprecationWarning` from `fastapi.testclient`), 4.98s. That includes `backend/tests/test_middleware_matcher.py`.
 - `cd frontend && pnpm test:e2e` → **7 passed** (2.5s) after a fresh `pnpm dev` on port 3010. The Backtest case asserts the heading `Paper backtest`. The Evaluation case asserts the subtitle, the `arima_111` sentence, the single-symbol label, the momentum annotation, and the qualified file note. A later run of the same command after quoting `honest_note` was **7 passed** (2.5s). `python3 -m pytest -q` on that pass was **57 passed**, 1 warning, 4.20s.
+- Banner revise: the shared disclaimer no longer calls the metrics a walk-forward. `python3 -m pytest -q` → **57 passed**, 1 warning, 4.24s. `cd frontend && pnpm test:e2e` → **7 passed** (2.5s). An unqualified `walk-forward` on `/evaluation` outside the quoted file note, or anywhere on `/backtest`, fails that run.
 
 ### Risks
 
